@@ -1,0 +1,358 @@
+{
+    "_reference": {
+        "File Description": "This object serves as a reference to understand the structure of this file, which contains variable codes from the American Community Survey API",
+        "Schema Key": {
+            "Category Name": {
+                "subcategory Name": {
+                        "Variables": {
+                            "Variable Name": {
+                                "variableCode": "Variable Code",
+                                "transformationType": "Transformation Type",
+                                "baseCode": "Base Variable Code",
+                                "baseLabel": "Base Variable Label"
+                            }
+                        }
+                    }
+                }
+            },
+        "Transformation Types": {
+            "none": "No transformation applied. Raw values from the dataset are used.",
+            "percentage": "The value is transformed into a percentage of the base value indicated.",
+            "ratePerThousand": "The value is transformed into a rate per thousand of the base value.",
+            "sumPercentage": "Specific categories are summed together before calculating the percentage of the base value."
+        }
+    },
+    "Demographics": {
+        "Age and Gender": {
+            "variables": {
+                "Total Population": {
+                    "variableCode": "B01001_001E",
+                    "transformationType": null,
+                    "baseCode": "none",
+                    "baseLabel": "none"
+                },
+                "Male Population": {
+                    "variableCode": "B01001_002E",
+                    "transformationType": "percentage",
+                    "baseCode": "B01001_001E",
+                    "baseLabel": "Total Population"
+                },
+                "Female Population": {
+                    "variableCode": "B01001_026E",
+                    "transformationType": "percentage",
+                    "baseCode": "B01001_001E",
+                    "baseLabel": "Total Population"
+                }
+            }
+        },
+        "Race and Ethnicity": {
+            "variables": {
+                "White Alone": {
+                    "variableCode": "B02001_002E",
+                    "transformationType": "percentage",
+                    "baseCode": "B01001_001E",
+                    "baseLabel": "Total Population"
+                },
+                "Black or African American Alone": {
+                    "variableCode": "B02001_003E",
+                    "transformationType": "percentage",
+                    "baseCode": "B01001_001E",
+                    "baseLabel": "Total Population"
+                },
+                "Hispanic or Latino": {
+                    "variableCode": "B03001_003E",
+                    "transformationType": "percentage",
+                    "baseCode": "B01001_001E",
+                    "baseLabel": "Total Population"
+                }
+            }
+        },
+        "Household Types": {
+            "variables": {
+                "Family Households": {
+                    "variableCode": "B11001_002E",
+                    "transformationType": "percentage",
+                    "baseCode": "B11001_001E",
+                    "baseLabel": "Total Households"
+                },
+                "Non-family Households": {
+                    "variableCode": "B11001_007E",
+                    "transformationType": "percentage",
+                    "baseCode": "B11001_001E",
+                    "baseLabel": "Total Households"
+                }
+            }
+        },
+        "Language Spoken At Home": {
+            "variables": {
+                "English Only": { 
+                    "variableCode": "C16001_002E", 
+                    "transformationType": "percentage", 
+                    "baseCode": "B01001_001E", 
+                    "baseLabel": "Total Population"
+                },
+                "Spanish": { 
+                    "variableCode": "C16001_003E", 
+                    "transformationType": "percentage", 
+                    "baseCode": "B01001_001E", 
+                    "baseLabel": "Total Population"
+                },
+                "Other Languages": { 
+                    "variableCode": "C16001_004E", 
+                    "transformationType": "percentage", 
+                    "baseCode": "B01001_001E", 
+                    "baseLabel": "Total Population"
+                }
+            }
+        },
+        "Veterans Status": {
+            "variables": {
+                "Total Veterans": { 
+                    "variableCode": "B21001_001E", 
+                    "transformationType": "ratePerThousand", 
+                    "baseCode": "B01001_001E", 
+                    "baseLabel": "Total Population"
+                }
+            }
+        }
+    },
+    "Economics": {
+        "Income": {
+            "variables": {
+                "Median Household Income": {
+                    "variableCode": "B19013_001E",
+                    "transformationType": null,
+                    "baseCode": null,
+                    "baseLabel": null
+                },
+                "Per Capita Income": {
+                    "variableCode": "B19301_001E",
+                    "transformationType": null,
+                    "baseCode": null,
+                    "baseLabel": null
+                }
+            }
+        },
+        "Poverty": {
+            "variables": {
+                "Individuals Below Poverty Level": {
+                    "variableCode": "B17001_002E",
+                    "transformationType": "percentage",
+                    "baseCode": "B01001_001E",
+                    "baseLabel": "Total Population"
+                }
+            }
+        },
+        "Employment": {
+            "variables": {
+                "Labor Force Participation": {
+                    "variableCode": "B23001_001E",
+                    "transformationType": "ratePerThousand",
+                    "baseCode": "B01001_001E",
+                    "baseLabel": "Total Population"
+                },
+                "Unemployment Rate": {
+                    "variableCode": "B23025_005E",
+                    "transformationType": "percentage",
+                    "baseCode": "B23025_002E",
+                    "baseLabel": "Labor Force"
+                }
+            }
+        },
+        "Industry and Occupation": {
+            "variables": {
+                "Agriculture, Forestry, Fishing": {
+                    "variableCode": "B24020_003E",
+                    "transformationType": "percentage",
+                    "baseCode": "B23001_001E",
+                    "baseLabel": "Labor Force Population"
+                },
+                "Education, Health Care, Social Assistance": {
+                    "variableCode": "B24020_019E",
+                    "transformationType": "percentage",
+                    "baseCode": "B23001_001E",
+                    "baseLabel": "Labor Force Population"
+                },
+                "Professional, Scientific, Management": {
+                    "variableCode": "B24020_015E",
+                    "transformationType": "percentage",
+                    "baseCode": "B23001_001E",
+                    "baseLabel": "Labor Force Population"
+                }
+            }
+        }
+    },
+    "Education": {
+        "Educational Attainment": {
+            "variables": {
+                "Less Than High School": {
+                    "variableCode": [
+                        "B15003_002E", "B15003_003E", "B15003_004E", "B15003_005E",
+                    "B15003_006E", "B15003_007E", "B15003_008E", "B15003_009E",
+                    "B15003_010E", "B15003_011E", "B15003_012E", "B15003_013E",
+                    "B15003_014E", "B15003_015E", "B15003_016E"
+                    ],
+                    "transformationType": "sumPercentage",
+                    "baseCode": "B01001_001E",
+                    "baseLabel": "Total Population"
+                },
+                "High School Graduate": {
+                    "variableCode": "B15003_017E",
+                    "transformationType": "percentage",
+                    "baseCode": "B01001_001E",
+                    "baseLabel": "Total Population"
+                },
+                "Bachelor's or Higher": {
+                    "variableCode": [
+                        "B15003_022E", "B15003_023E", "B15003_024E", "B15003_025E"
+                    ],
+                    "transformationType": "sumPercentage",
+                    "baseCode": "B01001_001E",
+                    "baseLabel": "Total Population"
+                }
+            }
+        },
+        "School Enrollment": {
+            "variables": {
+                "Nursery to Grade 4": {
+                    "variableCode": [
+                        "B14001_003E", "B14001_004E", "B14001_005E"
+                    ],
+                    "transformationType": "sumPercentage",
+                    "baseCode": "B01001_001E",
+                    "baseLabel": "Total Population"
+                },
+                "Grades 5 to 12": {
+                    "variableCode": [
+                        "B14001_006E", "B14001_007E", "B14001_008E"
+                    ],
+                    "transformationType": "sumPercentage",
+                    "baseCode": "B01001_001E",
+                    "baseLabel": "Total Population"
+                },
+                "College or Graduate School": {
+                    "variableCode": [
+                        "B14001_009E", "B14001_010E"
+                    ],
+                    "transformationType": "sumPercentage",
+                    "baseCode": "B01001_001E",
+                    "baseLabel": "Total Population"
+                }
+            }
+        }
+    },
+    "Housing": {
+        "Ownership and Rent": {
+            "variables": {
+                "Owner-Occupied Units": {
+                    "variableCode": "B25003_002E",
+                    "transformationType": "percentage",
+                    "baseCode": "B25003_001E",
+                    "baseLabel": "Total Housing Units"
+                },
+                "Renter-Occupied Units": {
+                    "variableCode": "B25003_003E",
+                    "transformationType": "percentage",
+                    "baseCode": "B25003_001E",
+                    "baseLabel": "Total Housing Units"
+                }
+            }
+        },
+        "Housing Affordability and Costs": {
+            "variables": {
+                "Median Value of Owner-Occupied Housing Units": {
+                    "variableCode": "B25077_001E",
+                    "transformationType": null,
+                    "baseCode": "none",
+                    "baseLabel": "none"
+                },
+                "Median Gross Rent": {
+                    "variableCode": "B25064_001E",
+                    "transformationType": null,
+                    "baseCode": "none",
+                    "baseLabel": "none"
+                }
+            }
+        }
+    },
+    "Health": {
+        "Insurance Coverage": {
+            "variables": {
+                "With Health Insurance": {
+                    "variableCode": "B27001_004E",
+                    "transformationType": "percentage",
+                    "baseCode": "B01001_001E",
+                    "baseLabel": "Total Population"
+                },
+                "Without Health Insurance": {
+                    "variableCode": "B27001_005E",
+                    "transformationType": "percentage",
+                    "baseCode": "B01001_001E",
+                    "baseLabel": "Total Population"
+                }
+            }
+        },
+        "Disability": {
+            "variables": {
+                "With a Disability": {
+                    "variableCode": "B18101_004E",
+                    "transformationType": "percentage",
+                    "baseCode": "B01001_001E",
+                    "baseLabel": "Total Civilian Non-institutionalized Population"
+                }
+            }
+        }
+    },
+    "Transportation": {
+        "Commuting Patterns": {
+            "variables": {
+                "Workers Who Commute by Car, Truck, or Van": {
+                    "variableCode": "B08006_002E",
+                    "transformationType": "percentage",
+                    "baseCode": "B08006_001E",
+                    "baseLabel": "Total Workers Commuting"
+                },
+                "Public Transportation (excluding taxicab)": {
+                    "variableCode": "B08006_008E",
+                    "transformationType": "percentage",
+                    "baseCode": "B08006_001E",
+                    "baseLabel": "Total Workers Commuting"
+                }
+            }
+        }
+    },
+    "Public Assistance": {
+        "Program Participation": {
+            "variables": {
+                "Households Receiving Food Stamps/SNAP": {
+                    "variableCode": "B22010_002E",
+                    "transformationType": "percentage",
+                    "baseCode": "B11001_001E",
+                    "baseLabel": "Total Households"
+                }
+            }
+        }
+    },
+    "Entrepreneurship": {
+        "Business Ownership": {
+            "variables": {
+                "Self-Employed in Own Not Incorporated Business Workers": {
+                    "variableCode": "B24080_004E",
+                    "transformationType": "percentage",
+                    "baseCode": "B24080_001E",
+                    "baseLabel": "Total Employed Population"
+                }
+            }
+        },
+        "Economic Development Indicators": {
+            "variables": {
+                "Employment Rate": {
+                    "variableCode": "B23025_004E",
+                    "transformationType": "percentage",
+                    "baseCode": "B23025_002E",
+                    "baseLabel": "Labor Force"
+                }
+            }
+        }
+    }
+}
