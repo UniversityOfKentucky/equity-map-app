@@ -1,7 +1,7 @@
 import React, { createContext, useState, useContext } from 'react';
 
 // Creates a context object to store the shared state variables.
-const GlobalStateContext = createContext();
+export const GlobalStateContext = createContext();
 
 // Creates a hook which returns the context value.
 export const useGlobalState = () => useContext(GlobalStateContext);
@@ -11,7 +11,7 @@ export const GlobalStateProvider = ({ children }) => { // This function manages 
 
     // Shared state variables and their initial values
     // Stores the selected indicator
-    const [selectedIndicator, setSelectedIndicator] = useState('');
+    const [selectedIndicator, setSelectedIndicator] = useState('Population');
     // Stores the selected feature
     const [selectedFeature, setSelectedFeature] = useState('');
     // Stores the modal open/close state
