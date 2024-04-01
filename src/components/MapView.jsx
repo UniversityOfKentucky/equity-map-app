@@ -1,9 +1,20 @@
-import React from 'react';
-import { MapContainer, TileLayer } from 'react-leaflet'; 
+import React, { useState, useEffect } from 'react';
+import { MapContainer, TileLayer, GeoJSON, Popup } from 'react-leaflet'; 
 import 'leaflet/dist/leaflet.css';
 
 const MapView = () => {
   const position = [38.0406, -84.5037];
+
+  // Array destructuring to set the state of 'geojsonData' and 'setGeojsonData' function
+  const [geojsonData, setGeojsonData] = useState(null);
+
+  // Fetches GeoJSON data from the local file 'fayette.geojson' and sets the 'setGeojsonData' state
+  useEffect(() => {
+    fetch('src/assets/data/fayette-county.geojson')
+      .then(response => response.json())
+      .then(data => setGeojsonData(data))
+      .catch(error => console.error(error));
+  }, []);
 
   return (
     <div className="h-screen w-screen">
@@ -14,7 +25,12 @@ const MapView = () => {
           subdomains='abcd'
           maxZoom= '19'
         />
-        {/* GeoJSON layers will be added here */}
+        {/* If geojosnData is available, render the GeoJSON component with the data */}
+        {geojsonData && (
+          <GeoJSON data={geojsonData}>
+            <Popup>A sample Popup.</Popup>
+          </GeoJSON>
+        )}
       </MapContainer>
     </div>
   );
