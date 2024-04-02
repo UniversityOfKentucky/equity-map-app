@@ -2,15 +2,13 @@ import { useState } from 'react'
 import React from 'react';
 import './App.css'
 import MapView from './components/MapView';
-import IndicatorsPanel from './components/IndicatorsPanel';
-import FeaturesPanel from './components/FeaturesPanel';
+import CategoriesPanel from './components/CategoriesPanel';
 
 function App() {
   return (
-    <div className="App h-screen w-screen">
+    <div className="App grid grid-cols-5 h-screen w-screen m-0 p-0">
+      <CategoriesPanel />
       <MapView />
-      <IndicatorsPanel />
-      <FeaturesPanel />
     </div>
   );
 }
