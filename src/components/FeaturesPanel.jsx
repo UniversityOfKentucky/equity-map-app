@@ -21,29 +21,44 @@ const FeaturesPanel = () => {
     };
 
     return (
-        <div className="features-panel absolute bottom-0 left-1/2 transform -translate-x-1/2 w-3/4">
+        <div className="features-panel absolute bottom-0 left-1/2 transform -translate-x-1/2 w-3/4 bg-white rounded-lg shadow-lg p-4">
             {/*HeadlessUI's 'Tab.Group' component is used to create a tabbed interface of features.*/}
             <Tab.Group>
-                <Tab.List>
+                <Tab.List className="flex space-x-1">
                     {features.map((feature, index) => (
-                        <Tab key={index}>
+                        <Tab key={index} className={({ selected }) => 
+                            `w-full py-2 text-sm font-medium leading-5 text-center rounded-lg 
+                            ${selected ? 'bg-blue-500 text-white' : 'bg-blue-100 text-blue-700 hover:bg-blue-200'}`
+                        }>
                             {feature}
                         </Tab>
                     ))}
                 </Tab.List>
+                <Tab.Panels className="mt-2">
                     {/* Maps over the 'features' array to render a tab for each feature.The tab, when clicked, will call 'openModal' with the feature. */}
-                {features.map((feature, index) => (
-                    <Tab.Panel key={index} onClick={() => openModal(feature)}>
-                        <h2>{feature}</h2>
-                        <p>This is a placeholder content for {feature}.</p>
-                    </Tab.Panel>
-                ))}
+                    {features.map((feature, index) => (
+                        <Tab.Panel key={index} className="p-3 bg-blue-50 rounded-lg text-slate-700" onClick={() => openModal(feature)}>
+                            <h2 className="font-semibold">{feature}</h2>
+                            <p>This is a placeholder content for {feature}.</p>
+                        </Tab.Panel>
+                    ))}
+                </Tab.Panels>
             </Tab.Group>
             {/* ReactModal component is used to display the selected feature in a modal. */}
-            <ReactModal isOpen={modalIsOpen} onRequestClose={() => setModalIsOpen(false)}>
-                <h2>{selectedFeature}</h2>
-                <p>This is a placeholder content for {selectedFeature}.</p>
-                <button onClick={() => setModalIsOpen(false)}>Close</button>
+            <ReactModal
+                isOpen={modalIsOpen} 
+                onRequestClose={() => setModalIsOpen(false)}
+                className=""
+                overlayClassName=""
+            >
+                <h2 className="text-xl font-bold">{selectedFeature}</h2>
+                <p className="mt-4">{selectedFeature}</p>
+                <button 
+                    onClick={() => setModalIsOpen(false)}
+                    className=""
+                >
+                    Close
+                </button>
             </ReactModal>
         </div>
     );
