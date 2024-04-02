@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, GeoJSON, Popup } from 'react-leaflet'; 
 import 'leaflet/dist/leaflet.css';
+import FeaturesPanel from './FeaturesPanel';
 
 const MapView = () => {
   const position = [38.0406, -84.5037];
@@ -17,7 +18,7 @@ const MapView = () => {
   }, []);
 
   return (
-    <div className="h-screen w-screen">
+    <div className="col-span-4 relative h-screen">
       <MapContainer center={position} zoom={11} style={{ height: '100%', width: '100%' }}>
         <TileLayer
           url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
@@ -32,6 +33,7 @@ const MapView = () => {
           </GeoJSON>
         )}
       </MapContainer>
+      <FeaturesPanel />
     </div>
   );
 };
