@@ -10,8 +10,10 @@ export const useGlobalState = () => useContext(GlobalStateContext);
 export const GlobalStateProvider = ({ children }) => { // This function manages the shared state variables and returns their values to the children components via props.
 
     // Shared state variables and their initial values
-    // Stores the selected indicator
-    const [selectedIndicator, setSelectedIndicator] = useState('Population');
+    // Stores the selected category
+    const [selectedCategory, setSelectedCategory] = useState('Population');
+    // Stores the expanded category
+    const [expandedCategory, setExpandedCategory] = useState('Population');
     // Stores the selected feature
     const [selectedFeature, setSelectedFeature] = useState('');
     // Stores the modal open/close state
@@ -19,8 +21,10 @@ export const GlobalStateProvider = ({ children }) => { // This function manages 
 
     // Value to be passed to provider consumers
     const value = {
-        selectedIndicator,
-        setSelectedIndicator,
+        selectedCategory,
+        setSelectedCategory,
+        expandedCategory,
+        setExpandedCategory,
         selectedFeature,
         setSelectedFeature,
         modalIsOpen,
