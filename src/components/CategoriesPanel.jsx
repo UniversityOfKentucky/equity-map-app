@@ -13,7 +13,7 @@ const CategoriesPanel = () => {
     };
     
     return (
-        <div className="categories-panel col-span-1 h-screen">
+        <div className="categories-panel col-span-1 h-screen overflow-auto">
             {CategoryConfig.map((category) => (
                 <Disclosure key={category.title} as="div" className="m-2">
                     {({ open }) => (
