@@ -3,10 +3,17 @@ import { Disclosure } from '@headlessui/react';
 import { ChevronUpIcon } from '@heroicons/react/24/outline';
 import { GlobalStateContext } from '../context/GlobalStateContext';
 import CategoryConfig from '../config/CategoryConfig';
+import useDataFetcher from '../hooks/useDataFetcher';
 
 const CategoriesPanel = () => {
+
+
     // Destructures the undefined setSelectedCategory function from the GlobalStateContext object and assigns it to the setSelectedCategory variable.
-    const { setSelectedCategory } = useContext(GlobalStateContext);
+    const { selectedCategory, setSelectedCategory, globalData, setGlobalData } = useContext(GlobalStateContext);
+
+    // At the top level of your CategoriesPanel component
+    useDataFetcher(selectedCategory, setGlobalData);
+
     // Handler to update the global state
     const handleSelectCategory = (category) => {
         setSelectedCategory(category);
@@ -34,6 +41,7 @@ const CategoriesPanel = () => {
                                     {category.visualization.map((visualization) => (
                                         <div key={visualization.title} className="m-2">
                                             <p>{visualization.title}</p>
+                                            <p>{globalData[category.title]}</p>
                                             <visualization.VisualizationComponent data={visualization.data} options={visualization.options} title={visualization.title}/>
                                         </div>
                                     ))}
@@ -43,10 +51,9 @@ const CategoriesPanel = () => {
                     )}
                 </Disclosure>
             ))}
-            {/* code below creates an information panel for the entire category panel */}
-        <div className="m-2 border h-full border-gray-200 rounded-lg">
-                    <p>Information about Project</p>
-                    {/* Charts and additional content will go here */}
+            <div className="m-2 border h-full border-gray-200 rounded-lg">
+                <p>Information about Project</p>
+                {/* Charts and additional content will go here */}
                 </div>
         </div>
     );
