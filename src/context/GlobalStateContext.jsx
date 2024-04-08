@@ -8,12 +8,17 @@ export const GlobalStateProvider = ({ children }) => { // This function manages 
 
     // Shared state variables and their initial values
     // Stores the selected category
-    const [selectedCategory, setSelectedCategory] = useState('Population');
+    const [selectedCategory, setSelectedCategory] = useState('Demographics');
+
+    // Stores the global data
+    const [globalData, setGlobalData] = useState({});
 
     // Value to be passed to provider consumers
     const value = {
         selectedCategory,
         setSelectedCategory,
+        globalData,
+        setGlobalData,
     };
 
     return (
