@@ -1,12 +1,4 @@
-// define the transformData function here
-
 function transformData(acsData, geography, transformationType) {
-
-  console.log(
-    "acsData: ", acsData, 
-    " geography: ", geography, 
-    " transformationType: ", transformationType,
-  );
   
   let transformedData = {};
 
@@ -21,8 +13,7 @@ function transformData(acsData, geography, transformationType) {
           // THis logic identifies all of the variable data and the base variable data in the response array
 
           // We begin by identifying and storing the index of the first location value
-          const locationIndex = geography === "tracts" ? row.length - 3 : row.length - 2; 
-          // ^ If geography is equal to "tracts", then locationIndex will be set to row.length - 3. Otherwise, locationIndex will be set to row.length - 2
+          const locationIndex = geography === 'tracts' ? row.length - 3 : geography === 'counties' ? row.length - 2 : row.length - 1;
         
           // EXAMPLE A - 'tracts' geography response
           // ['B01001_002E', 'B01001_001E', 'state', 'county', 'tract'],
@@ -33,6 +24,11 @@ function transformData(acsData, geography, transformationType) {
           // ['B14001_006E', 'B14001_007E', 'B14001_008E', 'B01001_001E', 'state', 'county']
           // ['909', '764', '1554', '18887', '21', '001']
           // In this example, locationIndex will be set to 4 ('state') (row.length - 2)
+
+          //EXAMPLE C - 'msa' geography response
+          // ["B01001_001E", "metropolitan statistical area/micropolitan statistical area"]
+          // ["515954", "30460"]
+          // In this example, locationIndex will be set to 1 ('metropolitan statistical area/micropolitan statistical area') (row.length - 1)
 
           //////////// NOTE //////////
           // If additional geographies are added to the app or the ACS API schema is altered by the Census Bureau, the response array selection logic will need to be checked and potentially updated depending on the structure of the response array.
@@ -51,13 +47,13 @@ function transformData(acsData, geography, transformationType) {
           // Store the transformed variable value keyed by the geographic code
            transformedData[geoCode] = transform(variablesValues, baseValue, transformationType);
       }
-      } else { // If transformationType is equal to "none"
+      } else { // If transformationType is equal to "none" or "convertToDollars"
 
       //For 'Total Population' and other variables that don't require transformation, we simply loop through the response array and store the variable value keyed by the geographic code
 
       // Example response array (Total Population variable for 'tracts' geography)
       // ['B01001_001E', 'state', 'county', 'tract']
-1           // ['3163', '21', '067', '000101']
+1     // ['3163', '21', '067', '000101']
 
       for (let i = 1; i < acsData.length; i++) { // Skip the first row since it's header information
           const row = acsData[i];
@@ -79,8 +75,6 @@ function transformData(acsData, geography, transformationType) {
       case 'summedPercentage': // in the case that the value is an array of numbers that need to be summed and then divided by the baseValue to get a percentage
         { const sum = variablesValues.reduce((acc, curr) => acc + curr, 0);
           return (sum / baseValue * 100).toFixed(2); }
-      // case "convertToDollars": // in the case that the value is a single number that needs to be converted to a dollar amount and returned as a string with currency formatting
-      //   return "$" + variablesValues.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
       default: // If the transformationType is not recognized, return the value as is
         return console.error("Transformation type not recognized");
     }
