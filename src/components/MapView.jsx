@@ -1,4 +1,3 @@
-// MapView.jsx
 import { useState, useEffect, useContext } from 'react';
 import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet'; 
 import 'leaflet/dist/leaflet.css';
@@ -11,6 +10,7 @@ import { useMapSettings } from '../hooks/useMapSettings';
 const MapView = () => {
   const { selectedCategory, selectedGeography, globalData, geojsonData, setGeojsonData } = useContext(GlobalStateContext);
   const mapSettings = useMapSettings(selectedGeography);
+  const maxBounds = [[mapSettings.center[0]*1.005, mapSettings.center[1]*1.005], [mapSettings.center[0]*.995, mapSettings.center[1]*.995]];
   const [geojsonKey, setGeojsonKey] = useState(Date.now());
 
   useEffect(() => {
@@ -37,7 +37,7 @@ const MapView = () => {
 
   return (
     <div className="col-span-3 relative h-screen">
-      <MapContainer key={`${selectedCategory}-${selectedGeography}`} {...mapSettings} style={{ height: '100%', width: '100%' }}>
+      <MapContainer key={`${selectedCategory}-${selectedGeography}`} {...mapSettings} style={{ height: '100%', width: '100%' }} maxBounds={maxBounds}>
         <TileLayer
           url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/attributions">CARTO</a>'
