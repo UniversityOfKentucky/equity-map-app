@@ -15,11 +15,92 @@ import { Bar, Line, Pie, Bubble } from 'react-chartjs-2';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, PointElement, LineElement, ArcElement);
 
-const CategoryConfig = [
-    {
+//////// CONFIGURATION OBJECT: ////////
+// The category configuration object is used to define the structure of the data and visualizations for each category in the dashboard.
+// The object contains a series of category keys, each with a nested object defining the category's details, visualizations, and questions.
+// The configuration object is imported into the CategoriesPanel component to render the category data and visualizations.
+////////
+  //////// OBJECT DESCRIPTION: 
+    //// PROPERTIES:
+    // - categories: An object containing category keys as properties, each with a nested object defining the category's details.
+    //   - title: The title of the category.
+    //   - subtitle: A brief description of the category.
+    //   - defaultMappedVariable: An object containing the default variable to be mapped to the GeoJSON data.
+    //     - label: The label of the variable.
+    //     - code: The code of the variable.
+    //     - endpoint: The API endpoint URL for fetching the variable data.
+    //     - transformationType: The type of transformation to be applied to the variable data.
+    //     - baseCode: The base code for the variable data transformation.
+    //     - title: The title of the variable.
+    //   - visualization: An array of visualization objects, each defining a chart or visualization to be displayed.
+    //     - title: The title of the visualization.
+    //     - description: A brief description of the visualization.
+    //     - type: The type of chart or visualization.
+    //     - chartJS: A boolean indicating whether the visualization uses Chart.js.
+    //     - data: The data object for the visualization.
+    //     - endpoint: The API endpoint URL for fetching data for the visualization.
+    //     - VisualizationComponent: The Chart.js component to render the visualization.
+    //     - options: The options object for the visualization.
+    //   - narrativeElements: An object containing narrative elements related to the category.
+    //    - questions: An array of questions related to the category.
+    //    - overview: A brief overview of the category.
+    //    - keyInsights: Key insights or findings within the category data.
+    //    - impact: The real-world impact or implications of the insights.
+    //    - tags: An array of tags or keywords related to the category.
+    ////////
+
+    //// MACHINE READABLE REFERENCE:
+    // categories: {
+    //   categoryKey: {
+    //     title: "Category Title",
+    //     subtitle: "Category Subtitle",
+    //     defaultMappedVariable: { 
+    //       label: "Variable Label",
+    //       code: "Variable Code",
+    //       endpoint: "API Endpoint URL"
+    //       transformationType: "Transformation Type",
+    //       baseCode: "Base Code"
+    //       title: "Variable Title"
+    //     },
+    //     visualization: [
+    //       {
+    //         title: "Visualization Title",
+    //         description: "Visualization Description",
+    //         type: "Chart Type",
+    //         chartJS: true,
+    //         data: { Chart Data },
+    //         endpoint: "API Endpoint URL",
+    //         VisualizationComponent: ChartJSComponent,
+    //         options: { ChartJS Options }
+    //       }
+    //     ],
+    //     narrativeElements: {
+    //       questions: ["Question 1", "Question 2"],
+    //       overview: "Category Overview",
+    //       keyInsights: "Key Insights",
+    //       impact: "Real-world Impact",
+    //       tags: ["Tag 1", "Tag 2"]
+    //     }
+    //   }
+    ////////
+
+const Config = {
+  categories: {
+    "Demographics": {
       title: "Demographics",
       subtitle: "A Foundational Category for Understanding Socio-Economic and Demographic Dynamics.",
-      defaultMappedVariable: { label: "Total Population", code: "B01001_001E" },
+      defaultMappedVariable: { 
+        label: "Total Population", 
+        code: "B01001_001E", 
+        // Retrieve data for all tracts in Fayette County, Kentucky (FIPS code 21067)
+        endpoint: {
+          counties: `https://api.census.gov/data/2022/acs/acs5?get=B01001_001E&for=county:*&in=state:21`,
+          tracts: `https://api.census.gov/data/2022/acs/acs5?get=B01001_001E&for=tract:*&in=state:21&in=county:067`,
+          msa: `https://api.census.gov/data/2022/acs/acs5?get=B01001_001E&&for=metropolitan%20statistical%20area/micropolitan%20statistical%20area:*`
+        },
+        transformationType: "none",
+        baseCode: "none"
+      },
       visualization: [
         // {
         //   title: "Population Distribution",
@@ -33,9 +114,14 @@ const CategoryConfig = [
         {
           title: "Demographics and Socio-economic Factors",
           description: "An interactive bar chart explores demographic data alongside socio-economic indicators.",
-          type: "Bar Chart",
+          type: "MultiVariableBarChart",
           chartJS: true,
           data: {
+            // Census API variable for 
+            // income B19013_001E, 
+            // education level B15003_001E, 
+            // health access B27001_017E
+              // https://censusreporter.org/tables/C27001H/
             labels: ["Income", "Education Level", "Health Access"],
             datasets: [{
                 label: "Community A",
@@ -49,6 +135,7 @@ const CategoryConfig = [
               }
             ]
           },
+          endpoint: `https://api.census.gov/data/2022/acs/acs5?get=B01001_001E&for=tract:*&in=state:21&in=county:067`,
           VisualizationComponent: Bar,
           options: {
             indexAxis: '',
@@ -66,7 +153,7 @@ const CategoryConfig = [
         {
           title: "Age and Gender Composition",
           description: "A stacked bar chart to represent the composition of different age groups within genders, offering a complementary view to the demographic pyramid.",
-          type: "Stacked Bar Chart",
+          type: "MultiVariableBarChart",
           chartJS: true,
           data: {
             labels: ["0-14", "15-24", "25-54", "55-64", "65+"],
@@ -83,6 +170,7 @@ const CategoryConfig = [
               }
             ]
           },
+          endpoint: `https://api.census.gov/data/2022/acs/acs5?get=B01001_001E&for=state%3A21`,
           VisualizationComponent: Bar,
           options: {
             scales: {
@@ -95,20 +183,34 @@ const CategoryConfig = [
             }
           }
         },
-      ],
-      questions: [
-        "How does the age distribution vary across different communities?",
-        "What are the correlations between demographic compositions and socio-economic factors like income and education levels?"
-      ],
-      overview: "A foundational category for understanding socio-economic and demographic dynamics.",
-      keyInsights: "Highlight significant findings, trends, and disparities within the data.",
-      impact: "Discuss the real-world implications of these insights on minorities, women, and veterans.",
-      tags:   ["demographics", "socio-economic factors", "age distribution", "gender composition", "bar chart", "stacked bar chart"]
+      ], 
+        questions: [
+          "How does the age distribution vary across different communities?",
+          "What are the correlations between demographic compositions and socio-economic factors like income and education levels?"
+        ],
+        overview: "A foundational category for understanding socio-economic and demographic dynamics.",
+        keyInsights: "Highlight significant findings, trends, and disparities within the data.",
+        impact: "Discuss the real-world implications of these insights on minorities, women, and veterans.",
+        tags:   ["demographics", "socio-economic factors", "age distribution", "gender composition", "bar chart", "stacked bar chart"]
+    
     },
-    {
+    "Income & Employment": {
       title: "Income & Employment",
       subtitle: "Central to Equality and Economic Opportunity Discussions.",
-      defaultMappedVariable: { label: "Median Household Income", code: "B19013_001E" },
+      defaultMappedVariable: { 
+        label: "Median Household Income", 
+        code: "B19013_001E",  
+        endpoint: {
+          counties: `https://api.census.gov/data/2022/acs/acs5?get=B19013_001E&for=county:*&in=state:21`,
+          tracts: `https://api.census.gov/data/2022/acs/acs5?get=B19013_001E&for=tract:*&in=state:21&in=county:067`,
+          msa: `https://api.census.gov/data/2022/acs/acs5?get=B19013_001E&for=metropolitan%20statistical%20area/micropolitan%20statistical%20area:*`
+          // endpoint fot all msa's in KY
+          // https://api.census.gov/data/2022/acs/acs5?get=B19013_001E&for=metropolitan%20statistical%20area/micropolitan%20statistical%20area:*&in=state:21
+        },
+        transformationType: "convertToDollars",
+        baseCode: "none"
+        
+      },
       visualization: [
         // {
         //   title: "Income Distribution",
@@ -119,9 +221,11 @@ const CategoryConfig = [
         //   VisualizationComponent: "none",
         //   options: {}
         // },
+        // Wealth > tenure by age https://censusreporter.org/tables/B25007/
         {
           title: "Employment and Poverty",
           description: "Dual-axis charts compare employment rates and poverty levels, showing their relationship.",
+          // Employment status https://censusreporter.org/tables/B23002A/ https://censusreporter.org/tables/C23002H/
           type: "Dual Axis Chart",
           chartJS: true,
           data: {
@@ -186,10 +290,21 @@ const CategoryConfig = [
       impact: "Discuss the real-world implications of these insights on policy and individual communities.",
       tags:   ["income distribution", "employment rates", "poverty levels", "choropleth map", "dual axis chart", "line chart"]
     },
-    {
+    "Education": {
       title: "Education",
       subtitle: "Critical for Long-term Socio-economic Mobility.",
-      defaultMappedVariable: { label: "Percentage of Population with a Bachelor's Degree or Higher", code: "B15003_022E, B15003_023E, B15003_024E, B15003_025E" },
+      defaultMappedVariable: { 
+        label: "Percentage of Population with a Bachelor's Degree or Higher", 
+        code: "B15003_022E, B15003_023E, B15003_024E, B15003_025E", 
+        endpoint: {
+          counties: `https://api.census.gov/data/2022/acs/acs5?get=B15003_022E,B15003_023E,B15003_024E,B15003_025E,B15003_001E&for=county:*&in=state:21`,
+          tracts: `https://api.census.gov/data/2022/acs/acs5?get=B15003_022E,B15003_023E,B15003_024E,B15003_025E,B15003_001E&for=tract:*&in=state:21&in=county:067`,
+          msa: `https://api.census.gov/data/2022/acs/acs5?get=B15003_022E,B15003_023E,B15003_024E,B15003_025E,B15003_001E&for=metropolitan%20statistical%20area/micropolitan%20statistical%20area:*`
+        },
+        transformationType: "summedPercentage",
+        baseCode: "B15003_001E",
+        title: "Educational Attainment for the Population 25 Years and Over"
+      },
       visualization: [
         {
           title: "Educational Attainment Distribution",
@@ -237,6 +352,7 @@ const CategoryConfig = [
           VisualizationComponent: Line,
           options: {}
         },
+        // Table B27019: Health Insurance Coverage Status and Type by Age by Educational Attainment https://censusreporter.org/tables/B27019/
         // { **Employment Rate by Education:** A scatter plot examines the relationship between education levels and employment rates.}
         {
           title: "Educational Programs Impact",
@@ -266,10 +382,22 @@ const CategoryConfig = [
       impact: "Real-world implications of these insights on minorities, women, and veterans.",
       tags: ["educational attainment", "income disparities by education", "educational programs impact", "bar chart", "line chart"]
     },
-    {
+    "Public Health": {
       title: "Public Health",
       subtitle: "Highlights Disparities in Health Access and Outcomes.",
-      defaultMappedVariable: { label: "Percentage Without Health Insurance", code: "B27001_017E" },
+      defaultMappedVariable: { 
+        label: "Percentage Without Health Insurance", 
+        code: "B27001_005E,B27001_008E,B27001_011E,B27001_014E,B27001_017E,B27001_020E,B27001_023E,B27001_026E,B27001_029E,B27001_033E,B27001_036E,B27001_039E,B27001_042E,B27001_045E,B27001_048E,B27001_051E,B27001_054E,B27001_057E", 
+        endpoint: {
+          counties: `https://api.census.gov/data/2022/acs/acs5?get=B27001_005E,B27001_008E,B27001_011E,B27001_014E,B27001_017E,B27001_020E,B27001_023E,B27001_026E,B27001_029E,B27001_033E,B27001_036E,B27001_039E,B27001_042E,B27001_045E,B27001_048E,B27001_051E,B27001_054E,B27001_057E,B27001_001E&for=county:*&in=state:21`,
+          tracts: `https://api.census.gov/data/2022/acs/acs5?get=B27001_005E,B27001_008E,B27001_011E,B27001_014E,B27001_017E,B27001_020E,B27001_023E,B27001_026E,B27001_029E,B27001_033E,B27001_036E,B27001_039E,B27001_042E,B27001_045E,B27001_048E,B27001_051E,B27001_054E,B27001_057E,B27001_001E&for=tract:*&in=state:21&in=county:067`,
+          msa: `https://api.census.gov/data/2022/acs/acs5?get=B27001_005E,B27001_008E,B27001_011E,B27001_014E,B27001_017E,B27001_020E,B27001_023E,B27001_026E,B27001_029E,B27001_033E,B27001_036E,B27001_039E,B27001_042E,B27001_045E,B27001_048E,B27001_051E,B27001_054E,B27001_057E,B27001_001E&for=metropolitan%20statistical%20area/micropolitan%20statistical%20area:*`
+        },
+        transformationType: "summedPercentage",
+        universe: "Civilian noninstitutionalized population",
+        baseCode: "B27001_001E",
+        title: "Health Insurance Coverage Status by Sex by Age"
+      },
       visualization: [
         {
           title: "Health Insurance Coverage",
@@ -293,14 +421,22 @@ const CategoryConfig = [
   
           title: "Public vs. Private Health Facilities",
           description: "A new bar chart showcasing the distribution of public vs. private health facilities across different regions.",
-          type: "Bar Chart",
+          type: "GroupedBarChart",
           chartJS: true,
           data: {
             labels: ["Region A", "Region B", "Region C"],
             datasets: [{
               label: 'Number of Facilities',
-              data: [{x: "Public", y: 120}, {x: "Private", y: 80}, {x: "Public", y: 150}, {x: "Private", y: 60}, {x: "Public", y: 90}, {x: "Private", y: 120}],
-              backgroundColor: 'rgba(255, 159, 64, 0.2)',
+              data: [{x: "Public", y: 120}, {x: "Private", y: 80}, {x: "Public", y: 300}, {x: "Private", y: 60}, {x: "Public", y: 90}, {x: "Private", y: 120}],
+              backgroundColor: 
+              [
+                'rgba(255, 99, 132, 0.2',
+                'rgba(54, 162, 235, 0.2',
+                'rgba(255, 206, 86, 0.2',
+                'rgba(75, 192, 192, 0.2',
+                'rgba(255, 99, 132, 0.2',
+                'rgba(54, 162, 235, 0.2)'
+              ],
               borderColor: 'rgba(255, 159, 64, 1)',
               borderWidth: 1
             }]
@@ -318,14 +454,25 @@ const CategoryConfig = [
       impact: "Real-world implications of these insights on minorities, women, and veterans.",
       tags:   ["public health", "health insurance coverage", "health facilities distribution", "pie chart", "bar chart"]
     },
-    {
+    "Housing & Infrastructure": {
       title: "Housing & Infrastructure",
       subtitle: "Reflects Living Standards and Access to Resources.",
-      defaultMappedVariable: { label: "Median Value of Owner-Occupied Housing Units", code: "B25077_001E" },
+      defaultMappedVariable: { 
+        label: "Median Value of Owner-Occupied Housing Units", 
+        code: "B25077_001E", 
+        endpoint: {
+          counties: `https://api.census.gov/data/2022/acs/acs5?get=B25077_001E&for=county:*&in=state:21`,
+          tracts: `https://api.census.gov/data/2022/acs/acs5?get=B25077_001E&for=tract:*&in=state:21&in=county:067`,
+          msa: `https://api.census.gov/data/2022/acs/acs5?get=B25077_001E&for=metropolitan%20statistical%20area/micropolitan%20statistical%20area:*`
+        },
+        transformationType: "convertToDollars",
+        baseCode: "none"
+      },
       visualization: [
         {
           title: "Housing Cost Burden",
-          description: "A histogram displays the distribution of housing costs as a percentage of household income.",
+          description: "A histogram displays the distribution of housing costs as a percentage of household income.", // https://censusreporter.org/tables/B25071/
+          
           type: "Bar Chart",
           chartJS: true,
           data: {
@@ -342,6 +489,7 @@ const CategoryConfig = [
           options: { scales: { y: { beginAtZero: true } } }
         },
         // {- **Access to Services:** Dot maps with overlays for essential services relative to housing areas indicate the level of access.},
+        // Tenure https://censusreporter.org/tables/B25003/
         {
           title: "Infrastructure Quality Index",
           description: "A line chart depicting the infrastructure quality index across different neighborhoods.",
@@ -370,10 +518,22 @@ const CategoryConfig = [
       impact: "Real-world implications of these insights on minorities, women, and veterans.",
       tags: ["housing affordability", "infrastructure quality", "access to services", "histogram", "line chart"]
     },
-    {
+    "Entrepreneurship": {
       title: "Entrepreneurship",
       subtitle: "Sheds Light on Economic Activities and Opportunities, with a Focus on Minorities, Women, and Veterans.",
-      defaultMappedVariable: { label: "Total Number of Firms", code: "FIRMPDEMP" }, // Assuming FIRMPDEMP is the code, replace with actual code if different
+      defaultMappedVariable: { 
+        label: "Percent Self-Employed", 
+        code: "B24080_005,B24080_010,B24080_015,B24080_020", 
+        endpoint: {
+          counties: `https://api.census.gov/data/2022/acs/acs5?get=B24080_005E,B24080_010E,B24080_015E,B24080_020E,B24080_001E&for=county:*&in=state:21`,
+          tracts: `https://api.census.gov/data/2022/acs/acs5?get=B24080_005E,B24080_010E,B24080_015E,B24080_020E,B24080_001E&for=tract:*&in=state:21&in=county:067`,
+          msa: `https://api.census.gov/data/2022/acs/acs5?get=B24080_005E,B24080_010E,B24080_015E,B24080_020E,B24080_001E&for=metropolitan%20statistical%20area/micropolitan%20statistical%20area:*`
+        },
+        transformationType: "summedPercentage",
+        baseCode: "B24080_001",
+        title: "Sex by Class of Worker for the Civilian Employed Population 16 Years and Over",
+        universe: "Civilian employed population 16 years and over"
+    },
       visualization: [
         {
           title: "Demographic Breakdown of Business Ownership",
@@ -393,6 +553,13 @@ const CategoryConfig = [
           VisualizationComponent: Bar,
           options: { scales: { y: { beginAtZero: true } } }
         },
+        // Sex by occupation and median earnings
+        // https://censusreporter.org/data/table/?table=B24012&geo_ids=16000US2146027&primary_geo_id=16000US2146027#valueType|percentage
+        // Table B24081: Class of Worker by Median Earnings for the Civilian Population
+        // https://censusreporter.org/tables/B24081/
+        //
+        // Table B24090: Sex by Class of Worker for the Full-time, Year-round Civilian Population
+        // https://censusreporter.org/tables/B24090/
         {
           title: "Sector Analysis of Minority-Owned Businesses",
           description: "A new bubble chart to visualize the sectors of minority-owned businesses by number and proportion.",
@@ -418,8 +585,10 @@ const CategoryConfig = [
       impact: "Real-world implications of these insights on minorities, women, and veterans.",
       tags: ["entrepreneurship", "business ownership demographics", "sector analysis", "minority-owned businesses", "bar chart", "bubble chart"]
     }
-  ];  
+  }, 
+  features: {}
+};
 
-export default CategoryConfig;
+export default Config;
 
 
