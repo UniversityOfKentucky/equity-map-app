@@ -36,7 +36,7 @@ const useDataFetcher = (endpointsAndKeys, selectedGeography, setGlobalData) => {
       }
     }
     fetchData();
-  }, [endpointsAndKeys, selectedGeography, setGlobalData]);
+  }, [endpointsAndKeys, setGlobalData]);
 }
 
 export default useDataFetcher;
