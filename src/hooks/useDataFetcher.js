@@ -1,9 +1,15 @@
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { transformData } from '../utils/transform';
 
 const useDataFetcher = (endpointsAndKeys, selectedGeography, setGlobalData) => {
+
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       const keys = Object.keys(endpointsAndKeys);
       for (const key of keys) {
         try {
@@ -28,11 +34,13 @@ const useDataFetcher = (endpointsAndKeys, selectedGeography, setGlobalData) => {
             }));
           } else {
             // If transformationType is not defined, store the data as is
-            console.error('No transformationType defined for endpoint:', endpointsAndKeys[key].endpoint);
+            setError('No transformationType defined for endpoint:', endpointsAndKeys[key].endpoint);
           }
         } catch (error) {
-          console.error(`Failed to fetch data from endpoint: ${JSON.stringify(endpointsAndKeys[key].endpoint)}`, error);
-        }
+          setError(error);
+        } finally {
+          setLoading(false);
+      }
       }
     }
     fetchData();
