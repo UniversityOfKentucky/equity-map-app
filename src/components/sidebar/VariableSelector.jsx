@@ -11,7 +11,7 @@ import { ChevronUpIcon } from "@heroicons/react/24/outline";
 import { referenceData } from "../../config/config";
 import propTypes from "prop-types";
 
-const CategorySelector = ({ selectedVariable, setSelectedVariable }) => {
+const VariableSelector = ({ selectedVariable, setSelectedVariable }) => {
   return (
     <div className="category-selector m-2 border border-gray-200 rounded-lg">
       {/* Loop over the categories in the referenceData object creating an element for each which will hold selection elements for the categories' subcategories and variables */}
@@ -80,9 +80,9 @@ const CategorySelector = ({ selectedVariable, setSelectedVariable }) => {
   );
 };
 
-CategorySelector.propTypes = {
+VariableSelector.propTypes = {
   selectedVariable: propTypes.string.isRequired,
   setSelectedVariable: propTypes.func.isRequired,
 };
 
-export default CategorySelector;
+export default VariableSelector;

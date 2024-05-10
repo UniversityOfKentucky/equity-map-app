@@ -1,6 +1,6 @@
 import GeographySelector from './GeographySelector';
 // import TimePeriodSelector from './TimePeriodSelector';
-import CategorySelector from './CategorySelector';
+import VariableSelector from './VariableSelector';
 // import FeaturesPanel from './FeaturesPanel.jsx';
 import propTypes from 'prop-types';
 
@@ -14,7 +14,7 @@ const SelectionPanel = ({ selectedGeography, setSelectedGeography, selectedVaria
                 setSelectedGeography={setSelectedGeography}
             />
             {/* <TimePeriodSelector /> */}
-            <CategorySelector 
+            <VariableSelector 
                 classname=""
                 selectedVariable={selectedVariable}
                 setSelectedVariable={setSelectedVariable}
