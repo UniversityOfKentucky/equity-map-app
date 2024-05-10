@@ -1,14 +1,30 @@
-import { useState } from 'react'
-import React from 'react';
 import './App.css'
-import MapView from './components/MapView';
-import CategoriesPanel from './components/CategoriesPanel';
+import MapView from './components/map/MapView';
+import SelectionPanel from './components/sidebar/SelectionPanel';
+import { useState } from 'react';
+import { appConfig } from './config/config';
 
 function App() {
+
+  const [selectedGeography, setSelectedGeography] = useState(appConfig.initialGeography);
+  const [selectedVariable, setSelectedVariable] = useState('No current selection');
+  // const [selectedTimePeriod, setSelectedTimePeriod] = useState(appConfig.initialTimePeriod);
+
   return (
     <div className="App grid grid-cols-4 h-screen w-screen m-0 p-0">
-      <CategoriesPanel />
-      <MapView />
+      <SelectionPanel 
+        selectedGeography={selectedGeography}
+        setSelectedGeography={setSelectedGeography}
+        selectedVariable={selectedVariable}
+        setSelectedVariable={setSelectedVariable}
+        // selectedTimePeriod={selectedTimePeriod}
+        // setSelectedTimePeriod={setSelectedTimePeriod}
+      />
+      <MapView 
+        selectedGeography={selectedGeography}
+        selectedVariable={selectedVariable}
+        // selectedTimePeriod={selectedTimePeriod}
+       />
     </div>
   );
 }
