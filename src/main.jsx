@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 import { ErrorBoundary } from 'react-error-boundary';
 import { GlobalStateProvider } from './context/GlobalStateContext';
 import App from './App.jsx';
-import ErrorFallback from './components/ErrorFallback';
+import ErrorFallback from './components/common/ErrorFallback';
 import './index.css';
 
 const queryClient = new QueryClient();
