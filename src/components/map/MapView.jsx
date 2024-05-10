@@ -2,7 +2,7 @@ import { MapContainer, TileLayer } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import PropTypes from "prop-types";
 import { appConfig } from '../../config/config';
-import CustomGeoJSONLayer from './CustomGeoJSONLayer';
+import GeoJSONFeatureLayer from './GeoJSONFeatureLayer';
 
 const MapView = ({ selectedGeography, selectedVariable }) => {
 
@@ -30,7 +30,7 @@ const MapView = ({ selectedGeography, selectedVariable }) => {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/attributions">CARTO</a>'
           maxZoom='19'
         />
-        <CustomGeoJSONLayer 
+        <GeoJSONFeatureLayer 
           selectedGeography={selectedGeography} 
           selectedVariable={selectedVariable}
         />

@@ -3,7 +3,7 @@ import { GeoJSON } from 'react-leaflet';
 import { appConfig } from '../../config/config';
 import PropTypes from "prop-types";
 
-const CustomGeoJSONLayer = ({ selectedGeography, selectedVariable }) => {
+const GeoJSONFeatureLayer = ({ selectedGeography, selectedVariable }) => {
   const [geojsonData, setGeojsonData] = useState(null);
   const [layerKey, setLayerKey] = useState('');
 
@@ -67,9 +67,9 @@ const CustomGeoJSONLayer = ({ selectedGeography, selectedVariable }) => {
   );
 };
 
-CustomGeoJSONLayer.propTypes = {
+GeoJSONFeatureLayer.propTypes = {
     selectedGeography: PropTypes.string,
     selectedVariable: PropTypes.string
     };
 
-export default CustomGeoJSONLayer;
+export default GeoJSONFeatureLayer;
