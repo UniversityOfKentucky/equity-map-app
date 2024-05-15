@@ -1,109 +1,159 @@
-import config from "../config/config";
+import { appConfig, referenceData } from '../config/config';
 
-function processData(acsData, selectedVariables) {
+function processData(acsData, selectedVariables, selectedGeography) {
   // The processData function takes the response array from the ACS API and the selected variables from the user and processes the data according to the selected variables
 
-  let parsedData = parseData(acsData, selectedVariables.transformationType); // Example: { '000101': { variablesValues: [1650, 3163], baseValue: 3163 }, '000102': { variablesValues: [1554, 18887], baseValue: 18887 } }
+const currentVariableProps = referenceData.variables[selectedVariables];
 
-  let transformedData = transformData(parsedData, selectedVariables.transformationType); // Example: { '000101': 52.11, '000102': 8.23 }
+// console.log(
+//   `CURRENT VARIABLE ${selectedVariables}
+//   BASE CODE ${currentVariableProps.baseCode} 
+//   TRANSFORMATION TYPE ${currentVariableProps.transformationType}
+//   CURRENT GEOGRAPHY ${selectedGeography}`)
+
+  let parsedData = parseData(acsData, currentVariableProps, selectedGeography); // Example: { '000101': { variablevalue: [1650, 3163], baseEstimate: 3163 }, '000102': { variablevalue: [1554, 18887], baseEstimate: 18887 } }
+
+  // console.log('PARSED DATA RETURNED TO PROCESSDATA | LINE 16', parsedData)
+
+  let transformedData = transformData(parsedData, currentVariableProps.transformationType); // example: { '000101': '52.11%', '000102': '8.23%' }
+
+  // console.log('TRANSFORMED DATA RETURNED TO PROCESSDATA | LINE 15 ', transformedData)
+  // Extract values for normalization
+  const values = Object.values(transformedData).map(value => parseFloat(value));
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  // console.log('MIN', min, 'MAX', max)
+
+  // Create a color scale using chroma.js
+  const colorScale = appConfig.colorScale;
   
   let processedData = {};
-  // Loop through the transformed data and format the data according to the selected variables
-  for (const geoCode in transformedData) { 
-    const value = transformedData[geoCode]; // Get the value for the current geographic code
-    processedData[geoCode] = formatData(value, selectedVariables.format); // Format the value according to the selected format
+
+  // Loop through the transformed data and normalize the values to a color scale, storing the values and colors in the processedData object
+  for (const geoCode in transformedData) {
+    const value = parseFloat(transformedData[geoCode]);
+    // console.log('VALUE', value)
+
+    const normalizedValue = (value - min) / (max - min);
+
+    const colorIndex = Math.floor(normalizedValue * (colorScale.length - 1));
+
+    processedData[geoCode] = { // Store the processed data keyed by the geographic code
+      formattedData: formatData(value, currentVariableProps.format),
+      color: colorScale[colorIndex]
+    };
   }
-  return processedData; // Example output: { '000101': '52.11%', '000102': '8.23%' }
+
+  // console.log('processedData', processedData)
+
+  return processedData; // Example: { '000101': { formattedData: '52.11%', color: 'rgb(219, 234, 254)' }, '000102': { formattedData: '8.23%', color: 'rgb(59, 130, 246)' } }
 }
 
-function parseData(acsData, selectedGeography, selectedVariables) {
-
+function parseData(acsData, currentVariableProps, selectedGeography) {
   let parsedData = {};
   
-  if (selectedVariables.transformationType) {  // If the selected variable has a transformation type, we need to parse the data differently
+  if (currentVariableProps.transformationType !== "none") {
+    // console.log(`ROUTED THROUGH IF STATEMENT IN PARSE DATA (TX TYPE EXISTS AND IS NOT "none")| LINE 41
+    // Transformation Type: ${currentVariableProps.transformationType}`)
+    for (let i = 1; i < acsData.length; i++) {
+      const row = acsData[i];
+      const geoCode = row[row.length - 1];  // The geographic code, which is the last value in the row
+      const locationIndex = selectedGeography === 'fayetteCountyTracts' ? row.length - 3 :
+                            selectedGeography === 'kentuckyCounties' ? row.length - 2 :
+                            row.length - 1;  // Adjust based on geography
 
-    for (let i = 1; i < acsData.length; i++) { // Loop through the response array, skipping the first row since it's header information
-        const row = acsData[i];
-        const geoCode = row[row.length - 1]; // The geographic code which will be used to join the data to the geojson file is always the last value in the row
+      let censusEstimates = row.slice(0, locationIndex); // The census estimates are all values up to the location index
 
-        // Parse the response array to identify the variable values and base variable value
-        // THis logic identifies all of the variable data and the base variable data in the response array
-
-        // We begin by identifying and storing the index of the first location-based data in the response array
-        const locationIndex = selectedGeography === 'tracts' ? row.length - 3 : selectedGeography === 'counties' ? row.length - 2 : row.length - 1;
+      censusEstimates = censusEstimates.map(value => // Map over the census estimates and convert to integers
+        value in referenceData.annotationValues 
+          ? value  // Keep as string if it's a known annotation
+          : parseInt(value, 10)  // Convert to integer otherwise
+      );
       
-        // EXAMPLE A - 'tracts' geography response
-        // ['B01001_002E', 'B01001_001E', 'state', 'county', 'tract'],
-1               // ['1650', '3163', '21', '067', '000101']
-        //  locationIndex = (row.length - 3) = 2 ('state' in this example')
+      let baseEstimate; // The base estimate (if present) is the last value in the census estimates
+      if (currentVariableProps.baseCode) {
+        // console.log('HAS BASE VALUE IN PARSE DATA ', currentVariableProps.baseCode)
+        baseEstimate = censusEstimates.pop(); // Remove and use the last value as baseEstimate if needed
+        if (!(baseEstimate in referenceData.annotationValues)) {
+          baseEstimate = parseInt(baseEstimate, 10);  // Convert baseEstimate to integer if it's not an annotation
+        } else {
+          // console.log(
+          //   `BASE VALUE IS AN ANNOTATION
+          //   ${baseEstimate}
+          //   ${referenceData.annotationValues[baseEstimate]}`)
+        }
+      }
 
-        // EXAMPLE B - 'counties' geography response
-        // ['B01001_002E', 'B01001_001E' 'state', 'county']
-        // ['1554', '18887', '21', '001']
-        // In this example, locationIndex will be set to 2 ('state') (row.length - 2)
-
-        //EXAMPLE C - 'msa' geography response
-        // ['B01001_002E', 'B01001_001E' "metropolitan statistical area/micropolitan statistical area"]
-        // ["15754", "515954", "30460"]
-        // In this example, locationIndex will be set to 1 ('metropolitan statistical area/micropolitan statistical area') (row.length - 1)
-
-        //////////// NOTE //////////
-        // If additional geographies are added to the app or the ACS API schema is altered by the Census Bureau, the response array selection logic will need to be checked and potentially updated depending on the structure of the response array.
-        ////////////////////////////
-
-        let variablesValues;
-        let baseValue;
-
-        // Store the base value to send it to the transformData function
-        baseValue = row[locationIndex - 1]; // The last variable value before location data, in the case of example A, that would be the base value 'B01001_001E'
-
-        // Variable values are all the values that come before the base variable and location values
-        variablesValues = row.slice(0, locationIndex - 1);
-        variablesValues = variablesValues.map(Number);
-
-        // Mapping Logic
-        parsedData[geoCode] = { variablesValues, baseValue }; // Store the variable values and base value keyed by the geographic code
+      // This code block is for variables that require transformation. The ternary operator checks if the baseEstimate is defined and if so uses array destructuring to assign the variablevalue and baseEstimate to the parsedData object. If the baseEstimate is not defined, only the variablevalue are assigned to the parsedData object under a variablevalue key as well.
+      parsedData[geoCode] = currentVariableProps.baseCode
+        ? { censusEstimates, baseEstimate }
+        : { censusEstimates: censusEstimates };
+      // Unlike in the case of `parsedData[geoCode] = baseEstimate ? { variablevalue, baseEstimate } : variablevalue;` the value is assigned to a key within parsedData object. This is because the baseEstimate is not always present in the data and the parsedData object needs to be consistent across all geographies.
+      // console.log('PARSED DATA BEING RETURNED FROM IF STATEMENT IN PARSE DATA: ', parsedData)
+      
     }
-    } else { //For 'Total Population' and other variables that don't require transformation, we simply loop through the response array and map the variable values to the geographic codes
+  } else { // For 'Total Population' and other variables that don't require transformation
+    // console.log('ROUTED THROUGH ELSE STATEMENT IN PARSE DATA (TX TYPE IS "none")| LINE 41');
 
-      // Example response array ('Total Population' variable for 'tracts' geography)
-      // ['B01001_001E', 'state', 'county', 'tract']
-      // ['3163', '21', '067', '000101']
-
-    for (let i = 1; i < acsData.length; i++) { // Skip the first row since it's header information
-        const row = acsData[i];
-        const geoCode = row[row.length - 1]; // the geographic code is the last value in the row
-        const variableValue = row[0]; // The variable value is the first value (and the only variable value) in the row
-
-        // // Store the variable value keyed by the geographic code
-        // transformedData[geoCode] = parseInt(variableValue, 10); // Convert to integer for mapping
-        parsedData[geoCode] = variableValue;
-        // example: transformedData['000101'] = 3163
+    for (let i = 1; i < acsData.length; i++) {
+      const row = acsData[i];
+      const geoCode = row[row.length - 1]; // the geographic code is the last value in the row
+      const censusEstimates = row[0]; // The variable value is the first value in the row
+      
+      // adds value as a value to a 'censusEstimates' key in the parsedData[geocode] object
+      parsedData[geoCode] = { censusEstimates: [parseInt(censusEstimates, 10)] };
     }
+    // console.log('PARSED DATA BEING RETURNED FROM ELSE STATEMENT IN PARSE DATA: ', parsedData)
   }
-  return parsedData;
+  return parsedData; 
 }
 
+
+
+
 function transformData(parsedData, transformationType) {
-  switch (transformationType) { // transformationType is a string that specifies the type of transformation to be applied
-    case "percentage": // in the case that the value is a single number that needs to be divided by the baseValue to get a percentage
-      return (parsedData.variablesValues / parsedData.baseValue * 100).toFixed(2);
-    case "ratePerThousand": // in the case that the value is a single number that needs to be divided by the baseValue and then multiplied by 1000 to get a rate per thousand
-      return (parsedData.variablesValues / parsedData.baseValue * 1000).toFixed(2);
-    case 'summedPercentage': // in the case that the value is an array of numbers that need to be summed and then divided by the baseValue to get a percentage
-      { const sum = parsedData.variablesValues.reduce((acc, curr) => acc + curr, 0);
-      return (sum / parsedData.baseValue * 100).toFixed(2); }
-    default: // If the transformationType is not recognized, return the value as is
-      return console.error("Transformation type not recognized");
+  // console.log(`PASSED TO TRANSFORM DATA | LINE 114
+  // TRANSFORMATION TYPE: ${transformationType}
+  // `);
+  // console.log('parsedData', parsedData);
+
+  let transformedData = {};  
+  let targetCensusEstimates;
+  let targetBaseEstimate;
+
+  for (const key in parsedData) {
+    targetCensusEstimates = parsedData[key]["censusEstimates"];
+    targetBaseEstimate = parsedData[key].baseEstimate;
+    
+    switch (transformationType) {
+      case "percentage":
+        transformedData[key] = (targetCensusEstimates / targetBaseEstimate * 100).toFixed(2); 
+        break;
+      case "ratePerThousand":
+        transformedData[key] = (targetCensusEstimates / targetBaseEstimate * 1000).toFixed(2); 
+        break;
+      case 'summedPercentage':
+        {const sum = targetCensusEstimates.reduce((acc, curr) => acc + curr, 0);
+        transformedData[key] = (sum / targetBaseEstimate * 100).toFixed(2); }
+        break;
+      case 'none':
+        transformedData[key] = targetCensusEstimates; 
+        break;
+      default:
+        transformedData[key] = targetCensusEstimates; 
+        break;
+    }
   }
+  
+  return transformedData;
 }
 
 function formatData(value, format) {
   if (value === null) { // If the value is null, return null
     return null;
   }
-  if (value in config.annotationValues) { // If the value is an annotation, return the annotation and meaning
-    return config.annotationValues[value].annotation, config.annotationValues[value].meaning;
+  if (value in referenceData.annotationValues) { // If the value is an annotation, return the annotation and meaning
+    return referenceData.annotationValues[value].annotation, referenceData.annotationValues[value].meaning;
   } else { 
     switch (format) { // If the value is not an annotation, apply the specified format
       case "currency": 
@@ -112,10 +162,9 @@ function formatData(value, format) {
         return `${value}%`;
       case "ratePerThousand":
         return `${value}/1,000`;
-      case "rawNumber":
       case "none":
         return value.toLocaleString();
-      default: // If the format is not recognized, return the value as is
+      default: // If the format is not recognized, return an error
         return console.error("Format not recognized");
     }
   }
