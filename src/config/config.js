@@ -1,14 +1,16 @@
-// TO DO
-  // BUILD INDEX CONSTRUCTING FUNCTION
+import chroma from "chroma-js";
 
 const appConfig = { // This object defines the configuration settings for the app. It includes the default settings for the app, such as the initial geography, category, and subcategory to be displayed, as well as the available geographies, categories, and subcategories that are rendered in the SelectionPanel. It also includes the default variables that are visualized in the map features' popups by default (in contrast to the user-selected variable visualization (which is also displayed in the popups after selection). These settings can be customized to fit the specific needs of the app.
 geographies: {
     fayetteCountyTracts: {
       label: "Fayette County",
-      ApiEndpoints: {
+      geoCodeField: "TRACTCE", // This property is used to match the location code in the geojson features with the location code in the census data. It must be a unique identifier for each feature in the geojson file.
+      apiEndpoints: {
         countyFIPScode: "067",
         stateFIPScode: "21",
+        apiQuery: "tract:*&in=state:21&in=county:067",
       },
+
       geoJSONfileName: "tracts.geojson",
       mapSettings: {
         center: [38, -84.5037],
@@ -19,38 +21,13 @@ geographies: {
     },
     kentuckyMSAs: {
       label: "Kentucky Metro Statistical Areas",
-      ApiEndpoints: {
+      geoCodeField: "GEOID", 
+      apiEndpoints: {
         // Lexington-Fayette, KY MSA
-        MSAFIPScode: "30460", // Not used in the current implementation. All MSAs in the nation are fetched ( you can't fetch) but because the geojson was pre-filtered, only the Kentucky MSAs are displayed.
-        // For reference, below are all of the MSAs FIPS codes relevant to Kentucky. For optimal fetching, the specific MSA FIPS codes should be used in the API call rather than fetching all MSAs.
-          /* [
-          "37140",
-          "25775",
-          "30460",
-          "31580",
-          "32460",
-          "49080",
-          "21060",
-          "23180",
-          "23190",
-          "23980",
-          "14540",
-          "18340",
-          "17300",
-          "34460",
-          "36980",
-          "43700",
-          "15820",
-          "17140",
-          "19220",
-          "34660",
-          "26580",
-          "31140",
-          "33180",
-          "382107",
-        ];
-          */
-      },
+        MSAFIPScode: "30460", // Not used in the current implementation. This is an example of how a specific MSA FIPS code can be defined for fetching data.
+        apiQuery: "metropolitan%20statistical%20area/micropolitan%20statistical%20area:30460,17300,23180,23190,23980,25775,31580,32460,37140,49080,21060,14540,18340,34460,36980,43700,15820,17140,19220,34660,26580,31140,33180,382107",
+
+      }, // All MSA FIPS codes for Kentucky
       geoJSONfileName: "msa.geojson",
       mapSettings: {
         center: [37.7153, -85.8569],
@@ -61,8 +38,10 @@ geographies: {
     },
     kentuckyCounties: {
       label: "Kentucky Counties",
-      ApiEndpoints: {
+      geoCodeField: "COUNTYFP",
+      apiEndpoints: {
         stateFIPScode: "21",
+        apiQuery: "county:*&in=state:21",
       },
       geoJSONfileName: "counties.geojson",
       mapSettings: {
@@ -85,7 +64,13 @@ popupVisualizationsVariables: [
   "Percent Self-Employed",
 ], // These are the variables that are always visualized in the map features' popups by default (in contrast to the user-selected variable visualization (which is also displayed in the popups after selection). They do not change based on user selection. Ensure they are properly defined and nested in the categories object below to ensure proper fetching and data transformation.
 initialTimePeriod: "2022", // This is the default time period for the data. In the current implementation, this must be a single year (not a range, such as "2012-2017"). This value is used in the API call to the Census Bureau and though only one year is passed, in the case of the ACS 5 year dataset, the data is still an estimate based on the five years ending in the selected year).
+colorScale: chroma.scale(['rgb(219, 234, 254)', 'rgb(59, 130, 246)']).mode('lch').colors(6), // This is the color scale used to color the map features based on the normalized values of the selected variable.
+
 };
+
+// how to run js file in term
+
+
 
 const referenceData = { // This object defines the reference data for the app. It includes the API endpoints, syntax for querying different geographies, categories, subcategories, and variables, as well as the transformation and formatting types that can be applied to the data. This data is used to fetch, process, and display the data in the app. It can be customized to fit the specific needs of the app.
     
@@ -412,7 +397,7 @@ const referenceData = { // This object defines the reference data for the app. I
                 "B15003_015E",
                 "B15003_016E",
               ],
-              transformationType: "sumPercentage",
+              transformationType: "summedPercentage",
               baseCode: "B01001_001E",
               baseLabel: "Total Population",
               format: "summedPercentage",
@@ -433,7 +418,7 @@ const referenceData = { // This object defines the reference data for the app. I
                 "B15003_024E",
                 "B15003_025E",
               ],
-              transformationType: "sumPercentage",
+              transformationType: "summedPercentage",
               baseCode: "B01001_001E",
               baseLabel: "Total Population",
               format: "summedPercentage",
@@ -443,7 +428,7 @@ const referenceData = { // This object defines the reference data for the app. I
             "Nursery to Grade 4": {
               dataset: "acs5, acs1",
               variableCode: ["B14001_003E", "B14001_004E", "B14001_005E"],
-              transformationType: "sumPercentage",
+              transformationType: "summedPercentage",
               baseCode: "B01001_001E",
               baseLabel: "Total Population",
               format: "summedPercentage",
@@ -451,7 +436,7 @@ const referenceData = { // This object defines the reference data for the app. I
             "Grades 5 to 12": {
               dataset: "acs5, acs1",
               variableCode: ["B14001_006E", "B14001_007E", "B14001_008E"],
-              transformationType: "sumPercentage",
+              transformationType: "summedPercentage",
               baseCode: "B01001_001E",
               baseLabel: "Total Population",
               format: "summedPercentage",
@@ -459,7 +444,7 @@ const referenceData = { // This object defines the reference data for the app. I
             "College or Graduate School": {
               dataset: "acs5, acs1",
               variableCode: ["B14001_009E", "B14001_010E"],
-              transformationType: "sumPercentage",
+              transformationType: "summedPercentage",
               baseCode: "B01001_001E",
               baseLabel: "Total Population",
               format: "summedPercentage",
@@ -656,6 +641,321 @@ const referenceData = { // This object defines the reference data for the app. I
         ],
       },
     },
+  },
+  variables: {
+    'Total Population': {
+      dataset: 'acs5, acs1',
+      variableCode: 'B01001_001E',
+      transformationType: 'none',
+      baseCode: 'none',
+      baseLabel: 'none',
+      format: 'none'
+    },
+    'Male Population': {
+      dataset: 'acs5, acs1',
+      variableCode: 'B01001_002E',
+      transformationType: 'percentage',
+      baseCode: 'B01001_001E',
+      baseLabel: 'Total Population',
+      format: 'percentage'
+    },
+    'Female Population': {
+      dataset: 'acs5, acs1',
+      variableCode: 'B01001_026E',
+      transformationType: 'percentage',
+      baseCode: 'B01001_001E',
+      baseLabel: 'Total Population',
+      format: 'percentage'
+    },
+    'White Alone': {
+      dataset: 'acs5, acs1',
+      variableCode: 'B02001_002E',
+      transformationType: 'percentage',
+      baseCode: 'B01001_001E',
+      baseLabel: 'Total Population',
+      format: 'percentage'
+    },
+    'Black or African American Alone': {
+      dataset: 'acs5, acs1',
+      variableCode: 'B02001_003E',
+      transformationType: 'percentage',
+      baseCode: 'B01001_001E',
+      baseLabel: 'Total Population',
+      format: 'percentage'
+    },
+    'Hispanic or Latino': {
+      dataset: 'acs5, acs1',
+      variableCode: 'B03001_003E',
+      transformationType: 'percentage',
+      baseCode: 'B01001_001E',
+      baseLabel: 'Total Population',
+      format: 'percentage'
+    },
+    'Family Households': {
+      dataset: 'acs5, acs1',
+      variableCode: 'B11001_002E',
+      transformationType: 'percentage',
+      baseCode: 'B11001_001E',
+      baseLabel: 'Total Households',
+      format: 'percentage'
+    },
+    'Non-family Households': {
+      dataset: 'acs5, acs1',
+      variableCode: 'B11001_007E',
+      transformationType: 'percentage',
+      baseCode: 'B11001_001E',
+      baseLabel: 'Total Households',
+      format: 'percentage'
+    },
+    'English Only': {
+      dataset: 'acs5, acs1',
+      variableCode: 'C16001_002E',
+      transformationType: 'percentage',
+      baseCode: 'B01001_001E',
+      baseLabel: 'Total Population',
+      format: 'percentage'
+    },
+    Spanish: {
+      dataset: 'acs5, acs1',
+      variableCode: 'C16001_003E',
+      transformationType: 'percentage',
+      baseCode: 'B01001_001E',
+      baseLabel: 'Total Population',
+      format: 'percentage'
+    },
+    'Other Languages': {
+      dataset: 'acs5, acs1',
+      variableCode: 'C16001_004E',
+      transformationType: 'percentage',
+      baseCode: 'B01001_001E',
+      baseLabel: 'Total Population',
+      format: 'percentage'
+    },
+    'Total Veterans': {
+      dataset: 'acs5, acs1',
+      variableCode: 'B21001_001E',
+      transformationType: 'ratePerThousand',
+      baseCode: 'B01001_001E',
+      baseLabel: 'Total Population',
+      format: 'ratePerThousand'
+    },
+    'Median Household Income': {
+      dataset: 'acs5, acs1',
+      variableCode: 'B19013_001E',
+      transformationType: 'none',
+      baseCode: 'none',
+      baseLabel: 'none',
+      format: 'currency'
+    },
+    'Per Capita Income': {
+      dataset: 'acs5, acs1',
+      variableCode: 'B19301_001E',
+      transformationType: 'none',
+      baseCode: 'none',
+      baseLabel: 'none',
+      format: 'currency'
+    },
+    'Individuals Below Poverty Level': {
+      dataset: 'acs5, acs1',
+      variableCode: 'B17001_002E',
+      transformationType: 'percentage',
+      baseCode: 'B01001_001E',
+      baseLabel: 'Total Population',
+      format: 'percentage'
+    },
+    'Households Receiving Food Stamps/SNAP': {
+      dataset: 'acs5, acs1',
+      variableCode: 'B22010_002E',
+      transformationType: 'percentage',
+      baseCode: 'B11001_001E',
+      baseLabel: 'Total Households',
+      format: 'percentage'
+    },
+    'Labor Force Participation': {
+      dataset: 'acs5, acs1',
+      variableCode: 'B23001_001E',
+      transformationType: 'ratePerThousand',
+      baseCode: 'B01001_001E',
+      baseLabel: 'Total Population',
+      format: 'ratePerThousand'
+    },
+    'Unemployment Rate': {
+      dataset: 'acs5, acs1',
+      variableCode: 'B23025_005E',
+      transformationType: 'percentage',
+      baseCode: 'B23025_002E',
+      baseLabel: 'Labor Force',
+      format: 'percentage'
+    },
+    'Agriculture, Forestry, Fishing': {
+      dataset: 'acs5, acs1',
+      variableCode: 'B24020_003E',
+      transformationType: 'percentage',
+      baseCode: 'B23001_001E',
+      baseLabel: 'Labor Force Population',
+      format: 'percentage'
+    },
+    'Education, Health Care, Social Assistance': {
+      dataset: 'acs5, acs1',
+      variableCode: 'B24020_019E',
+      transformationType: 'percentage',
+      baseCode: 'B23001_001E',
+      baseLabel: 'Labor Force Population',
+      format: 'percentage'
+    },
+    'Professional, Scientific, Management': {
+      dataset: 'acs5, acs1',
+      variableCode: 'B24020_015E',
+      transformationType: 'percentage',
+      baseCode: 'B23001_001E',
+      baseLabel: 'Labor Force Population',
+      format: 'percentage'
+    },
+    'Less Than High School': {
+      dataset: 'acs5, acs1',
+      variableCode: [
+        'B15003_002E', 'B15003_003E',
+        'B15003_004E', 'B15003_005E',
+        'B15003_006E', 'B15003_007E',
+        'B15003_008E', 'B15003_009E',
+        'B15003_010E', 'B15003_011E',
+        'B15003_012E', 'B15003_013E',
+        'B15003_014E', 'B15003_015E',
+        'B15003_016E'
+      ],
+      transformationType: 'summedPercentage',
+      baseCode: 'B01001_001E',
+      baseLabel: 'Total Population',
+      format: 'percentage'
+    },
+    'High School Graduate': {
+      dataset: 'acs5, acs1',
+      variableCode: 'B15003_017E',
+      transformationType: 'percentage',
+      baseCode: 'B01001_001E',
+      baseLabel: 'Total Population',
+      format: 'percentage'
+    },
+    "Bachelor's or Higher": {
+      dataset: 'acs5, acs1',
+      variableCode: [ 'B15003_022E', 'B15003_023E', 'B15003_024E', 'B15003_025E' ],
+      transformationType: 'summedPercentage',
+      baseCode: 'B01001_001E',
+      baseLabel: 'Total Population',
+      format: 'percentage'
+    },
+    'Nursery to Grade 4': {
+      dataset: 'acs5, acs1',
+      variableCode: [ 'B14001_003E', 'B14001_004E', 'B14001_005E' ],
+      transformationType: 'summedPercentage',
+      baseCode: 'B01001_001E',
+      baseLabel: 'Total Population',
+      format: 'percentage'
+    },
+    'Grades 5 to 12': {
+      dataset: 'acs5, acs1',
+      variableCode: [ 'B14001_006E', 'B14001_007E', 'B14001_008E' ],
+      transformationType: 'summedPercentage',
+      baseCode: 'B01001_001E',
+      baseLabel: 'Total Population',
+      format: 'percentage'
+    },
+    'College or Graduate School': {
+      dataset: 'acs5, acs1',
+      variableCode: [ 'B14001_009E', 'B14001_010E' ],
+      transformationType: 'summedPercentage',
+      baseCode: 'B01001_001E',
+      baseLabel: 'Total Population',
+      format: 'percentage'
+    },
+    'Owner-Occupied Units': {
+      dataset: 'acs5, acs1',
+      variableCode: 'B25003_002E',
+      transformationType: 'percentage',
+      baseCode: 'B25003_001E',
+      baseLabel: 'Total Housing Units',
+      format: 'percentage'
+    },
+    'Renter-Occupied Units': {
+      dataset: 'acs5, acs1',
+      variableCode: 'B25003_003E',
+      transformationType: 'percentage',
+      baseCode: 'B25003_001E',
+      baseLabel: 'Total Housing Units',
+      format: 'percentage'
+    },
+    'Median Value of Owner-Occupied Housing Units': {
+      dataset: 'acs5, acs1',
+      variableCode: 'B25077_001E',
+      transformationType: 'none',
+      baseCode: 'none',
+      baseLabel: 'none',
+      format: 'currency'
+    },
+    'Median Gross Rent': {
+      dataset: 'acs5, acs1',
+      variableCode: 'B25064_001E',
+      transformationType: 'none',
+      baseCode: 'none',
+      baseLabel: 'none',
+      format: 'currency'
+    },
+    'Workers Who Commute by Car, Truck, or Van': {
+      dataset: 'acs5, acs1',
+      variableCode: 'B08006_002E',
+      transformationType: 'percentage',
+      baseCode: 'B08006_001E',
+      baseLabel: 'Total Workers Commuting',
+      format: 'percentage'
+    },
+    'Public Transportation (excluding taxicab)': {
+      dataset: 'acs5, acs1',
+      variableCode: 'B08006_008E',
+      transformationType: 'percentage',
+      baseCode: 'B08006_001E',
+      baseLabel: 'Total Workers Commuting',
+      format: 'percentage'
+    },
+    'With Health Insurance': {
+      dataset: 'acs5, acs1',
+      variableCode: 'B27001_004E',
+      transformationType: 'percentage',
+      baseCode: 'B01001_001E',
+      baseLabel: 'Total Population',
+      format: 'percentage'
+    },
+    'Without Health Insurance': {
+      dataset: 'acs5, acs1',
+      variableCode: 'B27001_005E',
+      transformationType: 'percentage',
+      baseCode: 'B01001_001E',
+      baseLabel: 'Total Population',
+      format: 'percentage'
+    },
+    'With a Disability': {
+      dataset: 'acs5, acs1',
+      variableCode: 'B18101_004E',
+      transformationType: 'percentage',
+      baseCode: 'B01001_001E',
+      baseLabel: 'Total Civilian Non-institutionalized Population',
+      format: 'percentage'
+    },
+    'Self-Employed in Own Not Incorporated Business Workers': {
+      dataset: 'acs5, acs1',
+      variableCode: 'B24080_004E',
+      transformationType: 'percentage',
+      baseCode: 'B24080_001E',
+      baseLabel: 'Total Employed Population',
+      format: 'percentage'
+    },
+    'Employment Rate': {
+      dataset: 'acs5, acs1',
+      variableCode: 'B23025_004E',
+      transformationType: 'percentage',
+      baseCode: 'B23025_002E',
+      baseLabel: 'Labor Force',
+      format: 'percentage'
+    }
   },
   censusDataAPIs: {
     acs5: {
@@ -865,12 +1165,12 @@ const referenceData = { // This object defines the reference data for the app. I
       meaning:
         "The estimate or margin of error is not applicable or not available.",
     },
-    VariesMedianLow: {
+    "VariesMedianLow": {
       annotation: "median-",
       meaning:
         "The median falls in the lowest interval of an open-ended distribution.",
     },
-    VariesMedianHigh: {
+    "VariesMedianHigh": {
       annotation: "median+",
       meaning:
         "The median falls in the highest interval of an open-ended distribution.",
