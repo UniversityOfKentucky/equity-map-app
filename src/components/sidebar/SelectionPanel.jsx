@@ -18,6 +18,7 @@ const SelectionPanel = ({ selectedGeography, setSelectedGeography, selectedVaria
                 classname=""
                 selectedVariable={selectedVariable}
                 setSelectedVariable={setSelectedVariable}
+                selectedGeography={selectedGeography}
             />
             <div className="m-2 border border-gray-200 rounded-lg">
                 <p>Information about Project</p>

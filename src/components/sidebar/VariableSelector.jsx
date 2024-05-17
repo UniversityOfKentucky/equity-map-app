@@ -8,10 +8,31 @@ import {
   RadioGroup,
 } from "@headlessui/react";
 import { ChevronUpIcon } from "@heroicons/react/24/outline";
-import { referenceData } from "../../config/config";
+import { appConfig, referenceData } from "../../config/config";
 import propTypes from "prop-types";
+import { useMemo } from "react";
+import generateVariablesReference from "../../utils/generateVariables";
 
-const VariableSelector = ({ selectedVariable, setSelectedVariable }) => {
+const VariableSelector = ({
+  selectedVariable,
+  setSelectedVariable,
+  selectedGeography,
+}) => {
+
+  useMemo(() => {
+    referenceData.variables = generateVariablesReference(referenceData.categories);
+  }, []); // This will run once when the component is mounted
+
+  const isGeographyAvailable = (variableKey) => {
+    const variableDataset =
+      referenceData.variables[variableKey].dataset.displayedDataset;
+    const availableGeographies = referenceData.censusDataAPIs[variableDataset]
+      .geographiesAvailable;
+      let selectedGeosType =
+      appConfig.geographies[selectedGeography].typeOfGeography;
+    return availableGeographies.includes(selectedGeosType);
+  };
+
   return (
     <div className="category-selector m-2 border border-gray-200 rounded-lg">
       {/* Loop over the categories in the referenceData object creating an element for each which will hold selection elements for the categories' subcategories and variables */}
@@ -49,7 +70,8 @@ const VariableSelector = ({ selectedVariable, setSelectedVariable }) => {
                           {Object.keys(
                             referenceData.categories[categoryKey].data
                               .subcategories[subcategoryKey]
-                          ).map((variableKey) => (
+                          ).map((variableKey) => 
+                            isGeographyAvailable(variableKey) ? (
                             <Field
                               key={variableKey}
                               className="flex items-stretch gap-2 self-start"
@@ -65,7 +87,8 @@ const VariableSelector = ({ selectedVariable, setSelectedVariable }) => {
                               // To be added to the config file for each variable to provide a description of the variable to the user
                               */}
                             </Field>
-                          ))}
+                            ) : null
+                          )}
                         </RadioGroup>
                       </div>
                     ))}
@@ -83,6 +106,7 @@ const VariableSelector = ({ selectedVariable, setSelectedVariable }) => {
 VariableSelector.propTypes = {
   selectedVariable: propTypes.string.isRequired,
   setSelectedVariable: propTypes.func.isRequired,
+  selectedGeography: propTypes.string.isRequired,
 };
 
 export default VariableSelector;
