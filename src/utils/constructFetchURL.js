@@ -1,16 +1,23 @@
 import { appConfig, referenceData } from '../config/config';
-
-// ACS query example: https://api.census.gov/data/2020/acs/acs5?get=B01001_002E&for=tract:000101
+import generateVariablesReference from './generateVariables';
 
 const constructFetchURL = (selectedGeography, selectedVariable) => {
+
+    
+ // This function takes the categories object and flattens it into a single object which contains all the variables:
+    referenceData.variables = generateVariablesReference(referenceData.categories);
+    console.log('referenceData.variables[selectedVariable]: ', referenceData.variables[selectedVariable])
+
     const baseUrl = "https://api.census.gov/data";
     const year = "2022"; // Adjust as needed
-    const dataset = "acs/acs5"; // Example dataset, adjust based on your requirement
+    let dataset = referenceData.variables[selectedVariable].dataset.displayedDataset; // Example dataset, adjust based on your requirement
     const variableCode = referenceData.variables[selectedVariable].variableCode;
-    // console.log('selectedVariable', selectedVariable, 'selectedGeography', selectedGeography, 'variableCode', variableCode)
+    if (dataset.startsWith("acs")) {
+        dataset = `acs/${dataset}`;
+    }
 
 
-// ONce the variable codes are retrieved, the base code (if not null) is concatenated to the variable code. The base code is used to calculate the transformed value.
+// Once the variable codes are retrieved, the base code (if not null) is concatenated to the variable code. The base code is used to calculate the transformed value.
 
     const baseCode = referenceData.variables[selectedVariable].baseCode;
 
