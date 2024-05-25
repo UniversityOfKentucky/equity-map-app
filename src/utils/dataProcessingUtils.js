@@ -1,99 +1,125 @@
 import { appConfig, referenceData } from '../config/config';
 
 function processData(acsData, selectedVariables, selectedGeography) {
-  // The processData function takes the response array from the ACS API and the selected variables from the user and processes the data according to the selected variables
+  const currentVariableProps = referenceData.variables[selectedVariables];
 
-const currentVariableProps = referenceData.variables[selectedVariables];
+  let parsedData = parseData(acsData, currentVariableProps, selectedGeography);
+  console.log('PARSED DATA RETURNED TO PROCESSDATA | LINE 16', parsedData);
 
-// console.log(
-//   `CURRENT VARIABLE ${selectedVariables}
-//   BASE CODE ${currentVariableProps.baseCode} 
-//   TRANSFORMATION TYPE ${currentVariableProps.transformationType}
-//   CURRENT GEOGRAPHY ${selectedGeography}`)
+  let transformedData = transformData(parsedData, currentVariableProps.transformationType);
+  console.log('TRANSFORMED DATA RETURNED TO PROCESSDATA | LINE 15', transformedData);
 
-  let parsedData = parseData(acsData, currentVariableProps, selectedGeography); // Example: { '000101': { variablevalue: [1650, 3163], baseEstimate: 3163 }, '000102': { variablevalue: [1554, 18887], baseEstimate: 18887 } }
+  // Extract numeric values for normalization
+  const validValues = Object.values(transformedData).map(value => 
+    value in referenceData.annotationValues || isNaN(value) ? 0 : value
+  );
 
-  // console.log('PARSED DATA RETURNED TO PROCESSDATA | LINE 16', parsedData)
-
-  let transformedData = transformData(parsedData, currentVariableProps.transformationType); // example: { '000101': '52.11%', '000102': '8.23%' }
-
-  // console.log('TRANSFORMED DATA RETURNED TO PROCESSDATA | LINE 15 ', transformedData)
-  // Extract values for normalization
-  const values = Object.values(transformedData).map(value => parseFloat(value));
-  const min = Math.min(...values);
-  const max = Math.max(...values);
-  // console.log('MIN', min, 'MAX', max)
+  const min = Math.min(...validValues);
+  const max = Math.max(...validValues);
+  console.log('MIN', min, 'MAX', max);
 
   // Create a color scale using chroma.js
   const colorScale = appConfig.colorScale;
-  
+
+  // Initialize processedData object
   let processedData = {};
 
-  // Loop through the transformed data and normalize the values to a color scale, storing the values and colors in the processedData object
+  // Normalize values and store processed data
   for (const geoCode in transformedData) {
-    const value = parseFloat(transformedData[geoCode]);
-    // console.log('VALUE', value)
+    
+    if (transformedData[geoCode] in referenceData.annotationValues || transformedData[geoCode] == 0) { // If the transformedData value is an annotation value, we assign the transformedData value to the processedData object without normalizing the value or assigning a color
+      processedData[geoCode] = {
+        formattedData: transformedData[geoCode]
+      }
+      continue;
+    }
 
-    const normalizedValue = (value - min) / (max - min);
-
+    const value = transformedData[geoCode];
+    const normalizedValue = isNaN(value) ? 0 : (value - min) / (max - min);
     const colorIndex = Math.floor(normalizedValue * (colorScale.length - 1));
 
-    processedData[geoCode] = { // Store the processed data keyed by the geographic code
+
+    processedData[geoCode] = { 
       formattedData: formatData(value, currentVariableProps.format),
-      color: colorScale[colorIndex]
+      color: colorScale[colorIndex],
     };
   }
 
-  // console.log('processedData', processedData)
-
-  return processedData; // Example: { '000101': { formattedData: '52.11%', color: 'rgb(219, 234, 254)' }, '000102': { formattedData: '8.23%', color: 'rgb(59, 130, 246)' } }
+  return processedData; 
 }
+
+function formatData(value, format) {
+  if (value === null || isNaN(value)) {
+    return 'No data';
+  }
+
+  switch (format) {
+    case "currency":
+      return value === 0 ? "No data" : value.toLocaleString("en-US", { style: "currency", currency: "USD" });
+    case "percentage":
+      return value === 0 ? "No data" : `${value}%`;
+    case "ratePerThousand":
+      return value === 0 ? "No data" : `${value} per 1,000 residents`;
+    case "none":
+      return value === 0 ? "No data" : value.toLocaleString("en-US");
+    default:
+      console.error("Format not recognized");
+      return value;
+  }
+}
+
 
 function parseData(acsData, currentVariableProps, selectedGeography) {
   let parsedData = {};
   
   if (currentVariableProps.transformationType !== "none") {
-    // console.log(`ROUTED THROUGH IF STATEMENT IN PARSE DATA (TX TYPE EXISTS AND IS NOT "none")| LINE 41
-    // Transformation Type: ${currentVariableProps.transformationType}`)
     for (let i = 1; i < acsData.length; i++) {
       const row = acsData[i];
       const geoCode = row[row.length - 1];  // The geographic code, which is the last value in the row
-      const locationIndex = selectedGeography === 'fayetteCountyTracts' ? row.length - 3 :
-                            selectedGeography === 'kentuckyCounties' ? row.length - 2 :
-                            row.length - 1;  // Adjust based on geography
+      let locationIndex = currentVariableProps.dataset.displayedDataset === 'acs5'
+      ? (selectedGeography === 'fayetteCountyTracts' ? row.length - 3
+        : selectedGeography === 'kentuckyCounties' ? row.length - 2
+        : row.length - 1)
+      : (currentVariableProps.dataset.displayedDataset === 'abscs' ? row.length - 1
+        : row.length - 1
+      );
+    console.log('row.length', row.length, 'locationIndex', locationIndex, 'geoCode', geoCode, 'row', row, 'selectedGeography', selectedGeography, 'currentVariableProps', currentVariableProps, 'acsData', acsData)
 
       let censusEstimates = row.slice(0, locationIndex); // The census estimates are all values up to the location index
 
-      censusEstimates = censusEstimates.map(value => // Map over the census estimates and convert to integers
-        value in referenceData.annotationValues 
-          ? value  // Keep as string if it's a known annotation
-          : parseInt(value, 10)  // Convert to integer otherwise
-      );
+      currentVariableProps.dataset.displayedDataset === 'abscs' && currentVariableProps.baseFilter
+      ? currentVariableProps.baseCode = currentVariableProps.baseFilter
+      : "none";
       
-      let baseEstimate; // The base estimate (if present) is the last value in the census estimates
+      
+      let baseEstimates = [];
+
       if (currentVariableProps.baseCode) {
-        // console.log('HAS BASE VALUE IN PARSE DATA ', currentVariableProps.baseCode)
-        baseEstimate = censusEstimates.pop(); // Remove and use the last value as baseEstimate if needed
-        if (!(baseEstimate in referenceData.annotationValues)) {
-          baseEstimate = parseInt(baseEstimate, 10);  // Convert baseEstimate to integer if it's not an annotation
-        } else {
-          // console.log(
-          //   `BASE VALUE IS AN ANNOTATION
-          //   ${baseEstimate}
-          //   ${referenceData.annotationValues[baseEstimate]}`)
+        if (currentVariableProps.baseCode.length > 1) { // If there are multiple base estimates, we loop through the baseCode array and push the corresponding base estimates to the baseEstimates array
+
+        // Loop through baseCode array
+        currentVariableProps.baseCode.forEach((baseCode) => {
+          const baseIndex = acsData[0].indexOf(baseCode);
+          baseIndex !== -1 ? baseEstimates.push(row[baseIndex]) : baseEstimates.push(null); // If the baseCode is not found, push null to the baseEstimates array otherwise push the base estimate to the baseEstimates array
+        });
+
+        // Remove the baseCode values from the censusEstimates array 
+        let nunberOfBaseCodes = currentVariableProps.baseCode.length;
+        let startIndex = censusEstimates.length - nunberOfBaseCodes;
+        censusEstimates.splice(startIndex, nunberOfBaseCodes);
+
+        } else { // If there is only one base estimate, we remove the baseCode from the censusEstimates array and assign it to the baseEstimate variable by popping it off the array
+          baseEstimates = censusEstimates.pop();
         }
       }
 
-      // This code block is for variables that require transformation. The ternary operator checks if the baseEstimate is defined and if so uses array destructuring to assign the variablevalue and baseEstimate to the parsedData object. If the baseEstimate is not defined, only the variablevalue are assigned to the parsedData object under a variablevalue key as well.
+      // This code block is for variables that require transformation. The ternary operator checks if the baseEstimate is defined and if so assigns the censusEstimates and baseEstimate to the parsedData object. If the baseEstimate is not defined, only the censusEstimates are assigned to the parsedData object under a censusEstimates key as well.
       parsedData[geoCode] = currentVariableProps.baseCode
-        ? { censusEstimates, baseEstimate }
+        ? { censusEstimates, baseEstimates }
         : { censusEstimates: censusEstimates };
-      // Unlike in the case of `parsedData[geoCode] = baseEstimate ? { variablevalue, baseEstimate } : variablevalue;` the value is assigned to a key within parsedData object. This is because the baseEstimate is not always present in the data and the parsedData object needs to be consistent across all geographies.
-      // console.log('PARSED DATA BEING RETURNED FROM IF STATEMENT IN PARSE DATA: ', parsedData)
       
     }
   } else { // For 'Total Population' and other variables that don't require transformation
-    // console.log('ROUTED THROUGH ELSE STATEMENT IN PARSE DATA (TX TYPE IS "none")| LINE 41');
 
     for (let i = 1; i < acsData.length; i++) {
       const row = acsData[i];
@@ -101,73 +127,74 @@ function parseData(acsData, currentVariableProps, selectedGeography) {
       const censusEstimates = row[0]; // The variable value is the first value in the row
       
       // adds value as a value to a 'censusEstimates' key in the parsedData[geocode] object
-      parsedData[geoCode] = { censusEstimates: [parseInt(censusEstimates, 10)] };
+      parsedData[geoCode] = { censusEstimates: [parseInt(censusEstimates, 10)] }; // Check for annotation values
     }
-    // console.log('PARSED DATA BEING RETURNED FROM ELSE STATEMENT IN PARSE DATA: ', parsedData)
   }
   return parsedData; 
 }
 
-
-
-
 function transformData(parsedData, transformationType) {
-  // console.log(`PASSED TO TRANSFORM DATA | LINE 114
-  // TRANSFORMATION TYPE: ${transformationType}
-  // `);
-  // console.log('parsedData', parsedData);
+  const annotationValues = referenceData.annotationValues;
 
-  let transformedData = {};  
-  let targetCensusEstimates;
-  let targetBaseEstimate;
+  const convertValues = (data) => {
+    if (!data) return data;
+    const dataArray = Array.isArray(data) ? data : [data]; // Ensure data is an array
+    for (let i = 0; i < dataArray.length; i++) {
+      const value = dataArray[i];
+      if (value in annotationValues) {
+        return value; // Return the annotation value if found
+      }
+      dataArray[i] = parseFloat(value); // Convert to float otherwise
+    }
+    return dataArray;
+  };
+
+  const processEstimates = (estimates) => {
+    if (Array.isArray(estimates)) {
+      const result = estimates.length > 1 ? estimates.reduce((a, b) => a + b, 0) : estimates[0];
+      return result;
+    }
+    return estimates;
+  };
+
+  const applyTransformation = (census, base, type) => {
+    switch (type) {
+      case "percentage":
+        return ((census / base) * 100).toFixed(2);
+      case "ratePerThousand":
+        return ((census / base) * 1000).toFixed(2);
+      case "summedPercentage":
+        return ((census / base) * 100).toFixed(2);
+      case "subtractedPercentage":
+        return ((base - census) / base * 100).toFixed(2);
+      case "none":
+      default:
+        return census;
+    }
+  };
+
+  let transformedData = {};
 
   for (const key in parsedData) {
-    targetCensusEstimates = parsedData[key]["censusEstimates"];
-    targetBaseEstimate = parsedData[key].baseEstimate;
-    
-    switch (transformationType) {
-      case "percentage":
-        transformedData[key] = (targetCensusEstimates / targetBaseEstimate * 100).toFixed(2); 
-        break;
-      case "ratePerThousand":
-        transformedData[key] = (targetCensusEstimates / targetBaseEstimate * 1000).toFixed(2); 
-        break;
-      case 'summedPercentage':
-        {const sum = targetCensusEstimates.reduce((acc, curr) => acc + curr, 0);
-        transformedData[key] = (sum / targetBaseEstimate * 100).toFixed(2); }
-        break;
-      case 'none':
-        transformedData[key] = targetCensusEstimates; 
-        break;
-      default:
-        transformedData[key] = targetCensusEstimates; 
-        break;
-    }
-  }
-  
-  return transformedData;
-}
+    // Convert census and base estimates
+    let convertedCensus = convertValues(parsedData[key]["censusEstimates"]);
+    let convertedBase = convertValues(parsedData[key]["baseEstimates"]);
 
-function formatData(value, format) {
-  if (value === null) { // If the value is null, return null
-    return null;
-  }
-  if (value in referenceData.annotationValues) { // If the value is an annotation, return the annotation and meaning
-    return referenceData.annotationValues[value].annotation, referenceData.annotationValues[value].meaning;
-  } else { 
-    switch (format) { // If the value is not an annotation, apply the specified format
-      case "currency": 
-        return `$${value.toLocaleString()}`;
-      case "percentage":
-        return `${value}%`;
-      case "ratePerThousand":
-        return `${value}/1,000`;
-      case "none":
-        return value.toLocaleString();
-      default: // If the format is not recognized, return an error
-        return console.error("Format not recognized");
+    // Check for annotation values
+    if (convertedCensus in annotationValues) {
+      transformedData[key] = convertedCensus;
+    } else if (convertedBase in annotationValues) {
+      transformedData[key] = convertedBase;
+    } else {
+      // Process and transform data
+      let targetCensusEstimates = processEstimates(convertedCensus);
+      let targetBaseEstimates = processEstimates(convertedBase);
+      transformedData[key] = applyTransformation(targetCensusEstimates, targetBaseEstimates, transformationType);
     }
   }
+  console.log('TRANSFORMED DATA', transformedData);
+
+  return transformedData;
 }
 
 export { processData }
