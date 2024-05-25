@@ -3,6 +3,7 @@ import "leaflet/dist/leaflet.css";
 import PropTypes from "prop-types";
 import { appConfig } from "../../config/config";
 import DataLayerContainer from "./DataLayerContainer";
+import FeaturesPanel from "./FeaturesPanel";
 
 const MapView = ({ selectedGeography, selectedVariable }) => {
   const mapSettings = appConfig.geographies[selectedGeography].mapSettings;
@@ -31,6 +32,7 @@ const MapView = ({ selectedGeography, selectedVariable }) => {
           selectedGeography={selectedGeography}
           selectedVariable={selectedVariable}
         />
+        <FeaturesPanel />
       </MapContainer>
     </div>
   );
