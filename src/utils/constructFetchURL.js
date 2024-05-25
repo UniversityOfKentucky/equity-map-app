@@ -1,33 +1,34 @@
 import { appConfig, referenceData } from '../config/config';
 import generateVariablesReference from './generateVariables';
 
-const constructFetchURL = (selectedGeography, selectedVariable) => {
+const constructFetchURL = (selectedGeography, selectedVariable, filterType = null) => {
+  referenceData.variables = generateVariablesReference(referenceData.categories);
+  const selectedVariablesProps = referenceData.variables[selectedVariable];
 
-    
- // This function takes the categories object and flattens it into a single object which contains all the variables:
-    referenceData.variables = generateVariablesReference(referenceData.categories);
-    console.log('referenceData.variables[selectedVariable]: ', referenceData.variables[selectedVariable])
+  console.log('ConstructFetchURL Called');
+  const baseUrl = "https://api.census.gov/data";
+  let year;
+  let dataset = selectedVariablesProps.dataset.displayedDataset;
+  const variableCode = selectedVariablesProps.variableCode.join(',');
+  let geoCode = appConfig.geographies[selectedGeography].apiEndpoints.apiQuery;
 
-    const baseUrl = "https://api.census.gov/data";
-    const year = "2022"; // Adjust as needed
-    let dataset = referenceData.variables[selectedVariable].dataset.displayedDataset; // Example dataset, adjust based on your requirement
-    const variableCode = referenceData.variables[selectedVariable].variableCode;
-    if (dataset.startsWith("acs")) {
-        dataset = `acs/${dataset}`;
-    }
+  if (dataset.startsWith("acs")) {
+    console.log('ACS Dataset');
+    year = "2022";
+    dataset = `acs/${dataset}`;
+  } else if (dataset.startsWith("abscs")) {
+    year = "2021";
+    geoCode += filterType === 'base' ? selectedVariablesProps.baseFilter : selectedVariablesProps.filter;
+  }
+ console.log('Geo Code', geoCode);
+ console.log('baseCode', selectedVariablesProps.baseCode)
+  const baseCode = selectedVariablesProps.baseCode ? selectedVariablesProps.baseCode.join(',') : null;
+  console.log('Base Code', baseCode);
+  const queryCodes = baseCode ? `${variableCode},${baseCode}` : variableCode;
+  console.log('Query Codes', queryCodes);
+  let url = `${baseUrl}/${year}/${dataset}?get=${queryCodes}&for=${geoCode}`;
+  console.log('URL', url);
+  return url;
+};
 
-
-// Once the variable codes are retrieved, the base code (if not null) is concatenated to the variable code. The base code is used to calculate the transformed value.
-
-    const baseCode = referenceData.variables[selectedVariable].baseCode;
-
-    const queryCodes = baseCode && baseCode !== "none" ? `${variableCode},${baseCode}` : variableCode;
-
-// console.log('appConfig.geographies[selectedGeography]: ', appConfig.geographies[selectedGeography])
-    
-    const geoCode = appConfig.geographies[selectedGeography].apiEndpoints.apiQuery;
-  
-    return `${baseUrl}/${year}/${dataset}?get=${queryCodes}&for=${geoCode}`;
-  };
-
-  export default constructFetchURL;
+export default constructFetchURL;
