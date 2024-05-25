@@ -1,42 +1,43 @@
 import chroma from "chroma-js";
 
-const appConfig = { // This object defines the configuration settings for the app. It includes the default settings for the app, such as the initial geography, category, and subcategory to be displayed, as well as the available geographies, categories, and subcategories that are rendered in the SelectionPanel. It also includes the default variables that are visualized in the map features' popups by default (in contrast to the user-selected variable visualization (which is also displayed in the popups after selection). These settings can be customized to fit the specific needs of the app.
-geographies: {
+const appConfig = {
+  geographies: {
     fayetteCountyTracts: {
+      typeOfGeography: "Census Tracts",
       label: "Fayette County",
-      geoCodeField: "TRACTCE", // This property is used to match the location code in the geojson features with the location code in the census data. It must be a unique identifier for each feature in the geojson file.
+      geoCodeField: "TRACTCE",
       apiEndpoints: {
         countyFIPScode: "067",
         stateFIPScode: "21",
         apiQuery: "tract:*&in=state:21&in=county:067",
       },
-
       geoJSONfileName: "tracts.geojson",
       mapSettings: {
         center: [38, -84.5037],
         zoom: 11,
         minZoom: 11,
-        maxZoom: 18
-      }
+        maxZoom: 18,
+      },
     },
     kentuckyMSAs: {
+      typeOfGeography: "Metropolitan Statistical Areas",
       label: "Kentucky Metro Statistical Areas",
-      geoCodeField: "GEOID", 
+      geoCodeField: "GEOID",
       apiEndpoints: {
-        // Lexington-Fayette, KY MSA
-        MSAFIPScode: "30460", // Not used in the current implementation. This is an example of how a specific MSA FIPS code can be defined for fetching data.
-        apiQuery: "metropolitan%20statistical%20area/micropolitan%20statistical%20area:30460,17300,23180,23190,23980,25775,31580,32460,37140,49080,21060,14540,18340,34460,36980,43700,15820,17140,19220,34660,26580,31140,33180,382107",
-
-      }, // All MSA FIPS codes for Kentucky
+        MSAFIPScode: "30460",
+        apiQuery:
+          "metropolitan%20statistical%20area/micropolitan%20statistical%20area:30460,17300,23180,23190,23980,25775,31580,32460,37140,49080,21060,14540,18340,34460,36980,43700,15820,17140,19220,34660,26580,31140,33180,382107",
+      },
       geoJSONfileName: "msa.geojson",
       mapSettings: {
         center: [37.7153, -85.8569],
-        zoom: 7.25, 
-        minZoom: 7.25, 
-        maxZoom: 18
-      }
+        zoom: 7.25,
+        minZoom: 7.25,
+        maxZoom: 18,
+      },
     },
     kentuckyCounties: {
+      typeOfGeography: "Counties",
       label: "Kentucky Counties",
       geoCodeField: "COUNTYFP",
       apiEndpoints: {
@@ -48,51 +49,26 @@ geographies: {
         center: [37.8223, -85.7682],
         zoom: 7.25,
         minZoom: 7.25,
-        maxZoom: 18
-      }
+        maxZoom: 18,
+      },
     },
   },
-initialGeography: "fayetteCountyTracts", // This is the default geography that is visualized in the map when the app is first loaded.
-initialCategory: "Demographics", // This is the default category that is visualized in the SelectionPanel when the app is first loaded.
-initialSubcategory: "Age and Gender", // This is the default subcategory that is visualized in the SelectionPanel when the app is first loaded.
-popupVisualizationsVariables: [
-  "Total Population",
-  "Median Household Income",
-  "Percentage of Population with a Bachelor's Degree or Higher",
-  "Percentage Without Health Insurance",
-  "Median Value of Owner-Occupied Housing Units",
-  "Percent Self-Employed",
-], // These are the variables that are always visualized in the map features' popups by default (in contrast to the user-selected variable visualization (which is also displayed in the popups after selection). They do not change based on user selection. Ensure they are properly defined and nested in the categories object below to ensure proper fetching and data transformation.
-initialTimePeriod: "2022", // This is the default time period for the data. In the current implementation, this must be a single year (not a range, such as "2012-2017"). This value is used in the API call to the Census Bureau and though only one year is passed, in the case of the ACS 5 year dataset, the data is still an estimate based on the five years ending in the selected year).
-colorScale: chroma.scale(['rgb(219, 234, 254)', 'rgb(59, 130, 246)']).mode('lch').colors(6), // This is the color scale used to color the map features based on the normalized values of the selected variable.
-
+  initialGeography: "fayetteCountyTracts",
+  initialCategory: "Demographics",
+  initialSubcategory: "Age and Gender",
+  popupVisualizationsVariables: [
+    "Total Population",
+    "Median Household Income",
+    "Percentage of Population with a Bachelor's Degree or Higher",
+    "Percentage Without Health Insurance",
+    "Median Value of Owner-Occupied Housing Units",
+    "Percent Self-Employed",
+  ],
+  initialTimePeriod: "2022",
+  colorScale: chroma.scale(["rgb(219, 234, 254)", "rgb(59, 130, 246)"]).mode("lch").colors(6),
 };
 
-// how to run js file in term
-
-
-
-const referenceData = { // This object defines the reference data for the app. It includes the API endpoints, syntax for querying different geographies, categories, subcategories, and variables, as well as the transformation and formatting types that can be applied to the data. This data is used to fetch, process, and display the data in the app. It can be customized to fit the specific needs of the app.
-    
-    // Note:
-        // Before adding a new variable, dataset, or geography, it is important to double-check the Census Bureau API documentation to ensure the data is available and the syntax is correct.
-            // Variables, years, and geographies available in the Census Bureau API can vary between datasets. 
-                    // Sometimes the same variable is available between two datasets but the variable code is different. Sometimes, a variable's variable code is different from year to year, even in the same dataset! 
-                    // Sometimes the geographies available for a given dataset vary between years.
-                    // Sometimes the api syntax for querying the data is different even for the same variable in the same dataset between years.
-        // There are many such inconsistencies, and unfortunately, the Census Bureau documentation is not always clear or consistent or available. 
-        // For working with ACS data specifically, I recommend using the Census Reporter website to find the variable codes and geographies you need > http://censusreporter.org/
-
-    // To add a new variable from the Census Bureau API:
-        // If the variable is available in an existing dataset:
-            // 1. Add the variable to the appropriate category and subcategory in the categories object below. This placement is arbitrary and can be adjusted to fit the app's organization.
-            // 2. Define the dataset, variable code, transformation type, base code, base label, and format for the variable in the categories object below.
-        // If the variable is in a new dataset:
-            // 1. Refer to the Census Bureau API documentation to find/doublecheck the appropriate dataset, variable codes, and syntax for querying the data.
-            // 2. Add the dataset to the censusDataAPIs object below.
-            // 3. Adjust the geographiesAPISyntax object to include the syntax for the new dataset if needed.
-            // 4. Follow the steps above to add the variable to the appropriate category and subcategory in the categories object below.
-
+const referenceData = {
   censusAPIUtilities: {
     "Census TIGERweb GeoServices REST API": {
       description: "Access to geographic and cartographic boundary data",
@@ -104,1051 +80,1215 @@ const referenceData = { // This object defines the reference data for the app. I
     },
   },
   geographiesAPISyntax: {
-    // This non-exhaustive object defines the syntax for the different geographies that can be queried in the Census Bureau API. Not all datasets are available for all geographies. The syntax must be properly formatted according to the Census Bureau API documentation. Visit https://www.census.gov/data/developers/data-sets.html for more information.
     States: {
-      allStates: '&for=state:*',
-      specificState: '&for=state:${stateFIPScode}',
+      allStates: "&for=state:*",
+      specificState: "&for=state:${stateFIPScode}",
     },
     Counties: {
-      allCounties: '&for=county:*',
-      allCountiesInState: '&for=county:*&in=state:${stateFIPScode}',
-      specificCounty: '&for=county:${countyFIPScode}&in=state:${stateFIPScode}',
+      allCounties: "&for=county:*",
+      allCountiesInState: "&for=county:*&in=state:${stateFIPScode}",
+      specificCounty: "&for=county:${countyFIPScode}&in=state:${stateFIPScode}",
     },
     "Metropolitan Statistical Areas": {
-      allMSAs: '&for=metropolitan%20statistical%20area/micropolitan%20statistical%20area:*',
-      specificMSA: '&for=metropolitan%20statistical%20area/micropolitan%20statistical%20area:${MSAFIPScode}',
+      allMSAs: "&for=metropolitan%20statistical%20area/micropolitan%20statistical%20area:*",
+      specificMSA: "&for=metropolitan%20statistical%20area/micropolitan%20statistical%20area:${MSAFIPScode}",
     },
-    "Congressional Districts": '&for=congressional%20district:*',
-    Places: '&for=place:*',
+    "Congressional Districts": "&for=congressional%20district:*",
+    Places: "&for=place:*",
     "Census Tracts": {
-      allTracts: '&for=tract:*',
-      allTractsInCounty: '&for=tract:*&in=state:${stateFIPScode}&in=county:${countyFIPScode}',
-      specificTract: '&for=tract:${tractFIPScode}&in=state:${stateFIPScode}&in=county:${countyFIPScode}',
+      allTracts: "&for=tract:*",
+      allTractsInCounty: "&for=tract:*&in=state:${stateFIPScode}&in=county:${countyFIPScode}",
+      specificTract: "&for=tract:${tractFIPScode}&in=state:${stateFIPScode}&in=county:${countyFIPScode}",
     },
-    "Block Groups": '&for=block%20group:*',
-    Blocks: '&for=block:*',
-    "Cities and Towns": '&for=place:*',
-    "ZIP Code Tabulation Areas": '&for=zip%20code%20tabulation%20area:*',
-    Regions: '&for=region:*',
-    },
+    "Block Groups": "&for=block%20group:*",
+    Blocks: "&for=block:*",
+    "Cities and Towns": "&for=place:*",
+    "ZIP Code Tabulation Areas": "&for=zip%20code%20tabulation%20area:*",
+    Regions: "&for=region:*",
+  },
   categories: {
-    _reference: {
-      "Category Title": {
-        // This object defines the categories that are rendered in the SelectionPanel. To add a new category, add a new key-value pair to this object.
-        "Subcategory Title": {
-          // This object defines the subcategories that are rendered in the SelectionPanel under their associated Category. To add a new subcategory, add a new key-value pair to this object.
-          "Variable Label": {
-            // The variable label is the name that is displayed in the SelectionPanel. It should be a human-readable name that describes the variable.
-            dataset: "datasetSlug", // The dataset is a string that specifies the dataset to be used in the API call. It must be equal to a key defined in the censusDataAPIs object below.
-            variableCode: "XXXXX_XXXE", // The variable code is the unique identifier for the variable in the Census Bureau API. It is used in the API call to fetch the data. Many variables require multiple variable codes, separated by commas.
-            // For instance, in the case of "Educational Attainment" below, the variable code is a list of all the codes for the different levels of educational attainment.
-            // In this case, the app will fetch data for all the codes and then process the data as an array.
-            transformationType: "none", // The transformationType is a string that specifies the type of transformation to be applied to the data. If no transformation is needed, set this value to "none". If a transformation is needed, set this value to the appropriate transformation type (e.g., "percentage", "summedPercentage", "ratePerThousand", "convertToCurrency"), etc. The transformationType specified, must be defined in the transform function in the dataTransformUtils.js file.
-            baseCode: "XXXXX_XXXE", // The baseCode is the variable code of the variable that is used as the base value for the transformation and used to calculate the transformed value. For instance, in the case of a percentage transformation, the base value is used to calculate the percentage of the variable value. This is only needed if the transformationType is not "none".
-            baseLabel: "Total Population", // The baseLabel is used to indicate the base value in the user interface. It is a human-readable label that describes the base value. This is only needed if the transformationType is not "none".
-            format: "currency", // The format is a string that specifies how the data should be formatted for display. If no formatting is needed, set this value to "none". If formatting is needed, set this value to the appropriate format type (e.g., "percentage", "currency", "ratePerThousand"), etc. The format specified, must be defined in the formatData function in the dataProcessingUtils.js file.
+    "Community Economic Development": {
+      data: {
+        subcategories: {
+          Women: {
+            "Women 25 and Over with a Bachelors Degree or Higher": {
+              dataset: { availableIn: ["acs5"], displayedDataset: "acs5" },
+              variableCode: ["B15002_032E", "B15002_033E", "B15002_034E", "B15002_035E"],
+              transformationType: "summedPercentage",
+              baseCode: ["B15002_019E"],
+              baseLabel: "Total Female Population 25 and Over",
+              format: "percentage",
+            },
+            "Women 16 and Over Employed In the Labor Force": {
+              dataset: { availableIn: ["acs5"], displayedDataset: "acs5" },
+              variableCode: [
+                "B23001_093E", "B23001_100E", "B23001_107E", "B23001_114E", "B23001_121E", "B23001_128E",
+                "B23001_135E", "B23001_142E", "B23001_149E", "B23001_156E", "B23001_161E", "B23001_166E",
+                "B23001_171E"
+              ],
+              transformationType: "summedPercentage",
+              baseCode: [
+                "B23001_090E", "B23001_097E", "B23001_104E", "B23001_111E", "B23001_118E", "B23001_125E",
+                "B23001_132E", "B23001_139E", "B23001_146E", "B23001_153E", "B23001_160E", "B23001_165E",
+                "B23001_170E"
+              ],
+              baseLabel: "Women in the civilian labor force age 16 years and over",
+              format: "percentage",
+            },
+          },
+          Veterans: {
+            "Total Veterans in the Civilian Population": {
+              dataset: { availableIn: ["acs5"], displayedDataset: "acs5" },
+              variableCode: ["B21001_002E"],
+              transformationType: "percentage",
+              baseCode: ["B21001_001E"],
+              baseLabel: "Total Civilian Population 18 and Over",
+              format: "percentage",
+            },
+            "Total Female Veterans in the Civilian Population": {
+              dataset: { availableIn: ["acs5"], displayedDataset: "acs5" },
+              variableCode: ["B21001_023E"],
+              transformationType: "percentage",
+              baseCode: ["B21001_022E"],
+              baseLabel: "Total Female Civilian Population 18 and Over",
+              format: "percentage",
+            },
+            "Total Male Veterans in the Civilian Population": {
+              dataset: { availableIn: ["acs5"], displayedDataset: "acs5" },
+              variableCode: ["B21001_005E"],
+              transformationType: "percentage",
+              baseCode: ["B21001_004E"],
+              baseLabel: "Total Male Civilian Population 18 and Over",
+              format: "percentage",
+            },
+            "Percent of Veterans 18 to 64 Who Are Employed": {
+              dataset: { availableIn: ["acs5"], displayedDataset: "acs5" },
+              variableCode: [
+                "B21005_005E", "B21005_016E", "B21005_027E"
+              ],
+              transformationType: "summedPercentage",
+              baseCode: [
+                "B21005_003E", "B21005_014E", "B21005_025E"
+              ],
+              baseLabel: "Veteran Population 18 to 64 Years",
+              format: "percentage",
+            },
+            "Median Income for Veterans": {
+              dataset: { availableIn: ["acs5"], displayedDataset: "acs5" },
+              variableCode: ["B21004_002E"],
+              transformationType: "none",
+              format: "currency",
+            },
+          },
+          Minorities: {
+            "Minorities as a Percent of the Total Population": {
+              dataset: { availableIn: ["acs5"], displayedDataset: "acs5" },
+              variableCode: ["B02001_002E"],
+              transformationType: "subtractedPercentage",
+              baseCode: ["B02001_001E"],
+              baseLabel: "Total Population",
+              format: "percentage",
+            },
+          },
+          "Woman-Owned Businesses": {
+            "Percent of Total Businesses Owned by Women": {
+              dataset: { availableIn: ["abscs"], displayedDataset: "abscs" },
+              variableCode: ["FIRMPDEMP"],
+              transformationType: "percentage",
+              format: "percentage",
+              filter: "&NAICS2017=00&SEX=002",
+              baseFilter: ["&NAICS2017=00&SEX=001"],
+            },
+            "Women-Owned Businesses with sales/receipts of less than $5,000": {
+              dataset: { availableIn: ["abscs"], displayedDataset: "abscs" },
+              variableCode: ["FIRMPDEMP"],
+              transformationType: "percentage",
+              format: "percentage",
+              filter: "&NAICS2017=00&SEX=002&RCPSZFI=511",
+              baseFilter: ["&NAICS2017=00&SEX=002&RCPSZFI=001"],
+            },
+            "Women-Owned Businesses with sales/receipts of $5,000 to $9,999": {
+              dataset: { availableIn: ["abscs"], displayedDataset: "abscs" },
+              variableCode: ["FIRMPDEMP"],
+              transformationType: "percentage",
+              format: "percentage",
+              filter: "&NAICS2017=00&SEX=002&RCPSZFI=518",
+              baseFilter: ["&NAICS2017=00&SEX=002&RCPSZFI=001"],
+            },
+            "Women-Owned Businesses with sales/receipts of $10,000 to $24,999": {
+              dataset: { availableIn: ["abscs"], displayedDataset: "abscs" },
+              variableCode: ["FIRMPDEMP"],
+              transformationType: "percentage",
+              format: "percentage",
+              filter: "&NAICS2017=00&SEX=002&RCPSZFI=519",
+              baseFilter: ["&NAICS2017=00&SEX=002&RCPSZFI=001"],
+            },
+            "Women-Owned Businesses with sales/receipts of $25,000 to $49,999": {
+              dataset: { availableIn: ["abscs"], displayedDataset: "abscs" },
+              variableCode: ["FIRMPDEMP"],
+              transformationType: "percentage",
+              format: "percentage",
+              filter: "&NAICS2017=00&SEX=002&RCPSZFI=521",
+              baseFilter: ["&NAICS2017=00&SEX=002&RCPSZFI=001"],
+            },
+            "Women-Owned Businesses with sales/receipts of $50,000 to $99,999": {
+              dataset: { availableIn: ["abscs"], displayedDataset: "abscs" },
+              variableCode: ["FIRMPDEMP"],
+              transformationType: "percentage",
+              format: "percentage",
+              filter: "&NAICS2017=00&SEX=002&RCPSZFI=522",
+              baseFilter: ["&NAICS2017=00&SEX=002&RCPSZFI=001"],
+            },
+            "Women-Owned Businesses with sales/receipts of $100,000 to $249,999": {
+              dataset: { availableIn: ["abscs"], displayedDataset: "abscs" },
+              variableCode: ["FIRMPDEMP"],
+              transformationType: "percentage",
+              format: "percentage",
+              filter: "&NAICS2017=00&SEX=002&RCPSZFI=523",
+              baseFilter: ["&NAICS2017=00&SEX=002&RCPSZFI=001"],
+            },
+            "Women-Owned Businesses with sales/receipts of $250,000 to $499,999": {
+              dataset: { availableIn: ["abscs"], displayedDataset: "abscs" },
+              variableCode: ["FIRMPDEMP"],
+              transformationType: "percentage",
+              format: "percentage",
+              filter: "&NAICS2017=00&SEX=002&RCPSZFI=525",
+              baseFilter: ["&NAICS2017=00&SEX=002&RCPSZFI=001"],
+            },
+            "Women-Owned Businesses with sales/receipts of $500,000 to $999,999": {
+              dataset: { availableIn: ["abscs"], displayedDataset: "abscs" },
+              variableCode: ["FIRMPDEMP"],
+              transformationType: "percentage",
+              format: "percentage",
+              filter: "&NAICS2017=00&SEX=002&RCPSZFI=531",
+              baseFilter: ["&NAICS2017=00&SEX=002&RCPSZFI=001"],
+            },
+            "Women-Owned Businesses with sales/receipts of $1,000,000 or more": {
+              dataset: { availableIn: ["abscs"], displayedDataset: "abscs" },
+              variableCode: ["FIRMPDEMP"],
+              transformationType: "percentage",
+              format: "percentage",
+              filter: "&NAICS2017=00&SEX=002&RCPSZFI=532",
+              baseFilter: ["&NAICS2017=00&SEX=002&RCPSZFI=001"],
+            },
+            "Women Owned Businesses with less than 2 years in business": {
+              dataset: { availableIn: ["abscs"], displayedDataset: "abscs" },
+              variableCode: ["FIRMPDEMP"],
+              transformationType: "percentage",
+              format: "percentage",
+              filter: "&NAICS2017=00&SEX=002&YIBSZFI=311",
+              baseFilter: ["&NAICS2017=00&SEX=002&YIBSZFI=001"],
+            },
+            "Women Owned Businesses with 2 to 3 years in business": {
+              dataset: { availableIn: ["abscs"], displayedDataset: "abscs" },
+              variableCode: ["FIRMPDEMP"],
+              transformationType: "percentage",
+              format: "percentage",
+              filter: "&NAICS2017=00&SEX=002&YIBSZFI=318",
+              baseFilter: ["&NAICS2017=00&SEX=002&YIBSZFI=001"],
+            },
+            "Women Owned Businesses with 4 to 5 years in business": {
+              dataset: { availableIn: ["abscs"], displayedDataset: "abscs" },
+              variableCode: ["FIRMPDEMP"],
+              transformationType: "percentage",
+              format: "percentage",
+              filter: "&NAICS2017=00&SEX=002&YIBSZFI=319",
+              baseFilter: ["&NAICS2017=00&SEX=002&YIBSZFI=001"],
+            },
+            "Women Owned Businesses with 6 to 10 years in business": {
+              dataset: { availableIn: ["abscs"], displayedDataset: "abscs" },
+              variableCode: ["FIRMPDEMP"],
+              transformationType: "percentage",
+              format: "percentage",
+              filter: "&NAICS2017=00&SEX=002&YIBSZFI=321",
+              baseFilter: ["&NAICS2017=00&SEX=002&YIBSZFI=001"],
+            },
+            "Women Owned Businesses with 11 to 15 years in business": {
+              dataset: { availableIn: ["abscs"], displayedDataset: "abscs" },
+              variableCode: ["FIRMPDEMP"],
+              transformationType: "percentage",
+              format: "percentage",
+              filter: "&NAICS2017=00&SEX=002&YIBSZFI=322",
+              baseFilter: ["&NAICS2017=00&SEX=002&YIBSZFI=001"],
+            },
+            "Women Owned Businesses with 16 or more years in business": {
+              dataset: { availableIn: ["abscs"], displayedDataset: "abscs" },
+              variableCode: ["FIRMPDEMP"],
+              transformationType: "percentage",
+              format: "percentage",
+              filter: "&NAICS2017=00&SEX=002&YIBSZFI=321",
+              baseFilter: ["&NAICS2017=00&SEX=002&YIBSZFI=323"],
+            },
+            "Employment Size": {
+              dataset: { availableIn: ["abscs"], displayedDataset: "abscs" },
+              variableCode: ["EMP"],
+              transformationType: "none",
+              format: "number",
+              filter: "&SEX=002",
+              baseFilter: ["&SEX=001"],
+            },
+          },         
+          "Economic Data (BDS)": {
+            "Job Creation and Destruction": {
+              dataset: { availableIn: ["bds"], displayedDataset: "bds" },
+              variableCode: ["JOB_CREATION", "JOB_DESTRUCTION"],
+              transformationType: "none",
+              format: "number",
+            },
+            "Firm Births and Deaths": {
+              dataset: { availableIn: ["bds"], displayedDataset: "bds" },
+              variableCode: ["FIRM_BIRTHS", "FIRM_DEATHS"],
+              transformationType: "none",
+              format: "number",
+            },
+            "Establishment Characteristics": {
+              dataset: { availableIn: ["bds"], displayedDataset: "bds" },
+              variableCode: ["ESTABLISHMENT_SIZE"],
+              transformationType: "none",
+              format: "number",
+            },
+          },
+          "County Business Patterns": {
+            "Number of Establishments": {
+              dataset: { availableIn: ["cbp"], displayedDataset: "cbp" },
+              variableCode: ["ESTAB"],
+              transformationType: "none",
+              format: "number",
+            },
+            "Employment Size": {
+              dataset: { availableIn: ["cbp"], displayedDataset: "cbp" },
+              variableCode: ["EMP_SIZE"],
+              transformationType: "none",
+              format: "number",
+            },
+            "Payroll": {
+              dataset: { availableIn: ["cbp"], displayedDataset: "cbp" },
+              variableCode: ["PAY"],
+              transformationType: "none",
+              format: "currency",
+            },
+          },
+          "Post-Secondary Employment Outcomes (PSEO)": {
+            "Earnings by Degree Level": {
+              dataset: { availableIn: ["pseo"], displayedDataset: "pseo" },
+              variableCode: ["EARNINGS"],
+              transformationType: "none",
+              format: "currency",
+            },
+            "Employment Outcomes by Institution and Major": {
+              dataset: { availableIn: ["pseo"], displayedDataset: "pseo" },
+              variableCode: ["EMPLOYMENT"],
+              transformationType: "none",
+              format: "number",
+            },
+          },
+          "Survey of Income and Program Participation (SIPP)": {
+            "Income": {
+              dataset: { availableIn: ["sipp"], displayedDataset: "sipp" },
+              variableCode: ["INCOME"],
+              transformationType: "none",
+              format: "currency",
+            },
+            "Program Participation": {
+              dataset: { availableIn: ["sipp"], displayedDataset: "sipp" },
+              variableCode: ["PROGRAM_PARTICIPATION"],
+              transformationType: "none",
+              format: "number",
+            },
+            "Employment": {
+              dataset: { availableIn: ["sipp"], displayedDataset: "sipp" },
+              variableCode: ["EMPLOYMENT"],
+              transformationType: "none",
+              format: "number",
+            },
           },
         },
       },
+      narrativeElements: {
+        subtitle: "Key Insights into the Economic Growth and Sustainability of Communities.",
+        overview:
+          "Community Economic Development focuses on understanding and improving the economic health and sustainability of communities. This includes analyzing business ownership, employment, and economic indicators to identify areas of growth and opportunities for development.",
+        questions: [
+          "What are the main drivers of economic growth in different communities?",
+          "How do demographic factors influence economic development and business ownership?",
+          "What strategies can be implemented to foster sustainable economic development in underserved communities?",
+        ],
+        keyInsights: "Highlight significant trends, growth patterns, and economic disparities within various communities.",
+        impact:
+          "Discuss the real-world implications of these insights on policy-making, resource allocation, and community planning, particularly for minorities, women, and veterans.",
+        tags: [
+          "economic growth",
+          "community development",
+          "business ownership",
+          "employment",
+          "economic indicators",
+          "sustainability",
+        ],
+      },
     },
-    "Demographics": {
+    Demographics: {
       data: {
         subcategories: {
           "Age and Gender": {
-            "Total Population": {
-              dataset: "acs5, acs1",
-              variableCode: "B01001_001E",
-              format: "none",
-            },
-            "Male Population": {
-              dataset: "acs5, acs1",
-              variableCode: "B01001_002E",
-              transformationType: "percentage",
-              baseCode: "B01001_001E",
-              baseLabel: "Total Population",
-              format: "percentage",
-            },
             "Female Population": {
-              dataset: "acs5, acs1",
-              variableCode: "B01001_026E",
-              transformationType: "percentage",
-              baseCode: "B01001_001E",
-              baseLabel: "Total Population",
-              format: "percentage",
+              dataset: { availableIn: ["acs5", "acs1"],
+                  displayedDataset: "acs5"
+                },
+                variableCode: ["B01001_026E"],
+                transformationType: "percentage",
+                baseCode: ["B01001_001E"],
+                baseLabel: "Total Population",
+                format: "percentage",
+              },
+              "Male Population": {
+                dataset: {
+                  availableIn: ["acs5", "acs1"],
+                  displayedDataset: "acs5"
+                },
+                variableCode: ["B01001_002E"],
+                transformationType: "percentage",
+                baseCode: ["B01001_001E"],
+                baseLabel: "Total Population",
+                format: "percentage",
+              },
+              "Total Population": {
+                dataset: {
+                  availableIn: ["acs5", "acs1"],
+                  displayedDataset: "acs5"
+                },
+                variableCode: ["B01001_001E"],
+                format: "none",
+              },
             },
-          },
-          "Race and Ethnicity": {
-            "White Alone": {
-              dataset: "acs5, acs1",
-              variableCode: "B02001_002E",
-              transformationType: "percentage",
-              baseCode: "B01001_001E",
-              baseLabel: "Total Population",
-              format: "percentage",
+            "Race and Ethnicity": {
+              "Black or African American Alone": {
+                dataset: {
+                  availableIn: ["acs5", "acs1"],
+                  displayedDataset: "acs5"
+                },
+                variableCode: ["B02001_003E"],
+                transformationType: "percentage",
+                baseCode: ["B02001_001E"],
+                baseLabel: "Total Population",
+                format: "percentage",
+              },
+              "Hispanic or Latino": {
+                dataset: {
+                  availableIn: ["acs5", "acs1"],
+                  displayedDataset: "acs5"
+                },
+                variableCode: ["B03001_003E"],
+                transformationType: "percentage",
+                baseCode: ["B03001_001E"],
+                baseLabel: "Total Population",
+                format: "percentage",
+              },
+              "White Alone": {
+                dataset: {
+                  availableIn: ["acs5", "acs1"],
+                  displayedDataset: "acs5"
+                },
+                variableCode: ["B02001_002E"],
+                transformationType: "percentage",
+                baseCode: ["B02001_001E"],
+                baseLabel: "Total Population",
+                format: "percentage",
+              },
             },
-            "Black or African American Alone": {
-              dataset: "acs5, acs1",
-              variableCode: "B02001_003E",
-              transformationType: "percentage",
-              baseCode: "B01001_001E",
-              baseLabel: "Total Population",
-              format: "percentage",
+            "Household Types": {
+              "Family Households": {
+                dataset: {
+                  availableIn: ["acs5", "acs1"],
+                  displayedDataset: "acs5"
+                },
+                variableCode: ["B11001_002E"],
+                transformationType: "percentage",
+                baseCode: ["B11001_001E"],
+                baseLabel: "Total Households",
+                format: "percentage",
+              },
+              "Non-family Households": {
+                dataset: {
+                  availableIn: ["acs5", "acs1"],
+                  displayedDataset: "acs5"
+                },
+                variableCode: ["B11001_007E"],
+                transformationType: "percentage",
+                baseCode: ["B11001_001E"],
+                baseLabel: "Total Households",
+                format: "percentage",
+              },
             },
-            "Hispanic or Latino": {
-              dataset: "acs5, acs1",
-              variableCode: "B03001_003E",
-              transformationType: "percentage",
-              baseCode: "B01001_001E",
-              baseLabel: "Total Population",
-              format: "percentage",
+            "Language Spoken At Home": {
+              "English Only": {
+                dataset: {
+                  availableIn: ["acs5", "acs1"],
+                  displayedDataset: "acs5"
+                },
+                variableCode: ["C16001_002E"],
+                transformationType: "percentage",
+                baseCode: ["B01001_001E"],
+                baseLabel: "Total Population",
+                format: "percentage",
+              },
+              "Other Languages": {
+                dataset: {
+                  availableIn: ["acs5", "acs1"],
+                  displayedDataset: "acs5"
+                },
+                variableCode: ["C16001_004E"],
+                transformationType: "percentage",
+                baseCode: ["B01001_001E"],
+                baseLabel: "Total Population",
+                format: "percentage",
+              },
+              "Spanish": {
+                dataset: {
+                  availableIn: ["acs5", "acs1"],
+                  displayedDataset: "acs5"
+                },
+                variableCode: ["C16001_003E"],
+                transformationType: "percentage",
+                baseCode: ["B01001_001E"],
+                baseLabel: "Total Population",
+                format: "percentage",
+              },
             },
-          },
-          "Household Types": {
-            "Family Households": {
-              dataset: "acs5, acs1",
-              variableCode: "B11001_002E",
-              transformationType: "percentage",
-              baseCode: "B11001_001E",
-              baseLabel: "Total Households",
-              format: "percentage",
-            },
-            "Non-family Households": {
-              dataset: "acs5, acs1",
-              variableCode: "B11001_007E",
-              transformationType: "percentage",
-              baseCode: "B11001_001E",
-              baseLabel: "Total Households",
-              format: "percentage",
-            },
-          },
-          "Language Spoken At Home": {
-            "English Only": {
-              dataset: "acs5, acs1",
-              variableCode: "C16001_002E",
-              transformationType: "percentage",
-              baseCode: "B01001_001E",
-              baseLabel: "Total Population",
-              format: "percentage",
-            },
-            Spanish: {
-              dataset: "acs5, acs1",
-              variableCode: "C16001_003E",
-              transformationType: "percentage",
-              baseCode: "B01001_001E",
-              baseLabel: "Total Population",
-              format: "percentage",
-            },
-            "Other Languages": {
-              dataset: "acs5, acs1",
-              variableCode: "C16001_004E",
-              transformationType: "percentage",
-              baseCode: "B01001_001E",
-              baseLabel: "Total Population",
-              format: "percentage",
-            },
-          },
-          "Veterans Status": {
-            "Total Veterans": {
-              dataset: "acs5, acs1",
-              variableCode: "B21001_001E",
-              transformationType: "ratePerThousand",
-              baseCode: "B01001_001E",
-              baseLabel: "Total Population",
-              format: "ratePerThousand",
-            },
-          },
-        },
-      },
-      narrativeElements: {
-        subtitle:
-          "A Foundational Category for Understanding Socio-Economic and Demographic Dynamics.",
-        overview:
-          "Demographics provide a snapshot of the population's composition and characteristics. Understanding the demographic makeup of a community is essential for policymakers, businesses, and researchers to make informed decisions and address the needs of diverse populations.",
-        questions: [
-          "How does the age distribution vary across different communities?",
-          "What are the correlations between demographic compositions and socio-economic factors like income and education levels?",
-        ],
-        keyInsights:
-          "Highlight significant findings, trends, and disparities within the data.",
-        impact:
-          "Discuss the real-world implications of these insights on minorities, women, and veterans.",
-        tags: [
-          "demographics",
-          "socio-economic factors",
-          "age distribution",
-          "gender composition",
-        ],
-      },
-    },
-    "Income & Employment": {
-      data: {
-        subcategories: {
-          Income: {
-            "Median Household Income": {
-              dataset: "acs5, acs1",
-              variableCode: "B19013_001E",
-              format: "currency",
-            },
-            "Per Capita Income": {
-              dataset: "acs5, acs1",
-              variableCode: "B19301_001E",
-              format: "currency",
-            },
-          },
-          Poverty: {
-            "Individuals Below Poverty Level": {
-              dataset: "acs5, acs1",
-              variableCode: "B17001_002E",
-              transformationType: "percentage",
-              baseCode: "B01001_001E",
-              baseLabel: "Total Population",
-              format: "percentage",
-            },
-            "Households Receiving Food Stamps/SNAP": {
-              dataset: "acs5, acs1",
-              variableCode: "B22010_002E",
-              transformationType: "percentage",
-              baseCode: "B11001_001E",
-              baseLabel: "Total Households",
-              format: "percentage",
-            },
-          },
-          Employment: {
-            "Labor Force Participation": {
-              dataset: "acs5, acs1",
-              variableCode: "B23001_001E",
-              transformationType: "ratePerThousand",
-              baseCode: "B01001_001E",
-              baseLabel: "Total Population",
-              format: "ratePerThousand",
-            },
-            "Unemployment Rate": {
-              dataset: "acs5, acs1",
-              variableCode: "B23025_005E",
-              transformationType: "percentage",
-              baseCode: "B23025_002E",
-              baseLabel: "Labor Force",
-              format: "percentage",
-            },
-          },
-          "Industry and Occupation": {
-            "Agriculture, Forestry, Fishing": {
-              dataset: "acs5, acs1",
-              variableCode: "B24020_003E",
-              transformationType: "percentage",
-              baseCode: "B23001_001E",
-              baseLabel: "Labor Force Population",
-              format: "percentage",
-            },
-            "Education, Health Care, Social Assistance": {
-              dataset: "acs5, acs1",
-              variableCode: "B24020_019E",
-              transformationType: "percentage",
-              baseCode: "B23001_001E",
-              baseLabel: "Labor Force Population",
-              format: "percentage",
-            },
-            "Professional, Scientific, Management": {
-              dataset: "acs5, acs1",
-              variableCode: "B24020_015E",
-              transformationType: "percentage",
-              baseCode: "B23001_001E",
-              baseLabel: "Labor Force Population",
-              format: "percentage",
+            "Veterans Status": {
+              "Total Veterans": {
+                dataset: {
+                  availableIn: ["acs5", "acs1"],
+                  displayedDataset: "acs5"
+                },
+                variableCode: ["B21001_002E"],
+                transformationType: "ratePerThousand",
+                baseCode: ["B21001_001E"],
+                baseLabel: "Total Civilian population 18 years and over",
+                format: "ratePerThousand",
+              },
             },
           },
         },
+        narrativeElements: {
+          subtitle: "A Foundational Category for Understanding Socio-Economic and Demographic Dynamics.",
+          overview: "Demographics provide a snapshot of the population's composition and characteristics. Understanding the demographic makeup of a community is essential for policymakers, businesses, and researchers to make informed decisions and address the needs of diverse populations.",
+          questions: [
+            "How does the age distribution vary across different communities?",
+            "What are the correlations between demographic compositions and socio-economic factors like income and education levels?",
+          ],
+          keyInsights: "Highlight significant findings, trends, and disparities within the data.",
+          impact: "Discuss the real-world implications of these insights on minorities, women, and veterans.",
+          tags: [
+            "demographics",
+            "socio-economic factors",
+            "age distribution",
+            "gender composition",
+          ],
+        },
       },
-      narrativeElements: {
-        subtitle: "Central to Equality and Economic Opportunity Discussions.",
-        overview:
-          "An analysis of income levels, sources, employment rates, and their relationship with other socio-economic factors.",
-        questions: [
-          "Which areas show the most significant disparities in income distribution?",
-          "How does employment status affect poverty levels in different communities?",
-        ],
-        keyInsights:
-          "Highlight significant findings, trends, and disparities within the data.",
-        impact:
-          "Discuss the real-world implications of these insights on policy and individual communities.",
-        tags: ["income distribution", "employment rates", "poverty levels"],
-      },
-    },
-    "Education": {
-      data: {
-        subcategories: {
-          "Educational Attainment": {
-            "Less Than High School": {
-              dataset: "acs5, acs1",
-              variableCode: [
-                "B15003_002E",
-                "B15003_003E",
-                "B15003_004E",
-                "B15003_005E",
-                "B15003_006E",
-                "B15003_007E",
-                "B15003_008E",
-                "B15003_009E",
-                "B15003_010E",
-                "B15003_011E",
-                "B15003_012E",
-                "B15003_013E",
-                "B15003_014E",
-                "B15003_015E",
-                "B15003_016E",
-              ],
-              transformationType: "summedPercentage",
-              baseCode: "B01001_001E",
-              baseLabel: "Total Population",
-              format: "summedPercentage",
+      "Income & Employment": {
+        data: {
+          subcategories: {
+            "Income": {
+              "Median Household Income (in 2018 inflation-adjusted dollars)": {
+                dataset: {
+                  availableIn: ["acs5", "acs1"],
+                  displayedDataset: "acs5"
+                },
+                variableCode: ["B19013_001E"],
+                format: "currency",
+              },
+              "Per Capita Income": {
+                dataset: {
+                  availableIn: ["acs5", "acs1"],
+                  displayedDataset: "acs5"
+                },
+                variableCode: ["B19301_001E"],
+                format: "currency",
+              },
             },
-            "High School Graduate": {
-              dataset: "acs5, acs1",
-              variableCode: "B15003_017E",
-              transformationType: "percentage",
-              baseCode: "B01001_001E",
-              baseLabel: "Total Population",
-              format: "percentage",
+            "Poverty": {
+              "Households Receiving Food Stamps/SNAP": {
+                dataset: {
+                  availableIn: ["acs5", "acs1"],
+                  displayedDataset: "acs5"
+                },
+                variableCode: ["B22010_002E"],
+                transformationType: "percentage",
+                baseCode: ["B11001_001E"],
+                baseLabel: "Total Households",
+                format: "percentage",
+              },
+              "Individuals Below Poverty Level": {
+                dataset: {
+                  availableIn: ["acs5", "acs1"],
+                  displayedDataset: "acs5"
+                },
+                variableCode: ["B17001_002E"],
+                transformationType: "percentage",
+                baseCode: ["B01001_001E"],
+                baseLabel: "Total Population",
+                format: "percentage",
+              },
             },
-            "Bachelor's or Higher": {
-              dataset: "acs5, acs1",
-              variableCode: [
-                "B15003_022E",
-                "B15003_023E",
-                "B15003_024E",
-                "B15003_025E",
-              ],
-              transformationType: "summedPercentage",
-              baseCode: "B01001_001E",
-              baseLabel: "Total Population",
-              format: "summedPercentage",
+            "Employment": {
+              "Labor Force Participation": {
+                dataset: {
+                  availableIn: ["acs5", "acs1"],
+                  displayedDataset: "acs5"
+                },
+                variableCode: ["B23001_001E"],
+                transformationType: "ratePerThousand",
+                baseCode: ["B01001_001E"],
+                baseLabel: "Total Population",
+                format: "ratePerThousand",
+              },
+              "Unemployment Rate": {
+                dataset: {
+                  availableIn: ["acs5", "acs1"],
+                  displayedDataset: "acs5"
+                },
+                variableCode: ["B23025_005E"],
+                transformationType: "percentage",
+                baseCode: ["B23025_002E"],
+                baseLabel: "Labor Force",
+                format: "percentage",
+              },
             },
-          },
-          "School Enrollment": {
-            "Nursery to Grade 4": {
-              dataset: "acs5, acs1",
-              variableCode: ["B14001_003E", "B14001_004E", "B14001_005E"],
-              transformationType: "summedPercentage",
-              baseCode: "B01001_001E",
-              baseLabel: "Total Population",
-              format: "summedPercentage",
-            },
-            "Grades 5 to 12": {
-              dataset: "acs5, acs1",
-              variableCode: ["B14001_006E", "B14001_007E", "B14001_008E"],
-              transformationType: "summedPercentage",
-              baseCode: "B01001_001E",
-              baseLabel: "Total Population",
-              format: "summedPercentage",
-            },
-            "College or Graduate School": {
-              dataset: "acs5, acs1",
-              variableCode: ["B14001_009E", "B14001_010E"],
-              transformationType: "summedPercentage",
-              baseCode: "B01001_001E",
-              baseLabel: "Total Population",
-              format: "summedPercentage",
+            "Industry and Occupation": {
+              "Management, Business, Science, and Arts Occupations": {
+                dataset: {
+                  availableIn: ["acs5", "acs1"],
+                  displayedDataset: "acs5"
+                },
+                variableCode: ["C24010_003E", "C24010_039E"], // Male and Female codes combined
+                transformationType: "summedPercentage",
+                baseCode: ["C24010_001E"], // Total Labor Force Population
+                baseLabel: "Labor Force Population",
+                format: "percentage"
+              },
+              "Natural Resources, Construction, and Maintenance Occupations": {
+                dataset: {
+                  availableIn: ["acs5", "acs1"],
+                  displayedDataset: "acs5"
+                },
+                variableCode: ["C24010_030E", "C24010_066E"], // Male and Female codes combined
+                transformationType: "summedPercentage",
+                baseCode: ["C24010_001E"], // Total Labor Force Population
+                baseLabel: "Labor Force Population",
+                format: "percentage"
+              },
+              "Production, Transportation, and Material Moving Occupations": {
+                dataset: {
+                  availableIn: ["acs5", "acs1"],
+                  displayedDataset: "acs5"
+                },
+                variableCode: ["C24010_034E", "C24010_070E"], // Male and Female codes combined
+                transformationType: "summedPercentage",
+                baseCode: ["C24010_001E"], // Total Labor Force Population
+                baseLabel: "Labor Force Population",
+                format: "percentage"
+              },
+              "Sales and Office Occupations": {
+                dataset: {
+                  availableIn: ["acs5", "acs1"],
+                  displayedDataset: "acs5"
+                },
+                variableCode: ["C24010_027E", "C24010_063E"], // Male and Female codes combined
+                transformationType: "summedPercentage",
+                baseCode: ["C24010_001E"], // Total Labor Force Population
+                baseLabel: "Labor Force Population",
+                format: "percentage"
+              },
+              "Service Occupations": {
+                dataset: {
+                  availableIn: ["acs5", "acs1"],
+                  displayedDataset: "acs5"
+                },
+                variableCode: ["C24010_019E", "C24010_055E"], // Male and Female codes combined
+                transformationType: "summedPercentage",
+                baseCode: ["C24010_001E"], // Total Labor Force Population
+                baseLabel: "Labor Force Population",
+                format: "percentage"
+              },              
             },
           },
         },
+        narrativeElements: {
+          subtitle: "Central to Equality and Economic Opportunity Discussions.",
+          overview: "An analysis of income levels, sources, employment rates, and their relationship with other socio-economic factors.",
+          questions: [
+            "Which areas show the most significant disparities in income distribution?",
+            "How does employment status affect poverty levels in different communities?",
+          ],
+          keyInsights: "Highlight significant findings, trends, and disparities within the data.",
+          impact: "Discuss the real-world implications of these insights on policy and individual communities.",
+          tags: ["income distribution", "employment rates", "poverty levels"],
+        },
       },
-      narrativeElements: {
-        subtitle: "Critical for Long-term Socio-economic Mobility.",
-        overview:
-          "Insights into educational attainment levels, disparities, and impacts on income and employment.",
-        questions: [
-          "How does educational attainment affect income levels in different demographics?",
-          "What is the impact of education on employment opportunities?",
-        ],
-        keyInsights:
-          "Significant findings, trends, and disparities within the data.",
-        impact:
-          "Real-world implications of these insights on minorities, women, and veterans.",
-        tags: [
-          "educational attainment",
-          "income disparities by education",
-          "educational programs impact",
-        ],
-      },
-    },
-    "Housing & Infrastructure": {
-      data: {
-        subcategories: {
-          "Ownership and Rent": {
-            "Owner-Occupied Units": {
-              dataset: "acs5, acs1",
-              variableCode: "B25003_002E",
-              transformationType: "percentage",
-              baseCode: "B25003_001E",
-              baseLabel: "Total Housing Units",
-              format: "percentage",
+      "Education": {
+        data: {
+          subcategories: {
+            "Educational Attainment": {
+              "Less Than High School": {
+                dataset: {
+                  availableIn: ["acs5", "acs1"],
+                  displayedDataset: "acs5"
+                },
+                variableCode: [
+                  "B15003_002E",
+                  "B15003_003E",
+                  "B15003_004E",
+                  "B15003_005E",
+                  "B15003_006E",
+                  "B15003_007E",
+                  "B15003_008E",
+                  "B15003_009E",
+                  "B15003_010E",
+                  "B15003_011E",
+                  "B15003_012E",
+                  "B15003_013E",
+                  "B15003_014E",
+                  "B15003_015E",
+                  "B15003_016E",
+                ],
+                transformationType: "summedPercentage",
+                baseCode: ["B01001_001E"],
+                baseLabel: "Total Population",
+                format: "percentage",
+              },
+              "High School Graduate": {
+                dataset: {
+                  availableIn: ["acs5", "acs1"],
+                  displayedDataset: "acs5"
+                },
+                variableCode: ["B15003_017E"],
+                transformationType: "percentage",
+                baseCode: ["B01001_001E"],
+                baseLabel: "Total Population",
+                format: "percentage",
+              },
+              "Bachelor's or Higher": {
+                dataset: {
+                  availableIn: ["acs5", "acs1"],
+                  displayedDataset: "acs5"
+                },
+                variableCode: [
+                  "B15003_022E",
+                  "B15003_023E",
+                  "B15003_024E",
+                  "B15003_025E",
+                ],
+                transformationType: "summedPercentage",
+                baseCode: ["B01001_001E"],
+                baseLabel: "Total Population",
+                format: "percentage",
+              },
             },
-            "Renter-Occupied Units": {
-              dataset: "acs5, acs1",
-              variableCode: "B25003_003E",
-              transformationType: "percentage",
-              baseCode: "B25003_001E",
-              baseLabel: "Total Housing Units",
-              format: "percentage",
-            },
-          },
-          "Housing Affordability and Costs": {
-            "Median Value of Owner-Occupied Housing Units": {
-              dataset: "acs5, acs1",
-              variableCode: "B25077_001E",
-              format: "currency",
-            },
-            "Median Gross Rent": {
-              dataset: "acs5, acs1",
-              variableCode: "B25064_001E",
-              format: "currency",
-            },
-          },
-          "Commuting Patterns": {
-            "Workers Who Commute by Car, Truck, or Van": {
-              dataset: "acs5, acs1",
-              variableCode: "B08006_002E",
-              transformationType: "percentage",
-              baseCode: "B08006_001E",
-              baseLabel: "Total Workers Commuting",
-              format: "percentage",
-            },
-            "Public Transportation (excluding taxicab)": {
-              dataset: "acs5, acs1",
-              variableCode: "B08006_008E",
-              transformationType: "percentage",
-              baseCode: "B08006_001E",
-              baseLabel: "Total Workers Commuting",
-              format: "percentage",
+            "School Enrollment": {
+              "Nursery to Grade 4": {
+                dataset: {
+                  availableIn: ["acs5", "acs1"],
+                  displayedDataset: "acs5"
+                },
+                variableCode: ["B14001_003E", "B14001_004E", "B14001_005E"],
+                transformationType: "summedPercentage",
+                baseCode: ["B01001_001E"],
+                baseLabel: "Total Population",
+                format: "percentage",
+              },
+              "Grades 5 to 12": {
+                dataset: {
+                  availableIn: ["acs5", "acs1"],
+                  displayedDataset: "acs5"
+                },
+                variableCode: ["B14001_006E", "B14001_007E", "B14001_008E"],
+                transformationType: "summedPercentage",
+                baseCode: ["B01001_001E"],
+                baseLabel: "Total Population",
+                format: "percentage",
+              },
+              "College or Graduate School": {
+                dataset: {
+                  availableIn: ["acs5", "acs1"],
+                  displayedDataset: "acs5"
+                },
+                variableCode: ["B14001_009E", "B14001_010E"],
+                transformationType: "summedPercentage",
+                baseCode: ["B01001_001E"],
+                baseLabel: "Total Population",
+                format: "percentage",
+              },
             },
           },
         },
+        narrativeElements: {
+          subtitle: "Critical for Long-term Socio-economic Mobility.",
+          overview: "Insights into educational attainment levels, disparities, and impacts on income and employment.",
+          questions: [
+            "How does educational attainment affect income levels in different demographics?",
+            "What is the impact of education on employment opportunities?",
+          ],
+          keyInsights: "Significant findings, trends, and disparities within the data.",
+          impact: "Real-world implications of these insights on minorities, women, and veterans.",
+          tags: [
+            "educational attainment",
+            "income disparities by education",
+            "educational programs impact",
+          ],
+        },
       },
-      narrativeElements: {
-        subtitle: "Reflects Living Standards and Access to Resources.",
-        overview:
-          "Examination of housing affordability, quality, and access to essential services.",
-        questions: [
-          "What percentage of income do different demographics spend on housing?",
-          "How does access to essential services like healthcare and education vary across communities?",
-        ],
-        keyInsights:
-          "Significant findings, trends, and disparities within the data.",
-        impact:
-          "Real-world implications of these insights on minorities, women, and veterans.",
-        tags: [
-          "housing affordability",
-          "infrastructure quality",
-          "access to services",
-        ],
-      },
-    },
-    "Public Health": {
-      data: {
-        subcategories: {
-          "Insurance Coverage": {
-            "With Health Insurance": {
-              dataset: "acs5, acs1",
-              variableCode: "B27001_004E",
-              transformationType: "percentage",
-              baseCode: "B01001_001E",
-              baseLabel: "Total Population",
-              format: "percentage",
+      "Housing & Infrastructure": {
+        data: {
+          subcategories: {
+            "Ownership and Rent": {
+              "Owner-Occupied Units": {
+                dataset: {
+                  availableIn: ["acs5", "acs1"],
+                  displayedDataset: "acs5"
+                },
+                variableCode: ["B25003_002E"],
+                transformationType: "percentage",
+                baseCode: ["B25003_001E"],
+                baseLabel: "Total Housing Units",
+                format: "percentage",
+              },
+              "Renter-Occupied Units": {
+                dataset: {
+                  availableIn: ["acs5", "acs1"],
+                  displayedDataset: "acs5"
+                },
+                variableCode: ["B25003_003E"],
+                transformationType: "percentage",
+                baseCode: ["B25003_001E"],
+                baseLabel: "Total Housing Units",
+                format: "percentage",
+              },
             },
-            "Without Health Insurance": {
-              dataset: "acs5, acs1",
-              variableCode: "B27001_005E",
-              transformationType: "percentage",
-              baseCode: "B01001_001E",
-              baseLabel: "Total Population",
-              format: "percentage",
+            "Housing Affordability and Costs": {
+              "Median Value of Owner-Occupied Housing Units": {
+                dataset: {
+                  availableIn: ["acs5", "acs1"],
+                  displayedDataset: "acs5"
+                },
+                variableCode: ["B25077_001E"],
+                format: "currency",
+              },
+              "Median Gross Rent": {
+                dataset: {
+                  availableIn: ["acs5", "acs1"],
+                  displayedDataset: "acs5"
+                },
+                variableCode: ["B25064_001E"],
+                format: "currency",
+              },
             },
-          },
-          Disability: {
-            "With a Disability": {
-              dataset: "acs5, acs1",
-              variableCode: "B18101_004E",
-              transformationType: "percentage",
-              baseCode: "B01001_001E",
-              baseLabel: "Total Civilian Non-institutionalized Population",
-              format: "percentage",
+            "Commuting Patterns": {
+              "Workers Who Commute by Car, Truck, or Van": {
+                dataset: {
+                  availableIn: ["acs5", "acs1"],
+                  displayedDataset: "acs5"
+                },
+                variableCode: ["B08006_002E"],
+                transformationType: "percentage",
+                baseCode: ["B08006_001E"],
+                baseLabel: "Total Workers Commuting",
+                format: "percentage",
+              },
+              "Public Transportation (excluding taxicab)": {
+                dataset: {
+                  availableIn: ["acs5", "acs1"],
+                  displayedDataset: "acs5"
+                },
+                variableCode: ["B08006_008E"],
+                transformationType: "percentage",
+                baseCode: ["B08006_001E"],
+                baseLabel: "Total Workers Commuting",
+                format: "percentage",
+              },
             },
           },
         },
+        narrativeElements: {
+          subtitle: "Reflects Living Standards and Access to Resources.",
+          overview: "Examination of housing affordability, quality, and access to essential services.",
+          questions: [
+            "What percentage of income do different demographics spend on housing?",
+            "How does access to essential services like healthcare and education vary across communities?",
+          ],
+          keyInsights: "Significant findings, trends, and disparities within the data.",
+          impact: "Real-world implications of these insights on minorities, women, and veterans.",
+          tags: [
+            "housing affordability",
+            "infrastructure quality",
+            "access to services",
+          ],
+        },
       },
-      narrativeElements: {
-        subtitle: "Highlights Disparities in Health Access and Outcomes.",
-        overview:
-          "Information on health disparities, access to healthcare, and correlations with socio-economic conditions.",
-        questions: [
-          "Which communities face the most significant challenges in accessing healthcare?",
-          "How do health outcomes correlate with income and education levels?",
-        ],
-        keyInsights:
-          "Significant findings, trends, and disparities within the data.",
-        impact:
-          "Real-world implications of these insights on minorities, women, and veterans.",
-        tags: [
-          "public health",
-          "health insurance coverage",
-          "health facilities distribution",
-        ],
-      },
-    },
-    "Entrepreneurship": {
-      data: {
-        subcategories: {
-          "Business Ownership": {
-            "Self-Employed in Own Not Incorporated Business Workers": {
-              dataset: "acs5, acs1",
-              variableCode: "B24080_004E",
-              transformationType: "percentage",
-              baseCode: "B24080_001E",
-              baseLabel: "Total Employed Population",
-              format: "percentage",
+      "Public Health": {
+        data: {
+          subcategories: {
+            "Insurance Coverage": {
+              "With Health Insurance": {
+                dataset: {
+                  availableIn: ["acs5", "acs1"],
+                  displayedDataset: "acs5"
+                },
+                variableCode: ["B27001_004E"],
+                transformationType: "percentage",
+                baseCode: ["B01001_001E"],
+                baseLabel: "Total Population",
+                format: "percentage",
+              },
+              "Without Health Insurance": {
+                dataset: {
+                  availableIn: ["acs5", "acs1"],
+                  displayedDataset: "acs5"
+                },
+                variableCode: ["B27001_005E"],
+                transformationType: "percentage",
+                baseCode: ["B01001_001E"],
+                baseLabel: "Total Population",
+                format: "percentage",
+              },
             },
-          },
-          "Economic Development Indicators": {
-            "Employment Rate": {
-              dataset: "acs5, acs1",
-              variableCode: "B23025_004E",
-              transformationType: "percentage",
-              baseCode: "B23025_002E",
-              baseLabel: "Labor Force",
-              format: "percentage",
+            Disability: {
+              "With a Disability": {
+                dataset: {
+                  availableIn: ["acs5", "acs1"],
+                  displayedDataset: "acs5"
+                },
+                variableCode: ["B18101_004E"],
+                transformationType: "percentage",
+                baseCode: ["B01001_001E"],
+                baseLabel: "Total Civilian Non-institutionalized Population",
+                format: "percentage",
+              },
             },
           },
         },
+        narrativeElements: {
+          subtitle: "Highlights Disparities in Health Access and Outcomes.",
+          overview: "Information on health disparities, access to healthcare, and correlations with socio-economic conditions.",
+          questions: [
+            "Which communities face the most significant challenges in accessing healthcare?",
+            "How do health outcomes correlate with income and education levels?",
+          ],
+          keyInsights: "Significant findings, trends, and disparities within the data.",
+          impact: "Real-world implications of these insights on minorities, women, and veterans.",
+          tags: [
+            "public health",
+            "health insurance coverage",
+            "health facilities distribution",
+          ],
+        },
       },
-      narrativeElements: {
-        subtitle:
-          "Sheds Light on Economic Activities and Opportunities, with a Focus on Minorities, Women, and Veterans.",
-        overview:
-          "Characteristics of Business Owners and Businesses, Focusing on Minorities, Women, and Veterans.",
-        questions: [
-          "What are the characteristics of businesses owned by minorities, women, and veterans?",
-          "How does business size and sector distribution vary among different owner demographics?",
-        ],
-        keyInsights:
-          "Significant findings, trends, and disparities within the data.",
-        impact:
-          "Real-world implications of these insights on minorities, women, and veterans.",
-        tags: [
-          "entrepreneurship",
-          "business ownership demographics",
-          "sector analysis",
-          "minority-owned businesses",
-        ],
-      },
+      "Entrepreneurship": {
+        data: {
+          subcategories: {
+            "Business Ownership": {
+              "Self-Employed in Own Not Incorporated Business Workers": {
+                dataset: {
+                  availableIn: ["acs5", "acs1"],
+                  displayedDataset: "acs5"
+                },
+                variableCode: ["B24080_004E"],
+                transformationType: "percentage",
+                baseCode: ["B24080_001E"],
+                baseLabel: "Total Employed Population",
+                format: "percentage",
+              },
+              "Total Businesses Surveyed": {
+                dataset: {
+                  availableIn: ["abscs"],
+                  displayedDataset: "abscs"
+                },
+                variableCode: ["FIRMPDEMP"],
+                format: "none",
+                description: "This includes all businesses that responded to the survey. If any one person owned 10% or more of the business, the respondent provided details about the sex, ethnicity, race, and veteran status for up to four of the largest owners.",
+              },
+              "Female-Owned Businesses (State Level)": {
+                dataset: {
+                  availableIn: ["abscs"],
+                  displayedDataset: "abscs"
+                },
+                variableCode: ["FIRMPDEMP"],
+                transformationType: "none",
+                format: "none",
+              },
+              "Female-Owned Businesses (MSA Level)": {
+                dataset: {
+                  availableIn: ["abscs"],
+                  displayedDataset: "abscs"
+                },
+                variableCode: ["FIRMPDEMP"],
+                transformationType: "none",
+                format: "none",
+              },
+              "Veteran-Owned Businesses (MSA Level)": {
+                dataset: {
+                  availableIn: ["abscs"],
+                  displayedDataset: "abscs"
+                },
+                variableCode: ["FIRMPDEMP"],
+                transformationType: "none",
+                format: "none",
+              },
+              "Minority-Owned Businesses (MSA Level)": {
+                dataset: {
+                  availableIn: ["abscs"],
+                  displayedDataset: "abscs"
+                },
+                variableCode: ["FIRMPDEMP"],
+                transformationType: "none",
+                format: "none",
+              },
+            },
+            "Economic Development Indicators": {
+              "Employment Rate": {
+                dataset: {
+                  availableIn: ["acs5", "acs1"],
+                  displayedDataset: "acs5"
+                },
+                variableCode: ["B23025_004E"],
+                transformationType: "percentage",
+                baseCode: ["B23025_002E"],
+                baseLabel: "Labor Force",
+                format: "percentage",
+              },
+            },
+          },
+        },
+        narrativeElements: {
+          subtitle: "Sheds Light on Economic Activities and Opportunities, with a Focus on Minorities, Women, and Veterans.",
+          overview: "Characteristics of Business Owners and Businesses, Focusing on Minorities, Women, and Veterans.",
+          questions: [
+            "What are the characteristics of businesses owned by minorities, women, and veterans?",
+            "How does business size and sector distribution vary among different owner demographics?",
+          ],
+          keyInsights: "Significant findings, trends, and disparities within the data.",
+          impact: "Real-world implications of these insights on minorities, women, and veterans.",
+          tags: [
+            "entrepreneurship",
+            "business ownership demographics",
+            "sector analysis",
+            "minority-owned businesses",
+          ],
+        },
+      },        
     },
+    "censusDataAPIs": {
+      "abscs": {
+        "description": "Annual Business Survey data on business ownership",
+        "datasetName": "Annual Business Survey",
+        "yearsAvailable": [[2012, 2023]],
+        "apiReference": "https://api.census.gov/data/{year}/abscs?get=VARIABLE&for=GEOGRAPHY",
+        "geographiesAvailable": ["States", "Metropolitan Statistical Areas"],
+        "source": "https://www.census.gov/programs-surveys/abscs.html"
+      },
+      "abscbo": {
+        "description": "rovides data for owners of respondent employer firms by sector, sex, ethnicity, race, and veteran status for the U.S., states, and metro areas, including detailed owner characteristics. Data for counties and economic places are also available for 2018.",
+        "datasetName": "Annual Business Survey - Characteristics of Business Owners",
+        "yearsAvailable": [[2018, 2022]],
+        "apiReference": "https://api.census.gov/data/{year}/abscbo?get=VARIABLE&for=GEOGRAPHY&{filters}",
+        "geographiesAvailable": ["States", "Metropolitan Statistical Areas"],
+        "source": "https://www.census.gov/data/developers/data-sets/abs.html"
+      },
+      "acs5": {
+        "description": "Detailed demographic, social, economic, and housing statistics (5-year estimates)",
+        "datasetName": "American Community Survey 5-Year Data",
+        "yearsAvailable": [[2005, 2023]],
+        "apiReference": "https://api.census.gov/data/{year}/acs/acs5?get=VARIABLE&for=GEOGRAPHY",
+        "geographiesAvailable": [
+          "Nation",
+          "States",
+          "Counties",
+          "Metropolitan Statistical Areas",
+          "Congressional Districts",
+          "Places",
+          "Census Tracts",
+          "Block Groups"
+        ],
+        "source": "https://www.census.gov/programs-surveys/acs"
+      },
+      "acs1": {
+        "description": "Detailed demographic, social, economic, and housing statistics (1-year estimates)",
+        "datasetName": "American Community Survey 1-Year Data",
+        "yearsAvailable": [[2010, 2023]],
+        "apiReference": "https://api.census.gov/data/{year}/acs/acs1?get=VARIABLE&for=GEOGRAPHY",
+        "geographiesAvailable": [
+          "Nation",
+          "States",
+          "Counties",
+          "Metropolitan Statistical Areas",
+          "Congressional Districts",
+          "Places",
+          "Census Tracts"
+        ],
+        "source": "https://www.census.gov/programs-surveys/acs"
+      },
+      "dec": {
+        "description": "Basic demographic information, conducted every 10 years",
+        "datasetName": "Decennial Census",
+        "yearsAvailable": [
+          1790, 1800, 1810, 1820, 1830, 1840, 1850, 1860, 1870, 1880, 1890, 1900,
+          1910, 1920, 1930, 1940, 1950, 1960, 1970, 1980, 1990, 2000, 2010, 2020
+        ],
+        "apiReference": "https://api.census.gov/data/{year}/dec?get=VARIABLE&for=GEOGRAPHY",
+        "geographiesAvailable": [
+          "Nation",
+          "States",
+          "Counties",
+          "Places",
+          "Census Tracts",
+          "Block Groups",
+          "Blocks"
+        ],
+        "source": "https://www.census.gov/programs-surveys/decennial-census.html"
+      },
+      "pep": {
+        "description": "Updated population estimates for the nation, states, counties, cities, and towns",
+        "datasetName": "Population Estimates Program",
+        "yearsAvailable": [[1990, 2023]],
+        "apiReference": "https://api.census.gov/data/{year}/pep/population?get=VARIABLE&for=GEOGRAPHY",
+        "geographiesAvailable": [
+          "Nation",
+          "States",
+          "Counties",
+          "Metropolitan Statistical Areas",
+          "Cities and Towns"
+        ],
+        "source": "https://www.census.gov/programs-surveys/popest.html"
+      },
+      "cps": {
+        "description": "Labor force statistics, including employment, unemployment, and earnings",
+        "datasetName": "Current Population Survey",
+        "yearsAvailable": [[1940, 2023]],
+        "apiReference": "https://api.census.gov/data/{year}/cps/basic?get=VARIABLE&for=GEOGRAPHY",
+        "geographiesAvailable": ["Nation"],
+        "source": "https://www.census.gov/programs-surveys/cps.html"
+      },
+      "econ": {
+        "description": "Detailed economic data by industry and geography, conducted every 5 years",
+        "datasetName": "Economic Census",
+        "yearsAvailable": [
+          1967, 1972, 1977, 1982, 1987, 1992, 1997, 2002, 2007, 2012, 2017, 2022
+        ],
+        "apiReference": "https://api.census.gov/data/{year}/econ?get=VARIABLE&for=GEOGRAPHY",
+        "geographiesAvailable": [
+          "Nation",
+          "States",
+          "Counties",
+          "Places",
+          "Metropolitan Statistical Areas"
+        ],
+        "source": "https://www.census.gov/programs-surveys/economic-census.html"
+      },
+      "sbo": {
+        "description": "Economic data by race, ethnicity, gender, and veteran status of business owners",
+        "datasetName": "Survey of Business Owners",
+        "yearsAvailable": [
+          1972, 1977, 1982, 1987, 1992, 1997, 2002, 2007, 2012, 2017
+        ],
+        "apiReference": "https://api.census.gov/data/{year}/sbo?get=VARIABLE&for=GEOGRAPHY",
+        "geographiesAvailable": [
+          "Nation",
+          "States",
+          "Metropolitan Statistical Areas"
+        ],
+        "source": "https://www.census.gov/programs-surveys/sbo.html"
+      },
+      "bds": {
+        "description": "Measures of business dynamics, such as job creation and destruction",
+        "datasetName": "Business Dynamics Statistics",
+        "yearsAvailable": [[1977, 2023]],
+        "apiReference": "https://api.census.gov/data/timeseries/bds/firms?get=VARIABLE&for=GEOGRAPHY",
+        "geographiesAvailable": [
+          "Nation",
+          "States",
+          "Metropolitan Statistical Areas",
+          "Counties"
+        ],
+        "source": "https://www.census.gov/programs-surveys/bds.html"
+      },
+      "cbp": {
+        "description": "Annual subnational economic data by industry, including ZIP Code level",
+        "datasetName": "County Business Patterns",
+        "yearsAvailable": [[1964, 2023]],
+        "apiReference": "https://api.census.gov/data/{year}/cbp?get=VARIABLE&for=GEOGRAPHY",
+        "geographiesAvailable": [
+          "Nation",
+          "States",
+          "Counties",
+          "Metropolitan Statistical Areas",
+          "ZIP Code Tabulation Areas"
+        ],
+        "source": "https://www.census.gov/programs-surveys/cbp.html"
+      },
+      "hvs": {
+        "description": "Quarterly data on rental and homeowner vacancy rates, and homeownership rates",
+        "datasetName": "Housing Vacancies and Homeownership",
+        "yearsAvailable": [[1956, 2023]],
+        "apiReference": "https://api.census.gov/data/{year}/hvs?get=VARIABLE&for=GEOGRAPHY",
+        "geographiesAvailable": [
+          "Nation",
+          "Regions",
+          "States",
+          "Metropolitan Statistical Areas"
+        ],
+        "source": "https://www.census.gov/housing/hvs/index.html"
+      },
+      "ase": {
+        "description": "Timely updates on women, minority, and veteran-owned businesses",
+        "datasetName": "Annual Survey of Entrepreneurs",
+        "yearsAvailable": [2014, 2015, 2016],
+        "apiReference": "https://api.census.gov/data/{year}/ase?get=VARIABLE&for=GEOGRAPHY",
+        "geographiesAvailable": [
+          "Nation",
+          "States",
+          "Metropolitan Statistical Areas"
+        ],
+        "source": "https://www.census.gov/programs-surveys/ase.html"
+      },
+      "sipp": {
+        "description": "Detailed information on the economic situation of U.S. households",
+        "datasetName": "Survey of Income and Program Participation",
+        "yearsAvailable": [[1984, 2023]],
+        "apiReference": "https://api.census.gov/data/{year}/sipp?get=VARIABLE&for=GEOGRAPHY",
+        "geographiesAvailable": ["Nation", "States"],
+        "source": "https://www.census.gov/programs-surveys/sipp.html"
+      },
+      "timeseries/healthins/sahie": {
+        "description": "State and county health insurance statistics",
+        "datasetName": "Small Area Health Insurance Estimates",
+        "yearsAvailable": [[2006, 2023]],
+        "apiReference": "https://api.census.gov/data/timeseries/healthins/sahie?get=VARIABLE&for=GEOGRAPHY",
+        "geographiesAvailable": ["Nation", "States", "Counties"],
+        "source": "https://www.census.gov/programs-surveys/sahie.html"
+      },
+      "pseo": {
+        "description": "Earnings and employment outcomes for graduates of specific colleges",
+        "datasetName": "Post-Secondary Employment Outcomes",
+        "yearsAvailable": [[2018, 2023]],
+        "apiReference": "https://api.census.gov/data/{year}/pseo?get=VARIABLE&for=GEOGRAPHY",
+        "geographiesAvailable": [
+          "Nation",
+          "States",
+          "Metropolitan Statistical Areas"
+        ],
+        "source": "https://lehd.ces.census.gov/data/pseo_experimental.html"
+      },
+      "ncvs": {
+        "description": "Annual victimization data, including crime trends and victim characteristics",
+        "datasetName": "National Crime Victimization Survey",
+        "yearsAvailable": [[1993, 2023]],
+        "apiReference": "https://api.census.gov/data/{year}/ncvs?get=VARIABLE&for=GEOGRAPHY",
+        "geographiesAvailable": ["Nation"],
+        "source": "https://www.bjs.gov/index.cfm?ty=dcdetail&iid=245"
+      }
+    
   },
-  variables: {
-    'Total Population': {
-      dataset: 'acs5, acs1',
-      variableCode: 'B01001_001E',
-      transformationType: 'none',
-      baseCode: 'none',
-      baseLabel: 'none',
-      format: 'none'
-    },
-    'Male Population': {
-      dataset: 'acs5, acs1',
-      variableCode: 'B01001_002E',
-      transformationType: 'percentage',
-      baseCode: 'B01001_001E',
-      baseLabel: 'Total Population',
-      format: 'percentage'
-    },
-    'Female Population': {
-      dataset: 'acs5, acs1',
-      variableCode: 'B01001_026E',
-      transformationType: 'percentage',
-      baseCode: 'B01001_001E',
-      baseLabel: 'Total Population',
-      format: 'percentage'
-    },
-    'White Alone': {
-      dataset: 'acs5, acs1',
-      variableCode: 'B02001_002E',
-      transformationType: 'percentage',
-      baseCode: 'B01001_001E',
-      baseLabel: 'Total Population',
-      format: 'percentage'
-    },
-    'Black or African American Alone': {
-      dataset: 'acs5, acs1',
-      variableCode: 'B02001_003E',
-      transformationType: 'percentage',
-      baseCode: 'B01001_001E',
-      baseLabel: 'Total Population',
-      format: 'percentage'
-    },
-    'Hispanic or Latino': {
-      dataset: 'acs5, acs1',
-      variableCode: 'B03001_003E',
-      transformationType: 'percentage',
-      baseCode: 'B01001_001E',
-      baseLabel: 'Total Population',
-      format: 'percentage'
-    },
-    'Family Households': {
-      dataset: 'acs5, acs1',
-      variableCode: 'B11001_002E',
-      transformationType: 'percentage',
-      baseCode: 'B11001_001E',
-      baseLabel: 'Total Households',
-      format: 'percentage'
-    },
-    'Non-family Households': {
-      dataset: 'acs5, acs1',
-      variableCode: 'B11001_007E',
-      transformationType: 'percentage',
-      baseCode: 'B11001_001E',
-      baseLabel: 'Total Households',
-      format: 'percentage'
-    },
-    'English Only': {
-      dataset: 'acs5, acs1',
-      variableCode: 'C16001_002E',
-      transformationType: 'percentage',
-      baseCode: 'B01001_001E',
-      baseLabel: 'Total Population',
-      format: 'percentage'
-    },
-    Spanish: {
-      dataset: 'acs5, acs1',
-      variableCode: 'C16001_003E',
-      transformationType: 'percentage',
-      baseCode: 'B01001_001E',
-      baseLabel: 'Total Population',
-      format: 'percentage'
-    },
-    'Other Languages': {
-      dataset: 'acs5, acs1',
-      variableCode: 'C16001_004E',
-      transformationType: 'percentage',
-      baseCode: 'B01001_001E',
-      baseLabel: 'Total Population',
-      format: 'percentage'
-    },
-    'Total Veterans': {
-      dataset: 'acs5, acs1',
-      variableCode: 'B21001_001E',
-      transformationType: 'ratePerThousand',
-      baseCode: 'B01001_001E',
-      baseLabel: 'Total Population',
-      format: 'ratePerThousand'
-    },
-    'Median Household Income': {
-      dataset: 'acs5, acs1',
-      variableCode: 'B19013_001E',
-      transformationType: 'none',
-      baseCode: 'none',
-      baseLabel: 'none',
-      format: 'currency'
-    },
-    'Per Capita Income': {
-      dataset: 'acs5, acs1',
-      variableCode: 'B19301_001E',
-      transformationType: 'none',
-      baseCode: 'none',
-      baseLabel: 'none',
-      format: 'currency'
-    },
-    'Individuals Below Poverty Level': {
-      dataset: 'acs5, acs1',
-      variableCode: 'B17001_002E',
-      transformationType: 'percentage',
-      baseCode: 'B01001_001E',
-      baseLabel: 'Total Population',
-      format: 'percentage'
-    },
-    'Households Receiving Food Stamps/SNAP': {
-      dataset: 'acs5, acs1',
-      variableCode: 'B22010_002E',
-      transformationType: 'percentage',
-      baseCode: 'B11001_001E',
-      baseLabel: 'Total Households',
-      format: 'percentage'
-    },
-    'Labor Force Participation': {
-      dataset: 'acs5, acs1',
-      variableCode: 'B23001_001E',
-      transformationType: 'ratePerThousand',
-      baseCode: 'B01001_001E',
-      baseLabel: 'Total Population',
-      format: 'ratePerThousand'
-    },
-    'Unemployment Rate': {
-      dataset: 'acs5, acs1',
-      variableCode: 'B23025_005E',
-      transformationType: 'percentage',
-      baseCode: 'B23025_002E',
-      baseLabel: 'Labor Force',
-      format: 'percentage'
-    },
-    'Agriculture, Forestry, Fishing': {
-      dataset: 'acs5, acs1',
-      variableCode: 'B24020_003E',
-      transformationType: 'percentage',
-      baseCode: 'B23001_001E',
-      baseLabel: 'Labor Force Population',
-      format: 'percentage'
-    },
-    'Education, Health Care, Social Assistance': {
-      dataset: 'acs5, acs1',
-      variableCode: 'B24020_019E',
-      transformationType: 'percentage',
-      baseCode: 'B23001_001E',
-      baseLabel: 'Labor Force Population',
-      format: 'percentage'
-    },
-    'Professional, Scientific, Management': {
-      dataset: 'acs5, acs1',
-      variableCode: 'B24020_015E',
-      transformationType: 'percentage',
-      baseCode: 'B23001_001E',
-      baseLabel: 'Labor Force Population',
-      format: 'percentage'
-    },
-    'Less Than High School': {
-      dataset: 'acs5, acs1',
-      variableCode: [
-        'B15003_002E', 'B15003_003E',
-        'B15003_004E', 'B15003_005E',
-        'B15003_006E', 'B15003_007E',
-        'B15003_008E', 'B15003_009E',
-        'B15003_010E', 'B15003_011E',
-        'B15003_012E', 'B15003_013E',
-        'B15003_014E', 'B15003_015E',
-        'B15003_016E'
-      ],
-      transformationType: 'summedPercentage',
-      baseCode: 'B01001_001E',
-      baseLabel: 'Total Population',
-      format: 'percentage'
-    },
-    'High School Graduate': {
-      dataset: 'acs5, acs1',
-      variableCode: 'B15003_017E',
-      transformationType: 'percentage',
-      baseCode: 'B01001_001E',
-      baseLabel: 'Total Population',
-      format: 'percentage'
-    },
-    "Bachelor's or Higher": {
-      dataset: 'acs5, acs1',
-      variableCode: [ 'B15003_022E', 'B15003_023E', 'B15003_024E', 'B15003_025E' ],
-      transformationType: 'summedPercentage',
-      baseCode: 'B01001_001E',
-      baseLabel: 'Total Population',
-      format: 'percentage'
-    },
-    'Nursery to Grade 4': {
-      dataset: 'acs5, acs1',
-      variableCode: [ 'B14001_003E', 'B14001_004E', 'B14001_005E' ],
-      transformationType: 'summedPercentage',
-      baseCode: 'B01001_001E',
-      baseLabel: 'Total Population',
-      format: 'percentage'
-    },
-    'Grades 5 to 12': {
-      dataset: 'acs5, acs1',
-      variableCode: [ 'B14001_006E', 'B14001_007E', 'B14001_008E' ],
-      transformationType: 'summedPercentage',
-      baseCode: 'B01001_001E',
-      baseLabel: 'Total Population',
-      format: 'percentage'
-    },
-    'College or Graduate School': {
-      dataset: 'acs5, acs1',
-      variableCode: [ 'B14001_009E', 'B14001_010E' ],
-      transformationType: 'summedPercentage',
-      baseCode: 'B01001_001E',
-      baseLabel: 'Total Population',
-      format: 'percentage'
-    },
-    'Owner-Occupied Units': {
-      dataset: 'acs5, acs1',
-      variableCode: 'B25003_002E',
-      transformationType: 'percentage',
-      baseCode: 'B25003_001E',
-      baseLabel: 'Total Housing Units',
-      format: 'percentage'
-    },
-    'Renter-Occupied Units': {
-      dataset: 'acs5, acs1',
-      variableCode: 'B25003_003E',
-      transformationType: 'percentage',
-      baseCode: 'B25003_001E',
-      baseLabel: 'Total Housing Units',
-      format: 'percentage'
-    },
-    'Median Value of Owner-Occupied Housing Units': {
-      dataset: 'acs5, acs1',
-      variableCode: 'B25077_001E',
-      transformationType: 'none',
-      baseCode: 'none',
-      baseLabel: 'none',
-      format: 'currency'
-    },
-    'Median Gross Rent': {
-      dataset: 'acs5, acs1',
-      variableCode: 'B25064_001E',
-      transformationType: 'none',
-      baseCode: 'none',
-      baseLabel: 'none',
-      format: 'currency'
-    },
-    'Workers Who Commute by Car, Truck, or Van': {
-      dataset: 'acs5, acs1',
-      variableCode: 'B08006_002E',
-      transformationType: 'percentage',
-      baseCode: 'B08006_001E',
-      baseLabel: 'Total Workers Commuting',
-      format: 'percentage'
-    },
-    'Public Transportation (excluding taxicab)': {
-      dataset: 'acs5, acs1',
-      variableCode: 'B08006_008E',
-      transformationType: 'percentage',
-      baseCode: 'B08006_001E',
-      baseLabel: 'Total Workers Commuting',
-      format: 'percentage'
-    },
-    'With Health Insurance': {
-      dataset: 'acs5, acs1',
-      variableCode: 'B27001_004E',
-      transformationType: 'percentage',
-      baseCode: 'B01001_001E',
-      baseLabel: 'Total Population',
-      format: 'percentage'
-    },
-    'Without Health Insurance': {
-      dataset: 'acs5, acs1',
-      variableCode: 'B27001_005E',
-      transformationType: 'percentage',
-      baseCode: 'B01001_001E',
-      baseLabel: 'Total Population',
-      format: 'percentage'
-    },
-    'With a Disability': {
-      dataset: 'acs5, acs1',
-      variableCode: 'B18101_004E',
-      transformationType: 'percentage',
-      baseCode: 'B01001_001E',
-      baseLabel: 'Total Civilian Non-institutionalized Population',
-      format: 'percentage'
-    },
-    'Self-Employed in Own Not Incorporated Business Workers': {
-      dataset: 'acs5, acs1',
-      variableCode: 'B24080_004E',
-      transformationType: 'percentage',
-      baseCode: 'B24080_001E',
-      baseLabel: 'Total Employed Population',
-      format: 'percentage'
-    },
-    'Employment Rate': {
-      dataset: 'acs5, acs1',
-      variableCode: 'B23025_004E',
-      transformationType: 'percentage',
-      baseCode: 'B23025_002E',
-      baseLabel: 'Labor Force',
-      format: 'percentage'
-    }
-  },
-  censusDataAPIs: {
-    acs5: {
-      description:
-        "Detailed demographic, social, economic, and housing statistics (5-year estimates)",
-      datasetName: "American Community Survey 5-Year Data",
-      yearsAvailable: [[2005, 2023]],
-      apiReference: `https://api.census.gov/data/{year}/acs/acs5?get=VARIABLE&for=GEOGRAPHY`,
-      geographiesAvailable: [ // This array specifies the geographies that are available for the dataset. The values must match the keys defined in the geographiesAPISyntax object above.
-        "Nation",
-        "States",
-        "Counties",
-        "Metropolitan Statistical Areas",
-        "Congressional Districts",
-        "Places",
-        "Census Tracts",
-        "Block Groups",
-      ],
-    },
-    acs1: {
-      description:
-        "Detailed demographic, social, economic, and housing statistics (1-year estimates)",
-      datasetName: "American Community Survey 1-Year Data",
-      yearsAvailable: [[2010, 2023]],
-      apiReference: `https://api.census.gov/data/{year}/acs/acs1?get=VARIABLE&for=GEOGRAPHY`,
-      geographiesAvailable: [
-        "Nation",
-        "States",
-        "Counties",
-        "Metropolitan Statistical Areas",
-        "Congressional Districts",
-        "Places",
-        "Census Tracts",
-      ],
-    },
-    dec: {
-      description: "Basic demographic information, conducted every 10 years",
-      datasetName: "Decennial Census",
-      yearsAvailable: [
-        1790, 1800, 1810, 1820, 1830, 1840, 1850, 1860, 1870, 1880, 1890, 1900,
-        1910, 1920, 1930, 1940, 1950, 1960, 1970, 1980, 1990, 2000, 2010, 2020,
-      ],
-      apiReference: `https://api.census.gov/data/{year}/dec?get=VARIABLE&for=GEOGRAPHY`,
-      geographiesAvailable: [
-        "Nation",
-        "States",
-        "Counties",
-        "Places",
-        "Census Tracts",
-        "Block Groups",
-        "Blocks",
-      ],
-    },
-    pep: {
-      description:
-        "Updated population estimates for the nation, states, counties, cities, and towns",
-      datasetName: "Population Estimates Program",
-      yearsAvailable: [[1990, 2023]],
-      apiReference: `https://api.census.gov/data/{year}/pep/population?get=VARIABLE&for=GEOGRAPHY`,
-      geographiesAvailable: [
-        "Nation",
-        "States",
-        "Counties",
-        "Metropolitan Statistical Areas",
-        "Cities and Towns",
-      ],
-    },
-    cps: {
-      description:
-        "Labor force statistics, including employment, unemployment, and earnings",
-      datasetName: "Current Population Survey",
-      yearsAvailable: [[1940, 2023]], // monthly data availability with annual summaries
-      apiReference: `https://api.census.gov/data/{year}/cps/basic?get=VARIABLE&for=GEOGRAPHY`,
-      geographiesAvailable: ["Nation"], // Typically only national level data is available
-    },
-    econ: {
-      description:
-        "Detailed economic data by industry and geography, conducted every 5 years",
-      datasetName: "Economic Census",
-      yearsAvailable: [
-        1967, 1972, 1977, 1982, 1987, 1992, 1997, 2002, 2007, 2012, 2017, 2022,
-      ],
-      apiReference: `https://api.census.gov/data/{year}/econ?get=VARIABLE&for=GEOGRAPHY`,
-      geographiesAvailable: [
-        "Nation",
-        "States",
-        "Counties",
-        "Places",
-        "Metropolitan Statistical Areas",
-      ],
-    },
-    sbo: {
-      description:
-        "Economic data by race, ethnicity, gender, and veteran status of business owners",
-      datasetName: "Survey of Business Owners",
-      yearsAvailable: [
-        1972, 1977, 1982, 1987, 1992, 1997, 2002, 2007, 2012, 2017,
-      ],
-      apiReference: `https://api.census.gov/data/{year}/sbo?get=VARIABLE&for=GEOGRAPHY`,
-      geographiesAvailable: [
-        "Nation",
-        "States",
-        "Metropolitan Statistical Areas",
-      ],
-    },
-    "timeseries/bds/firms": {
-      description:
-        "Measures of business dynamics, such as job creation and destruction",
-      datasetName: "Business Dynamics Statistics",
-      yearsAvailable: [[1977, 2023]],
-      apiReference: `https://api.census.gov/data/timeseries/bds/firms?get=VARIABLE&for=GEOGRAPHY`,
-      geographiesAvailable: [
-        "Nation",
-        "States",
-        "Metropolitan Statistical Areas",
-        "Counties",
-      ],
-    },
-    cbp: {
-      description:
-        "Annual subnational economic data by industry, including ZIP Code level",
-      datasetName: "County Business Patterns",
-      yearsAvailable: [[1964, 2023]],
-      apiReference: `https://api.census.gov/data/{year}/cbp?get=VARIABLE&for=GEOGRAPHY`,
-      geographiesAvailable: [
-        "Nation",
-        "States",
-        "Counties",
-        "Metropolitan Statistical Areas",
-        "ZIP Code Tabulation Areas",
-      ],
-    },
-    hvs: {
-      description:
-        "Quarterly data on rental and homeowner vacancy rates, and homeownership rates",
-      datasetName: "Housing Vacancies and Homeownership",
-      yearsAvailable: [[1956, 2023]], // quarterly data
-      apiReference: `https://api.census.gov/data/{year}/hvs?get=VARIABLE&for=GEOGRAPHY`,
-      geographiesAvailable: [
-        "Nation",
-        "Regions",
-        "States",
-        "Metropolitan Statistical Areas",
-      ],
-    },
-    ase: {
-      description:
-        "Timely updates on women, minority, and veteran-owned businesses",
-      datasetName: "Annual Survey of Entrepreneurs",
-      yearsAvailable: [2014, 2015, 2016],
-      apiReference: `https://api.census.gov/data/{year}/ase?get=VARIABLE&for=GEOGRAPHY`,
-      geographiesAvailable: [
-        "Nation",
-        "States",
-        "Metropolitan Statistical Areas",
-      ],
-    },
-    sipp: {
-      description:
-        "Detailed information on the economic situation of U.S. households",
-      datasetName: "Survey of Income and Program Participation",
-      yearsAvailable: [[1984, 2023]], // longitudinal survey
-      apiReference: `https://api.census.gov/data/{year}/sipp?get=VARIABLE&for=GEOGRAPHY`,
-      geographiesAvailable: ["Nation", "States"],
-    },
-    "timeseries/healthins/sahie": {
-      description: "State and county health insurance statistics",
-      datasetName: "Small Area Health Insurance Estimates",
-      yearsAvailable: [[2006, 2023]],
-      apiReference: `https://api.census.gov/data/timeseries/healthins/sahie?get=VARIABLE&for=GEOGRAPHY`,
-      geographiesAvailable: ["Nation", "States", "Counties"],
-    },
-    pseo: {
-      description:
-        "Earnings and employment outcomes for graduates of specific colleges",
-      datasetName: "Post-Secondary Employment Outcomes",
-      yearsAvailable: [[2018, 2023]], // assumed experimental range
-      apiReference: `https://api.census.gov/data/{year}/pseo?get=VARIABLE&for=GEOGRAPHY`,
-      geographiesAvailable: [
-        "Nation",
-        "States",
-        "Metropolitan Statistical Areas",
-      ],
-    },
-    ncvs: {
-      description:
-        "Annual victimization data, including crime trends and victim characteristics",
-      datasetName: "National Crime Victimization Survey",
-      yearsAvailable: [[1993, 2023]], // available since 1993 annually
-      apiReference: `https://api.census.gov/data/{year}/ncvs?get=VARIABLE&for=GEOGRAPHY`,
-      geographiesAvailable: ["Nation"], // Typically only national level data is available
-    },
-  },
+
   annotationValues: {
     "-666666666": {
       annotation: "-",
@@ -1199,6 +1339,27 @@ const referenceData = { // This object defines the reference data for the app. I
       annotation: "null",
       meaning:
         "A null value in the estimate means there is no data available for the requested geography.",
+    },
+    "D": {
+      annotation: "D",
+      meaning:
+        "Withheld to avoid disclosing data for individual companies; data are included in higher level totals.",
+    },
+    "S": {
+      annotation
+        : "S",
+      meaning:
+        "Estimate does not meet publication standards because of high sampling variability, poor response quality, or other concerns about the estimate quality. Unpublished estimates derived from this table by subtraction are subject to these same limitations and should not be attributed to the U.S. Census Bureau.",
+    },
+    "N": {
+      annotation: "N",
+      meaning:
+        "Not available or not comparable",
+    },
+    "X": {
+      annotation: "X",
+      meaning:
+        "Not applicable",
     },
   },
   featuredStudies: [
