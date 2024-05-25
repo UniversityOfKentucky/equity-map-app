@@ -11,9 +11,11 @@ function generateVariablesReference(categories) {
           dataset: variableDetails.dataset,
           variableCode: variableDetails.variableCode,
           transformationType: variableDetails.transformationType || "none",
-          baseCode: variableDetails.baseCode || "none",
+          baseCode: variableDetails.baseCode || null,
           baseLabel: variableDetails.baseLabel || "none",
-          format: variableDetails.format || "none"
+          format: variableDetails.format || "none",
+          filter: variableDetails.filter || "none",
+          baseFilter: variableDetails.baseFilter || null
         };
       }
     }
