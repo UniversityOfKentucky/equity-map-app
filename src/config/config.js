@@ -65,7 +65,7 @@ const appConfig = {
     "Percent Self-Employed",
   ],
   initialTimePeriod: "2022",
-  colorScale: chroma.scale(["rgb(219, 234, 254)", "rgb(59, 130, 246)"]).mode("lch").colors(6),
+  colorScale: chroma.scale(['rgb(219, 234, 254)', 'rgb(59, 130, 246)']).colors(5)
 };
 
 const referenceData = {
@@ -118,6 +118,7 @@ const referenceData = {
               baseCode: ["B15002_019E"],
               baseLabel: "Total Female Population 25 and Over",
               format: "percentage",
+              classificationMethod: "quantiles",
             },
             "Women 16 and Over Employed In the Labor Force": {
               dataset: { availableIn: ["acs5"], displayedDataset: "acs5" },
@@ -134,6 +135,7 @@ const referenceData = {
               ],
               baseLabel: "Women in the civilian labor force age 16 years and over",
               format: "percentage",
+              classificationMethod: "quantiles",
             },
           },
           Veterans: {
@@ -144,6 +146,7 @@ const referenceData = {
               baseCode: ["B21001_001E"],
               baseLabel: "Total Civilian Population 18 and Over",
               format: "percentage",
+              classificationMethod: "equalInterval",
             },
             "Total Female Veterans in the Civilian Population": {
               dataset: { availableIn: ["acs5"], displayedDataset: "acs5" },
@@ -152,6 +155,7 @@ const referenceData = {
               baseCode: ["B21001_022E"],
               baseLabel: "Total Female Civilian Population 18 and Over",
               format: "percentage",
+              classificationMethod: "equalInterval",
             },
             "Total Male Veterans in the Civilian Population": {
               dataset: { availableIn: ["acs5"], displayedDataset: "acs5" },
@@ -160,24 +164,23 @@ const referenceData = {
               baseCode: ["B21001_004E"],
               baseLabel: "Total Male Civilian Population 18 and Over",
               format: "percentage",
+              classificationMethod: "equalInterval",
             },
             "Percent of Veterans 18 to 64 Who Are Employed": {
               dataset: { availableIn: ["acs5"], displayedDataset: "acs5" },
-              variableCode: [
-                "B21005_005E", "B21005_016E", "B21005_027E"
-              ],
+              variableCode: ["B21005_005E", "B21005_016E", "B21005_027E"],
               transformationType: "summedPercentage",
-              baseCode: [
-                "B21005_003E", "B21005_014E", "B21005_025E"
-              ],
+              baseCode: ["B21005_003E", "B21005_014E", "B21005_025E"],
               baseLabel: "Veteran Population 18 to 64 Years",
               format: "percentage",
+              classificationMethod: "quantiles",
             },
             "Median Income for Veterans": {
               dataset: { availableIn: ["acs5"], displayedDataset: "acs5" },
               variableCode: ["B21004_002E"],
               transformationType: "none",
               format: "currency",
+              classificationMethod: "naturalBreaks",
             },
           },
           Minorities: {
@@ -188,6 +191,7 @@ const referenceData = {
               baseCode: ["B02001_001E"],
               baseLabel: "Total Population",
               format: "percentage",
+              classificationMethod: "quantiles",
             },
           },
           "Woman-Owned Businesses": {
@@ -198,6 +202,7 @@ const referenceData = {
               format: "percentage",
               filter: "&NAICS2017=00&SEX=002",
               baseFilter: ["&NAICS2017=00&SEX=001"],
+              classificationMethod: "equalInterval",
             },
             "Women-Owned Businesses with sales/receipts of less than $5,000": {
               dataset: { availableIn: ["abscs"], displayedDataset: "abscs" },
@@ -206,6 +211,7 @@ const referenceData = {
               format: "percentage",
               filter: "&NAICS2017=00&SEX=002&RCPSZFI=511",
               baseFilter: ["&NAICS2017=00&SEX=002&RCPSZFI=001"],
+              classificationMethod: "equalInterval",
             },
             "Women-Owned Businesses with sales/receipts of $5,000 to $9,999": {
               dataset: { availableIn: ["abscs"], displayedDataset: "abscs" },
@@ -214,6 +220,7 @@ const referenceData = {
               format: "percentage",
               filter: "&NAICS2017=00&SEX=002&RCPSZFI=518",
               baseFilter: ["&NAICS2017=00&SEX=002&RCPSZFI=001"],
+              classificationMethod: "equalInterval",
             },
             "Women-Owned Businesses with sales/receipts of $10,000 to $24,999": {
               dataset: { availableIn: ["abscs"], displayedDataset: "abscs" },
@@ -222,6 +229,7 @@ const referenceData = {
               format: "percentage",
               filter: "&NAICS2017=00&SEX=002&RCPSZFI=519",
               baseFilter: ["&NAICS2017=00&SEX=002&RCPSZFI=001"],
+              classificationMethod: "equalInterval",
             },
             "Women-Owned Businesses with sales/receipts of $25,000 to $49,999": {
               dataset: { availableIn: ["abscs"], displayedDataset: "abscs" },
@@ -230,6 +238,7 @@ const referenceData = {
               format: "percentage",
               filter: "&NAICS2017=00&SEX=002&RCPSZFI=521",
               baseFilter: ["&NAICS2017=00&SEX=002&RCPSZFI=001"],
+              classificationMethod: "equalInterval",
             },
             "Women-Owned Businesses with sales/receipts of $50,000 to $99,999": {
               dataset: { availableIn: ["abscs"], displayedDataset: "abscs" },
@@ -238,6 +247,7 @@ const referenceData = {
               format: "percentage",
               filter: "&NAICS2017=00&SEX=002&RCPSZFI=522",
               baseFilter: ["&NAICS2017=00&SEX=002&RCPSZFI=001"],
+              classificationMethod: "equalInterval",
             },
             "Women-Owned Businesses with sales/receipts of $100,000 to $249,999": {
               dataset: { availableIn: ["abscs"], displayedDataset: "abscs" },
@@ -246,6 +256,7 @@ const referenceData = {
               format: "percentage",
               filter: "&NAICS2017=00&SEX=002&RCPSZFI=523",
               baseFilter: ["&NAICS2017=00&SEX=002&RCPSZFI=001"],
+              classificationMethod: "equalInterval",
             },
             "Women-Owned Businesses with sales/receipts of $250,000 to $499,999": {
               dataset: { availableIn: ["abscs"], displayedDataset: "abscs" },
@@ -254,6 +265,7 @@ const referenceData = {
               format: "percentage",
               filter: "&NAICS2017=00&SEX=002&RCPSZFI=525",
               baseFilter: ["&NAICS2017=00&SEX=002&RCPSZFI=001"],
+              classificationMethod: "equalInterval",
             },
             "Women-Owned Businesses with sales/receipts of $500,000 to $999,999": {
               dataset: { availableIn: ["abscs"], displayedDataset: "abscs" },
@@ -262,6 +274,7 @@ const referenceData = {
               format: "percentage",
               filter: "&NAICS2017=00&SEX=002&RCPSZFI=531",
               baseFilter: ["&NAICS2017=00&SEX=002&RCPSZFI=001"],
+              classificationMethod: "equalInterval",
             },
             "Women-Owned Businesses with sales/receipts of $1,000,000 or more": {
               dataset: { availableIn: ["abscs"], displayedDataset: "abscs" },
@@ -270,6 +283,7 @@ const referenceData = {
               format: "percentage",
               filter: "&NAICS2017=00&SEX=002&RCPSZFI=532",
               baseFilter: ["&NAICS2017=00&SEX=002&RCPSZFI=001"],
+              classificationMethod: "equalInterval",
             },
             "Women Owned Businesses with less than 2 years in business": {
               dataset: { availableIn: ["abscs"], displayedDataset: "abscs" },
@@ -278,6 +292,7 @@ const referenceData = {
               format: "percentage",
               filter: "&NAICS2017=00&SEX=002&YIBSZFI=311",
               baseFilter: ["&NAICS2017=00&SEX=002&YIBSZFI=001"],
+              classificationMethod: "equalInterval",
             },
             "Women Owned Businesses with 2 to 3 years in business": {
               dataset: { availableIn: ["abscs"], displayedDataset: "abscs" },
@@ -286,6 +301,7 @@ const referenceData = {
               format: "percentage",
               filter: "&NAICS2017=00&SEX=002&YIBSZFI=318",
               baseFilter: ["&NAICS2017=00&SEX=002&YIBSZFI=001"],
+              classificationMethod: "equalInterval",
             },
             "Women Owned Businesses with 4 to 5 years in business": {
               dataset: { availableIn: ["abscs"], displayedDataset: "abscs" },
@@ -294,6 +310,7 @@ const referenceData = {
               format: "percentage",
               filter: "&NAICS2017=00&SEX=002&YIBSZFI=319",
               baseFilter: ["&NAICS2017=00&SEX=002&YIBSZFI=001"],
+              classificationMethod: "equalInterval",
             },
             "Women Owned Businesses with 6 to 10 years in business": {
               dataset: { availableIn: ["abscs"], displayedDataset: "abscs" },
@@ -302,6 +319,7 @@ const referenceData = {
               format: "percentage",
               filter: "&NAICS2017=00&SEX=002&YIBSZFI=321",
               baseFilter: ["&NAICS2017=00&SEX=002&YIBSZFI=001"],
+              classificationMethod: "equalInterval",
             },
             "Women Owned Businesses with 11 to 15 years in business": {
               dataset: { availableIn: ["abscs"], displayedDataset: "abscs" },
@@ -310,6 +328,7 @@ const referenceData = {
               format: "percentage",
               filter: "&NAICS2017=00&SEX=002&YIBSZFI=322",
               baseFilter: ["&NAICS2017=00&SEX=002&YIBSZFI=001"],
+              classificationMethod: "equalInterval",
             },
             "Women Owned Businesses with 16 or more years in business": {
               dataset: { availableIn: ["abscs"], displayedDataset: "abscs" },
@@ -318,6 +337,7 @@ const referenceData = {
               format: "percentage",
               filter: "&NAICS2017=00&SEX=002&YIBSZFI=321",
               baseFilter: ["&NAICS2017=00&SEX=002&YIBSZFI=323"],
+              classificationMethod: "equalInterval",
             },
             "Employment Size": {
               dataset: { availableIn: ["abscs"], displayedDataset: "abscs" },
@@ -326,26 +346,30 @@ const referenceData = {
               format: "number",
               filter: "&SEX=002",
               baseFilter: ["&SEX=001"],
+              classificationMethod: "naturalBreaks",
             },
-          },         
+          },
           "Economic Data (BDS)": {
             "Job Creation and Destruction": {
               dataset: { availableIn: ["bds"], displayedDataset: "bds" },
               variableCode: ["JOB_CREATION", "JOB_DESTRUCTION"],
               transformationType: "none",
               format: "number",
+              classificationMethod: "naturalBreaks",
             },
             "Firm Births and Deaths": {
               dataset: { availableIn: ["bds"], displayedDataset: "bds" },
               variableCode: ["FIRM_BIRTHS", "FIRM_DEATHS"],
               transformationType: "none",
               format: "number",
+              classificationMethod: "naturalBreaks",
             },
             "Establishment Characteristics": {
               dataset: { availableIn: ["bds"], displayedDataset: "bds" },
               variableCode: ["ESTABLISHMENT_SIZE"],
               transformationType: "none",
               format: "number",
+              classificationMethod: "naturalBreaks",
             },
           },
           "County Business Patterns": {
@@ -354,18 +378,21 @@ const referenceData = {
               variableCode: ["ESTAB"],
               transformationType: "none",
               format: "number",
+              classificationMethod: "naturalBreaks",
             },
             "Employment Size": {
               dataset: { availableIn: ["cbp"], displayedDataset: "cbp" },
               variableCode: ["EMP_SIZE"],
               transformationType: "none",
               format: "number",
+              classificationMethod: "naturalBreaks",
             },
             "Payroll": {
               dataset: { availableIn: ["cbp"], displayedDataset: "cbp" },
               variableCode: ["PAY"],
               transformationType: "none",
               format: "currency",
+              classificationMethod: "naturalBreaks",
             },
           },
           "Post-Secondary Employment Outcomes (PSEO)": {
@@ -374,12 +401,14 @@ const referenceData = {
               variableCode: ["EARNINGS"],
               transformationType: "none",
               format: "currency",
+              classificationMethod: "naturalBreaks",
             },
             "Employment Outcomes by Institution and Major": {
               dataset: { availableIn: ["pseo"], displayedDataset: "pseo" },
               variableCode: ["EMPLOYMENT"],
               transformationType: "none",
               format: "number",
+              classificationMethod: "naturalBreaks",
             },
           },
           "Survey of Income and Program Participation (SIPP)": {
@@ -388,18 +417,21 @@ const referenceData = {
               variableCode: ["INCOME"],
               transformationType: "none",
               format: "currency",
+              classificationMethod: "naturalBreaks",
             },
             "Program Participation": {
               dataset: { availableIn: ["sipp"], displayedDataset: "sipp" },
               variableCode: ["PROGRAM_PARTICIPATION"],
               transformationType: "none",
               format: "number",
+              classificationMethod: "naturalBreaks",
             },
             "Employment": {
               dataset: { availableIn: ["sipp"], displayedDataset: "sipp" },
               variableCode: ["EMPLOYMENT"],
               transformationType: "none",
               format: "number",
+              classificationMethod: "naturalBreaks",
             },
           },
         },
@@ -426,149 +458,126 @@ const referenceData = {
         ],
       },
     },
-    Demographics: {
+    "Demographics": {
       data: {
         subcategories: {
           "Age and Gender": {
             "Female Population": {
-              dataset: { availableIn: ["acs5", "acs1"],
-                  displayedDataset: "acs5"
-                },
-                variableCode: ["B01001_026E"],
-                transformationType: "percentage",
-                baseCode: ["B01001_001E"],
-                baseLabel: "Total Population",
-                format: "percentage",
-              },
-              "Male Population": {
-                dataset: {
-                  availableIn: ["acs5", "acs1"],
-                  displayedDataset: "acs5"
-                },
-                variableCode: ["B01001_002E"],
-                transformationType: "percentage",
-                baseCode: ["B01001_001E"],
-                baseLabel: "Total Population",
-                format: "percentage",
-              },
-              "Total Population": {
-                dataset: {
-                  availableIn: ["acs5", "acs1"],
-                  displayedDataset: "acs5"
-                },
-                variableCode: ["B01001_001E"],
-                format: "none",
-              },
+              dataset: { availableIn: ["acs5", "acs1"], displayedDataset: "acs5" },
+              variableCode: ["B01001_026E"],
+              transformationType: "percentage",
+              baseCode: ["B01001_001E"],
+              baseLabel: "Total Population",
+              format: "percentage",
+              classificationMethod: "equalInterval",
             },
-            "Race and Ethnicity": {
-              "Black or African American Alone": {
-                dataset: {
-                  availableIn: ["acs5", "acs1"],
-                  displayedDataset: "acs5"
-                },
-                variableCode: ["B02001_003E"],
-                transformationType: "percentage",
-                baseCode: ["B02001_001E"],
-                baseLabel: "Total Population",
-                format: "percentage",
-              },
-              "Hispanic or Latino": {
-                dataset: {
-                  availableIn: ["acs5", "acs1"],
-                  displayedDataset: "acs5"
-                },
-                variableCode: ["B03001_003E"],
-                transformationType: "percentage",
-                baseCode: ["B03001_001E"],
-                baseLabel: "Total Population",
-                format: "percentage",
-              },
-              "White Alone": {
-                dataset: {
-                  availableIn: ["acs5", "acs1"],
-                  displayedDataset: "acs5"
-                },
-                variableCode: ["B02001_002E"],
-                transformationType: "percentage",
-                baseCode: ["B02001_001E"],
-                baseLabel: "Total Population",
-                format: "percentage",
-              },
+            "Male Population": {
+              dataset: { availableIn: ["acs5", "acs1"], displayedDataset: "acs5" },
+              variableCode: ["B01001_002E"],
+              transformationType: "percentage",
+              baseCode: ["B01001_001E"],
+              baseLabel: "Total Population",
+              format: "percentage",
+              classificationMethod: "equalInterval",
             },
-            "Household Types": {
-              "Family Households": {
-                dataset: {
-                  availableIn: ["acs5", "acs1"],
-                  displayedDataset: "acs5"
-                },
-                variableCode: ["B11001_002E"],
-                transformationType: "percentage",
-                baseCode: ["B11001_001E"],
-                baseLabel: "Total Households",
-                format: "percentage",
-              },
-              "Non-family Households": {
-                dataset: {
-                  availableIn: ["acs5", "acs1"],
-                  displayedDataset: "acs5"
-                },
-                variableCode: ["B11001_007E"],
-                transformationType: "percentage",
-                baseCode: ["B11001_001E"],
-                baseLabel: "Total Households",
-                format: "percentage",
-              },
+            "Total Population": {
+              dataset: { availableIn: ["acs5", "acs1"], displayedDataset: "acs5" },
+              variableCode: ["B01001_001E"],
+              format: "none",
+              classificationMethod: "naturalBreaks",
             },
-            "Language Spoken At Home": {
-              "English Only": {
-                dataset: {
-                  availableIn: ["acs5", "acs1"],
-                  displayedDataset: "acs5"
-                },
-                variableCode: ["C16001_002E"],
-                transformationType: "percentage",
-                baseCode: ["B01001_001E"],
-                baseLabel: "Total Population",
-                format: "percentage",
-              },
-              "Other Languages": {
-                dataset: {
-                  availableIn: ["acs5", "acs1"],
-                  displayedDataset: "acs5"
-                },
-                variableCode: ["C16001_004E"],
-                transformationType: "percentage",
-                baseCode: ["B01001_001E"],
-                baseLabel: "Total Population",
-                format: "percentage",
-              },
-              "Spanish": {
-                dataset: {
-                  availableIn: ["acs5", "acs1"],
-                  displayedDataset: "acs5"
-                },
-                variableCode: ["C16001_003E"],
-                transformationType: "percentage",
-                baseCode: ["B01001_001E"],
-                baseLabel: "Total Population",
-                format: "percentage",
-              },
+          },
+          "Race and Ethnicity": {
+            "Black or African American Alone": {
+              dataset: { availableIn: ["acs5", "acs1"], displayedDataset: "acs5" },
+              variableCode: ["B02001_003E"],
+              transformationType: "percentage",
+              baseCode: ["B02001_001E"],
+              baseLabel: "Total Population",
+              format: "percentage",
+              classificationMethod: "quantiles",
             },
-            "Veterans Status": {
-              "Total Veterans": {
-                dataset: {
-                  availableIn: ["acs5", "acs1"],
-                  displayedDataset: "acs5"
-                },
-                variableCode: ["B21001_002E"],
-                transformationType: "ratePerThousand",
-                baseCode: ["B21001_001E"],
-                baseLabel: "Total Civilian population 18 years and over",
-                format: "ratePerThousand",
-              },
+            "Hispanic or Latino": {
+              dataset: { availableIn: ["acs5", "acs1"], displayedDataset: "acs5" },
+              variableCode: ["B03001_003E"],
+              transformationType: "percentage",
+              baseCode: ["B03001_001E"],
+              baseLabel: "Total Population",
+              format: "percentage",
+              classificationMethod: "quantiles",
+            },
+            "White Alone": {
+              dataset: { availableIn: ["acs5", "acs1"], displayedDataset: "acs5" },
+              variableCode: ["B02001_002E"],
+              transformationType: "percentage",
+              baseCode: ["B02001_001E"],
+              baseLabel: "Total Population",
+              format: "percentage",
+              classificationMethod: "quantiles",
+            },
+          },
+          "Household Types": {
+            "Family Households": {
+              dataset: { availableIn: ["acs5", "acs1"], displayedDataset: "acs5" },
+              variableCode: ["B11001_002E"],
+              transformationType: "percentage",
+              baseCode: ["B11001_001E"],
+              baseLabel: "Total Households",
+              format: "percentage",
+              classificationMethod: "equalInterval",
+            },
+            "Non-family Households": {
+              dataset: { availableIn: ["acs5", "acs1"], displayedDataset: "acs5" },
+              variableCode: ["B11001_007E"],
+              transformationType: "percentage",
+              baseCode: ["B11001_001E"],
+              baseLabel: "Total Households",
+              format: "percentage",
+              classificationMethod: "equalInterval",
+            },
+          },
+          "Language Spoken At Home": {
+            "English Only": {
+              dataset: { availableIn: ["acs5", "acs1"], displayedDataset: "acs5" },
+              variableCode: ["C16001_002E"],
+              transformationType: "percentage",
+              baseCode: ["B01001_001E"],
+              baseLabel: "Total Population",
+              format: "percentage",
+              classificationMethod: "equalInterval",
+            },
+            "Other Languages": {
+              dataset: { availableIn: ["acs5", "acs1"], displayedDataset: "acs5" },
+              variableCode: ["C16001_004E"],
+              transformationType: "percentage",
+              baseCode: ["B01001_001E"],
+              baseLabel: "Total Population",
+              format: "percentage",
+              classificationMethod: "equalInterval",
+            },
+            "Spanish": {
+              dataset: { availableIn: ["acs5", "acs1"], displayedDataset: "acs5" },
+              variableCode: ["C16001_003E"],
+              transformationType: "percentage",
+              baseCode: ["B01001_001E"],
+              baseLabel: "Total Population",
+              format: "percentage",
+              classificationMethod: "equalInterval",
+            },
+          },
+          "Veterans Status": {
+            "Total Veterans": {
+              dataset: { availableIn: ["acs5", "acs1"], displayedDataset: "acs5" },
+              variableCode: ["B21001_002E"],
+              transformationType: "ratePerThousand",
+              baseCode: ["B21001_001E"],
+              baseLabel: "Total Civilian population 18 years and over",
+              format: "ratePerThousand",
+              classificationMethod: "equalInterval",
             },
           },
         },
+      },
         narrativeElements: {
           subtitle: "A Foundational Category for Understanding Socio-Economic and Demographic Dynamics.",
           overview: "Demographics provide a snapshot of the population's composition and characteristics. Understanding the demographic makeup of a community is essential for policymakers, businesses, and researchers to make informed decisions and address the needs of diverse populations.",
@@ -591,126 +600,104 @@ const referenceData = {
           subcategories: {
             "Income": {
               "Median Household Income (in 2018 inflation-adjusted dollars)": {
-                dataset: {
-                  availableIn: ["acs5", "acs1"],
-                  displayedDataset: "acs5"
-                },
+                dataset: { availableIn: ["acs5", "acs1"], displayedDataset: "acs5" },
                 variableCode: ["B19013_001E"],
                 format: "currency",
+                classificationMethod: "naturalBreaks",
               },
               "Per Capita Income": {
-                dataset: {
-                  availableIn: ["acs5", "acs1"],
-                  displayedDataset: "acs5"
-                },
+                dataset: { availableIn: ["acs5", "acs1"], displayedDataset: "acs5" },
                 variableCode: ["B19301_001E"],
                 format: "currency",
+                classificationMethod: "naturalBreaks",
               },
             },
             "Poverty": {
               "Households Receiving Food Stamps/SNAP": {
-                dataset: {
-                  availableIn: ["acs5", "acs1"],
-                  displayedDataset: "acs5"
-                },
+                dataset: { availableIn: ["acs5", "acs1"], displayedDataset: "acs5" },
                 variableCode: ["B22010_002E"],
                 transformationType: "percentage",
                 baseCode: ["B11001_001E"],
                 baseLabel: "Total Households",
                 format: "percentage",
+                classificationMethod: "quantiles",
               },
               "Individuals Below Poverty Level": {
-                dataset: {
-                  availableIn: ["acs5", "acs1"],
-                  displayedDataset: "acs5"
-                },
+                dataset: { availableIn: ["acs5", "acs1"], displayedDataset: "acs5" },
                 variableCode: ["B17001_002E"],
                 transformationType: "percentage",
                 baseCode: ["B01001_001E"],
                 baseLabel: "Total Population",
                 format: "percentage",
+                classificationMethod: "quantiles",
               },
             },
             "Employment": {
               "Labor Force Participation": {
-                dataset: {
-                  availableIn: ["acs5", "acs1"],
-                  displayedDataset: "acs5"
-                },
+                dataset: { availableIn: ["acs5", "acs1"], displayedDataset: "acs5" },
                 variableCode: ["B23001_001E"],
                 transformationType: "ratePerThousand",
                 baseCode: ["B01001_001E"],
                 baseLabel: "Total Population",
                 format: "ratePerThousand",
+                classificationMethod: "equalInterval",
               },
               "Unemployment Rate": {
-                dataset: {
-                  availableIn: ["acs5", "acs1"],
-                  displayedDataset: "acs5"
-                },
+                dataset: { availableIn: ["acs5", "acs1"], displayedDataset: "acs5" },
                 variableCode: ["B23025_005E"],
                 transformationType: "percentage",
                 baseCode: ["B23025_002E"],
                 baseLabel: "Labor Force",
                 format: "percentage",
+                classificationMethod: "equalInterval",
               },
             },
             "Industry and Occupation": {
               "Management, Business, Science, and Arts Occupations": {
-                dataset: {
-                  availableIn: ["acs5", "acs1"],
-                  displayedDataset: "acs5"
-                },
+                dataset: { availableIn: ["acs5", "acs1"], displayedDataset: "acs5" },
                 variableCode: ["C24010_003E", "C24010_039E"], // Male and Female codes combined
                 transformationType: "summedPercentage",
                 baseCode: ["C24010_001E"], // Total Labor Force Population
                 baseLabel: "Labor Force Population",
-                format: "percentage"
+                format: "percentage",
+                classificationMethod: "quantiles",
               },
               "Natural Resources, Construction, and Maintenance Occupations": {
-                dataset: {
-                  availableIn: ["acs5", "acs1"],
-                  displayedDataset: "acs5"
-                },
+                dataset: { availableIn: ["acs5", "acs1"], displayedDataset: "acs5" },
                 variableCode: ["C24010_030E", "C24010_066E"], // Male and Female codes combined
                 transformationType: "summedPercentage",
                 baseCode: ["C24010_001E"], // Total Labor Force Population
                 baseLabel: "Labor Force Population",
-                format: "percentage"
+                format: "percentage",
+                classificationMethod: "quantiles",
               },
               "Production, Transportation, and Material Moving Occupations": {
-                dataset: {
-                  availableIn: ["acs5", "acs1"],
-                  displayedDataset: "acs5"
-                },
+                dataset: { availableIn: ["acs5", "acs1"], displayedDataset: "acs5" },
                 variableCode: ["C24010_034E", "C24010_070E"], // Male and Female codes combined
                 transformationType: "summedPercentage",
                 baseCode: ["C24010_001E"], // Total Labor Force Population
                 baseLabel: "Labor Force Population",
-                format: "percentage"
+                format: "percentage",
+                classificationMethod: "quantiles",
               },
               "Sales and Office Occupations": {
-                dataset: {
-                  availableIn: ["acs5", "acs1"],
-                  displayedDataset: "acs5"
-                },
+                dataset: { availableIn: ["acs5", "acs1"], displayedDataset: "acs5" },
                 variableCode: ["C24010_027E", "C24010_063E"], // Male and Female codes combined
                 transformationType: "summedPercentage",
                 baseCode: ["C24010_001E"], // Total Labor Force Population
                 baseLabel: "Labor Force Population",
-                format: "percentage"
+                format: "percentage",
+                classificationMethod: "quantiles",
               },
               "Service Occupations": {
-                dataset: {
-                  availableIn: ["acs5", "acs1"],
-                  displayedDataset: "acs5"
-                },
+                dataset: { availableIn: ["acs5", "acs1"], displayedDataset: "acs5" },
                 variableCode: ["C24010_019E", "C24010_055E"], // Male and Female codes combined
                 transformationType: "summedPercentage",
                 baseCode: ["C24010_001E"], // Total Labor Force Population
                 baseLabel: "Labor Force Population",
-                format: "percentage"
-              },              
+                format: "percentage",
+                classificationMethod: "quantiles",
+              },
             },
           },
         },
@@ -756,6 +743,7 @@ const referenceData = {
                 baseCode: ["B01001_001E"],
                 baseLabel: "Total Population",
                 format: "percentage",
+                classificationMethod: "quantiles",
               },
               "High School Graduate": {
                 dataset: {
@@ -767,6 +755,7 @@ const referenceData = {
                 baseCode: ["B01001_001E"],
                 baseLabel: "Total Population",
                 format: "percentage",
+                classificationMethod: "quantiles",
               },
               "Bachelor's or Higher": {
                 dataset: {
@@ -783,6 +772,7 @@ const referenceData = {
                 baseCode: ["B01001_001E"],
                 baseLabel: "Total Population",
                 format: "percentage",
+                classificationMethod: "quantiles",
               },
             },
             "School Enrollment": {
@@ -796,6 +786,7 @@ const referenceData = {
                 baseCode: ["B01001_001E"],
                 baseLabel: "Total Population",
                 format: "percentage",
+                classificationMethod: "quantiles",
               },
               "Grades 5 to 12": {
                 dataset: {
@@ -807,6 +798,7 @@ const referenceData = {
                 baseCode: ["B01001_001E"],
                 baseLabel: "Total Population",
                 format: "percentage",
+                classificationMethod: "quantiles",
               },
               "College or Graduate School": {
                 dataset: {
@@ -818,6 +810,7 @@ const referenceData = {
                 baseCode: ["B01001_001E"],
                 baseLabel: "Total Population",
                 format: "percentage",
+                classificationMethod: "quantiles",
               },
             },
           },
@@ -852,6 +845,7 @@ const referenceData = {
                 baseCode: ["B25003_001E"],
                 baseLabel: "Total Housing Units",
                 format: "percentage",
+                classificationMethod: "equalInterval",
               },
               "Renter-Occupied Units": {
                 dataset: {
@@ -863,6 +857,7 @@ const referenceData = {
                 baseCode: ["B25003_001E"],
                 baseLabel: "Total Housing Units",
                 format: "percentage",
+                classificationMethod: "equalInterval",
               },
             },
             "Housing Affordability and Costs": {
@@ -873,6 +868,7 @@ const referenceData = {
                 },
                 variableCode: ["B25077_001E"],
                 format: "currency",
+                classificationMethod: "naturalBreaks",
               },
               "Median Gross Rent": {
                 dataset: {
@@ -881,6 +877,7 @@ const referenceData = {
                 },
                 variableCode: ["B25064_001E"],
                 format: "currency",
+                classificationMethod: "naturalBreaks",
               },
             },
             "Commuting Patterns": {
@@ -894,6 +891,7 @@ const referenceData = {
                 baseCode: ["B08006_001E"],
                 baseLabel: "Total Workers Commuting",
                 format: "percentage",
+                classificationMethod: "equalInterval",
               },
               "Public Transportation (excluding taxicab)": {
                 dataset: {
@@ -905,6 +903,7 @@ const referenceData = {
                 baseCode: ["B08006_001E"],
                 baseLabel: "Total Workers Commuting",
                 format: "percentage",
+                classificationMethod: "equalInterval",
               },
             },
           },
@@ -939,6 +938,7 @@ const referenceData = {
                 baseCode: ["B01001_001E"],
                 baseLabel: "Total Population",
                 format: "percentage",
+                classificationMethod: "equalInterval",
               },
               "Without Health Insurance": {
                 dataset: {
@@ -950,6 +950,7 @@ const referenceData = {
                 baseCode: ["B01001_001E"],
                 baseLabel: "Total Population",
                 format: "percentage",
+                classificationMethod: "equalInterval",
               },
             },
             Disability: {
@@ -963,6 +964,7 @@ const referenceData = {
                 baseCode: ["B01001_001E"],
                 baseLabel: "Total Civilian Non-institutionalized Population",
                 format: "percentage",
+                classificationMethod: "equalInterval",
               },
             },
           },
@@ -997,6 +999,7 @@ const referenceData = {
                 baseCode: ["B24080_001E"],
                 baseLabel: "Total Employed Population",
                 format: "percentage",
+                classificationMethod: "equalInterval",
               },
               "Total Businesses Surveyed": {
                 dataset: {
@@ -1006,6 +1009,7 @@ const referenceData = {
                 variableCode: ["FIRMPDEMP"],
                 format: "none",
                 description: "This includes all businesses that responded to the survey. If any one person owned 10% or more of the business, the respondent provided details about the sex, ethnicity, race, and veteran status for up to four of the largest owners.",
+                classificationMethod: "naturalBreaks",
               },
               "Female-Owned Businesses (State Level)": {
                 dataset: {
@@ -1015,6 +1019,7 @@ const referenceData = {
                 variableCode: ["FIRMPDEMP"],
                 transformationType: "none",
                 format: "none",
+                classificationMethod: "naturalBreaks",
               },
               "Female-Owned Businesses (MSA Level)": {
                 dataset: {
@@ -1024,6 +1029,7 @@ const referenceData = {
                 variableCode: ["FIRMPDEMP"],
                 transformationType: "none",
                 format: "none",
+                classificationMethod: "naturalBreaks",
               },
               "Veteran-Owned Businesses (MSA Level)": {
                 dataset: {
@@ -1033,6 +1039,7 @@ const referenceData = {
                 variableCode: ["FIRMPDEMP"],
                 transformationType: "none",
                 format: "none",
+                classificationMethod: "naturalBreaks",
               },
               "Minority-Owned Businesses (MSA Level)": {
                 dataset: {
@@ -1042,6 +1049,7 @@ const referenceData = {
                 variableCode: ["FIRMPDEMP"],
                 transformationType: "none",
                 format: "none",
+                classificationMethod: "naturalBreaks",
               },
             },
             "Economic Development Indicators": {
@@ -1055,6 +1063,7 @@ const referenceData = {
                 baseCode: ["B23025_002E"],
                 baseLabel: "Labor Force",
                 format: "percentage",
+                classificationMethod: "equalInterval",
               },
             },
           },
@@ -1288,7 +1297,6 @@ const referenceData = {
       }
     
   },
-
   annotationValues: {
     "-666666666": {
       annotation: "-",
