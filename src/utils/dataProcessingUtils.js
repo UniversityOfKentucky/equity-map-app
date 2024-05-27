@@ -1,73 +1,163 @@
-import { appConfig, referenceData } from '../config/config';
+import { referenceData } from '../config/config';
+import * as ss from 'simple-statistics';
+import { appConfig } from '../config/config';
 
 function processData(acsData, selectedVariables, selectedGeography) {
   const currentVariableProps = referenceData.variables[selectedVariables];
 
   let parsedData = parseData(acsData, currentVariableProps, selectedGeography);
-  console.log('PARSED DATA RETURNED TO PROCESSDATA | LINE 16', parsedData);
-
   let transformedData = transformData(parsedData, currentVariableProps.transformationType);
-  console.log('TRANSFORMED DATA RETURNED TO PROCESSDATA | LINE 15', transformedData);
 
-  // Extract numeric values for normalization
-  const validValues = Object.values(transformedData).map(value => 
-    value in referenceData.annotationValues || isNaN(value) ? 0 : value
-  );
-
-  const min = Math.min(...validValues);
-  const max = Math.max(...validValues);
-  console.log('MIN', min, 'MAX', max);
-
-  // Create a color scale using chroma.js
-  const colorScale = appConfig.colorScale;
+  // Classify the transformed data
+  const { classifiedData, breaks, colors } = classifyValues(transformedData, currentVariableProps);
+  // // console.log('classifiedData', classifiedData, 'breaks', breaks, 'colors', colors);
 
   // Initialize processedData object
   let processedData = {};
+  // Process data and assign colors based on classified data
+  for (const geoCode in classifiedData) {
+    const value = classifiedData[geoCode].value;
 
-  // Normalize values and store processed data
-  for (const geoCode in transformedData) {
-    
-    if (transformedData[geoCode] in referenceData.annotationValues || transformedData[geoCode] == 0) { // If the transformedData value is an annotation value, we assign the transformedData value to the processedData object without normalizing the value or assigning a color
+    if (value in referenceData.annotationValues || isNaN(value)) {
       processedData[geoCode] = {
-        formattedData: transformedData[geoCode]
-      }
+        value
+      };
       continue;
     }
 
-    const value = transformedData[geoCode];
-    const normalizedValue = isNaN(value) ? 0 : (value - min) / (max - min);
-    const colorIndex = Math.floor(normalizedValue * (colorScale.length - 1));
-
-
-    processedData[geoCode] = { 
-      formattedData: formatData(value, currentVariableProps.format),
-      color: colorScale[colorIndex],
+    // Assign color based on class
+    processedData[geoCode] = {
+      value,
+      color: classifiedData[geoCode].color,
+      // format: currentVariableProps.format
     };
   }
 
-  return processedData; 
+  return { processedData, breaks, colors };
+}
+
+function classifyValues(data, variableProps) {
+  const values = Object.values(data).filter(value => 
+    // check if value is not in annotationValues, is a number, and is not and is not less than 0 
+    !(value in referenceData.annotationValues) && !isNaN(value) && value > 0
+  ); // the 'data' object remains unchanged
+
+
+  const classificationMethod = variableProps.classificationMethod || 'equalInterval';
+  let breaks = [];
+  const colorScale = appConfig.colorScale;
+
+  switch (classificationMethod) {
+    case 'equalInterval':
+      breaks = getEqualIntervalBreaks(values, 5);
+      break;
+    case 'quantiles':
+      breaks = getQuantileBreaks(values, 5);
+      break;
+    case 'naturalBreaks':
+      breaks = ss.jenks(values, 4); 
+      break;
+    case 'standardDeviation':
+      breaks = getStandardDeviationBreaks(values);
+      break;
+    case 'continuous':
+      // No breaks needed, continuous scale
+      break;
+    default:
+      console.error('Unknown classification method');
+  }
+
+  let classifiedData = {};
+
+  for (const geoCode in data) {
+    const value = data[geoCode];
+
+    // Check if value is an annotation value, not a number, or less than or equal to 0 and if so assign the value and a default color to the classifiedData object
+    if (value in referenceData.annotationValues || isNaN(value) || value <= 0) {
+      classifiedData[geoCode] = {
+        value,
+        color: 'lightgrey'
+      };
+      continue;
+    }
+
+    // Classify the value based on the classification method
+    if (classificationMethod === 'continuous') {
+      const normalizedValue = (value - Math.min(...values)) / (Math.max(...values) - Math.min(...values));
+      const colorIndex = Math.floor(normalizedValue * (colorScale.length - 1));
+      classifiedData[geoCode] = {
+        value,
+        color: colorScale[colorIndex]
+      };
+    } else {
+      const classIndex = getClassIndex(value, breaks);
+      classifiedData[geoCode] = {
+        value,
+        color: colorScale[classIndex]
+      };
+    }
+  }
+
+  return { classifiedData, breaks, colors: colorScale };
+}
+
+function getClassIndex(value, breaks) {
+  for (let i = 0; i < breaks.length; i++) {
+    if (value <= breaks[i]) {
+      return i;
+    }
+  }
+  return breaks.length;
+}
+
+function getEqualIntervalBreaks(values, numClasses) {
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const interval = (max - min) / numClasses;
+  let breaks = [];
+  for (let i = 1; i < numClasses; i++) {
+    breaks.push(min + i * interval);
+  }
+  return breaks;
+}
+
+function getQuantileBreaks(values, numClasses) {
+  return ss.quantile(values, Array.from({ length: numClasses - 1 }, (_, i) => (i + 1) / numClasses));
+}
+
+function getStandardDeviationBreaks(values) {
+  const mean = ss.mean(values);
+  const stdDev = ss.standardDeviation(values);
+  return [
+    mean - 2 * stdDev,
+    mean - stdDev,
+    mean,
+    mean + stdDev,
+    mean + 2 * stdDev
+  ];
 }
 
 function formatData(value, format) {
-  if (value === null || isNaN(value)) {
+  if (value === null || isNaN(value) || typeof value !== 'number') {
     return 'No data';
   }
 
+  let intValue = Math.floor(value);
+
   switch (format) {
     case "currency":
-      return value === 0 ? "No data" : value.toLocaleString("en-US", { style: "currency", currency: "USD" });
+      return intValue.toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 0, maximumFractionDigits: 0 });
     case "percentage":
-      return value === 0 ? "No data" : `${value}%`;
+      return value.toFixed(2);
     case "ratePerThousand":
-      return value === 0 ? "No data" : `${value} per 1,000 residents`;
+      return intValue.toLocaleString();
     case "none":
-      return value === 0 ? "No data" : value.toLocaleString("en-US");
+      return value.toLocaleString("en-US");
     default:
       console.error("Format not recognized");
       return value;
   }
 }
-
 
 function parseData(acsData, currentVariableProps, selectedGeography) {
   let parsedData = {};
@@ -83,7 +173,7 @@ function parseData(acsData, currentVariableProps, selectedGeography) {
       : (currentVariableProps.dataset.displayedDataset === 'abscs' ? row.length - 1
         : row.length - 1
       );
-    console.log('row.length', row.length, 'locationIndex', locationIndex, 'geoCode', geoCode, 'row', row, 'selectedGeography', selectedGeography, 'currentVariableProps', currentVariableProps, 'acsData', acsData)
+    // // // console.log('row.length', row.length, 'locationIndex', locationIndex, 'geoCode', geoCode, 'row', row, 'selectedGeography', selectedGeography, 'currentVariableProps', currentVariableProps, 'acsData', acsData)
 
       let censusEstimates = row.slice(0, locationIndex); // The census estimates are all values up to the location index
 
@@ -127,7 +217,8 @@ function parseData(acsData, currentVariableProps, selectedGeography) {
       const censusEstimates = row[0]; // The variable value is the first value in the row
       
       // adds value as a value to a 'censusEstimates' key in the parsedData[geocode] object
-      parsedData[geoCode] = { censusEstimates: [parseInt(censusEstimates, 10)] }; // Check for annotation values
+      parsedData[geoCode] = { censusEstimates: censusEstimates };
+      // // console.log('single parsedData', parsedData)
     }
   }
   return parsedData; 
@@ -137,14 +228,19 @@ function transformData(parsedData, transformationType) {
   const annotationValues = referenceData.annotationValues;
 
   const convertValues = (data) => {
-    if (!data) return data;
+    if (!data) return data; // If data is null or undefined, return as is
     const dataArray = Array.isArray(data) ? data : [data]; // Ensure data is an array
     for (let i = 0; i < dataArray.length; i++) {
       const value = dataArray[i];
       if (value in annotationValues) {
         return value; // Return the annotation value if found
       }
-      dataArray[i] = parseFloat(value); // Convert to float otherwise
+      const parsedValue = parseFloat(value);
+      if (isNaN(parsedValue)) {
+        console.error(`Failed to parse value to float: ${value}`);
+        continue; // Skip this value if it can't be parsed
+      }
+      dataArray[i] = parsedValue; // Convert to float otherwise
     }
     return dataArray;
   };
@@ -158,15 +254,19 @@ function transformData(parsedData, transformationType) {
   };
 
   const applyTransformation = (census, base, type) => {
+    if (isNaN(census) || (base !== undefined && (isNaN(base) || base === 0))) {
+      console.error(`Invalid census (${census}) or base (${base}) value for transformation type: ${type}`);
+      return NaN;
+    }
     switch (type) {
       case "percentage":
-        return ((census / base) * 100).toFixed(2);
+        return parseFloat(((census / base) * 100).toFixed(2));
       case "ratePerThousand":
-        return ((census / base) * 1000).toFixed(2);
+        return parseFloat(((census / base) * 1000).toFixed(2));
       case "summedPercentage":
-        return ((census / base) * 100).toFixed(2);
+        return parseFloat(((census / base) * 100).toFixed(2));
       case "subtractedPercentage":
-        return ((base - census) / base * 100).toFixed(2);
+        return parseFloat(((base - census) / base * 100).toFixed(2));
       case "none":
       default:
         return census;
@@ -176,25 +276,34 @@ function transformData(parsedData, transformationType) {
   let transformedData = {};
 
   for (const key in parsedData) {
-    // Convert census and base estimates
-    let convertedCensus = convertValues(parsedData[key]["censusEstimates"]);
-    let convertedBase = convertValues(parsedData[key]["baseEstimates"]);
+    try {
+      // Convert census and base estimates
+      let convertedCensus = convertValues(parsedData[key]["censusEstimates"]);
+      let convertedBase = convertValues(parsedData[key]["baseEstimates"]);
 
-    // Check for annotation values
-    if (convertedCensus in annotationValues) {
-      transformedData[key] = convertedCensus;
-    } else if (convertedBase in annotationValues) {
-      transformedData[key] = convertedBase;
-    } else {
-      // Process and transform data
-      let targetCensusEstimates = processEstimates(convertedCensus);
-      let targetBaseEstimates = processEstimates(convertedBase);
-      transformedData[key] = applyTransformation(targetCensusEstimates, targetBaseEstimates, transformationType);
+      if (Array.isArray(convertedCensus) && convertedCensus.some(value => value in annotationValues)) {
+        transformedData[key] = convertedCensus.find(value => value in annotationValues);
+      } else if (Array.isArray(convertedBase) && convertedBase.some(value => value in annotationValues)) {
+        transformedData[key] = convertedBase.find(value => value in annotationValues);
+      } else {
+        // Process and transform data
+        let targetCensusEstimates = processEstimates(convertedCensus);
+        let targetBaseEstimates = processEstimates(convertedBase);
+
+        if (isNaN(targetCensusEstimates) || (targetBaseEstimates !== undefined && isNaN(targetBaseEstimates))) {
+          console.error(`Invalid estimates for key: ${key}. Census: ${targetCensusEstimates}, Base: ${targetBaseEstimates}`);
+          transformedData[key] = NaN;
+        } else {
+          transformedData[key] = applyTransformation(targetCensusEstimates, targetBaseEstimates, transformationType);
+        }
+      }
+    } catch (error) {
+      console.error(`Error processing data for key: ${key}. Error: ${error.message}`);
+      transformedData[key] = NaN;
     }
   }
-  console.log('TRANSFORMED DATA', transformedData);
 
   return transformedData;
 }
 
-export { processData }
+export { processData, formatData }
