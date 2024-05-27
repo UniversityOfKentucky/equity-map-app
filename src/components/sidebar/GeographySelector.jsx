@@ -6,7 +6,7 @@ import PropTypes from "prop-types";
 const GeographySelector = ({ selectedGeography, setSelectedGeography }) => {
   return (
     // Initially, the selectedGeography state variable is set to the initialGeography property in the appConfig object. This is the default geography that is visualized in the map when the app is first loaded. The setSelectedGeography function is used to update the selectedGeography state variable when the user selects a new geography.
-    <div className="geography-selector m-2 border border-gray-200 rounded-lg">
+    <div className="geography-selector m-2 border border-gray-200 rounded-lg text-gray-500">
       <RadioGroup
         value={selectedGeography}
         onChange={setSelectedGeography}

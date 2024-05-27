@@ -4,5 +4,23 @@ export default {
   theme: {
     extend: {},
   },
-  plugins: [],
-};
+  important: true,
+  variants: {
+    extend: {
+      overflow: ['hover'],
+      textOverflow: ['hover'],
+      whiteSpace: ['hover'],
+    }
+  },
+  plugins: [
+    function ({ addUtilities }) {
+      addUtilities({
+        '.untruncate': {
+          overflow: 'visible',
+          textOverflow: 'clip',
+          whiteSpace: 'normal',
+        }
+      }, ['hover']);
+    }
+  ]
+}
