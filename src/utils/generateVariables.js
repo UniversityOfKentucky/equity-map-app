@@ -15,7 +15,8 @@ function generateVariablesReference(categories) {
           baseLabel: variableDetails.baseLabel || "none",
           format: variableDetails.format || "none",
           filter: variableDetails.filter || "none",
-          baseFilter: variableDetails.baseFilter || null
+          baseFilter: variableDetails.baseFilter || null,
+          classificationMethod: variableDetails.classificationMethod || "none",
         };
       }
     }
