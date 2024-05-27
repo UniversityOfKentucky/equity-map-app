@@ -3,45 +3,85 @@ import { GeoJSON } from "react-leaflet";
 import React from "react";
 import { appConfig, referenceData } from "../../config/config";
 import generateVariablesReference from "../../utils/generateVariables";
-
+import { formatData } from '../../utils/dataProcessingUtils';
 
 const annotationValues = referenceData.annotationValues;
 
 referenceData.variables = generateVariablesReference(referenceData.categories);
 
-console.log('referenceData.variables: ', referenceData.variables)
-
-
 const GeoJSONFeatureLayer = ({ data, selectedVariable }) => {
-
   const selectedDataset = referenceData.variables[selectedVariable].dataset.displayedDataset;
 
   const style = (feature) => ({
-    fillColor: annotationValues[feature.properties.formattedData] ? "lightgrey" : feature.properties.color || "lightgrey",
+    fillColor: annotationValues[feature.properties.value] ? "lightgrey" : feature.properties.color || "lightgrey",
     weight: 2,
     opacity: 1,
     color: "white",
     fillOpacity: 0.7,
   });
 
+  const format = referenceData.variables[selectedVariable].format;
+
+  const formattingSuffix = {
+    "percentage": '%',
+    "ratePerThousand": ' per 1,000 residents',
+    "currency": '',
+    "none": ''
+  };
+
+
   const onEachFeature = (feature, layer) => {
-    const formattedData = feature.properties.formattedData;
-const popupContent =
-      annotationValues[formattedData] ? (
-        `<div>
-          <h2 class="text-xl">${feature.properties.NAMELSAD}</h2>
-          <h2>${selectedVariable}: <b>${annotationValues[formattedData].annotation}</b></h2>
-          <p>${annotationValues[formattedData].meaning}</p>
-          <p>Source: US Census ${referenceData.censusDataAPIs.datasetName} Dataset | ${appConfig.initialTimePeriod}</p>
-        </div>`
-      ) : (
-        `<div>
-        <h2 class="text-xl">${feature.properties.NAMELSAD}</h2>
-        <h2>${selectedVariable}: <b>${formattedData ? formattedData : "No Data"}</b></h2>
-          <p>Source: US Census Bureau's <a href="${referenceData.censusDataAPIs[selectedDataset].source}">${referenceData.censusDataAPIs[selectedDataset].datasetName} Dataset</a> | ${appConfig.initialTimePeriod}</p>
-          </div>`
-      );
+    const value = feature.properties.value;
+    const generatePopupContent = (feature, value, selectedVariable, format, formattingSuffix) => {
+      const datasetName = referenceData.censusDataAPIs[selectedDataset].datasetName;
+      const sourceLink = referenceData.censusDataAPIs[selectedDataset].source;
+      const annotation = annotationValues[value]?.annotation;
+      const meaning = annotationValues[value]?.meaning;
+    
+      if (annotation) {
+        return `
+          <div>
+            <h2 class="text-xl">${feature.properties.NAMELSAD}</h2>
+            <h2>${selectedVariable}: <b>${annotation}</b></h2>
+            <p class="text-sm text-gray-400 truncate hover:untruncate underline">${meaning}</p>
+            <p>Source: US Census ${datasetName} Dataset | ${appConfig.initialTimePeriod}</p>
+          </div>
+        `;
+      }
+    
+      let valueContent = `<b><span class="text-black">Not Available</span></b>`;
+      if (value) {
+        if (value !== 0) {
+          valueContent = `<b><span class="text-black">${formatData(value, format)}${formattingSuffix[format]}</span></b>`;
+        } else {
+          valueContent = `
+          <b><span class="text-black">Zero</span></b>
+            <div>
+              <p class="text-sm underline">Disclaimer: Values of zero in this data may occur for several reasons:</p>
+              <ul class="list-disc">
+                <li>No Occurrence: The category genuinely has no individuals or entities.</li>
+                <li>Data Collection Issues: Possible errors or gaps in data reporting.</li>
+                <li>Small Sample Size: Insufficient sample to capture occurrences.</li>
+                <li>Sociocultural Factors: Influences affecting the presence or measurement of the category.</li>
+              </ul>
+              <p>Please interpret zero values with these considerations in mind.</p>
+            </div>
+          `;
+        }
+      }
+    
+      return `
+        <div>
+          <h2 class="text-2xl text-neutral-500">${feature.properties.NAMELSAD}</h2>
+          <p class="text-lg text-left text-pretty text-neutral-500">${selectedVariable}: ${valueContent}</p>
+          <p>Source: US Census Bureau's <a class="text-neutral-400 underline" href="${sourceLink}">${datasetName} Dataset</a> | ${appConfig.initialTimePeriod}</p>
+        </div>
+      `;
+    };
+    
+    const popupContent = generatePopupContent(feature, value, selectedVariable, format, formattingSuffix);
     layer.bindPopup(popupContent);
+    
   };
 
   return (
