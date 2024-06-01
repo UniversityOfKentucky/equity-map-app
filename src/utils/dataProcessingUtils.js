@@ -161,19 +161,56 @@ function formatData(value, format) {
 
 function parseData(acsData, currentVariableProps, selectedGeography) {
   let parsedData = {};
-  
+  console.log('currentVariableProps', currentVariableProps)
+
   if (currentVariableProps.transformationType !== "none") {
     for (let i = 1; i < acsData.length; i++) {
       const row = acsData[i];
+      console.log('row', row);
       const geoCode = row[row.length - 1];  // The geographic code, which is the last value in the row
-      let locationIndex = currentVariableProps.dataset.displayedDataset === 'acs5'
-      ? (selectedGeography === 'fayetteCountyTracts' ? row.length - 3
-        : selectedGeography === 'kentuckyCounties' ? row.length - 2
-        : row.length - 1)
-      : (currentVariableProps.dataset.displayedDataset === 'abscs' ? row.length - 1
-        : row.length - 1
-      );
-    // // // console.log('row.length', row.length, 'locationIndex', locationIndex, 'geoCode', geoCode, 'row', row, 'selectedGeography', selectedGeography, 'currentVariableProps', currentVariableProps, 'acsData', acsData)
+      let locationIndex;
+      console.log('currentVariableProps', currentVariableProps)
+
+      if (currentVariableProps.dataset.displayedDataset === 'acs/acs5' 
+        || currentVariableProps.dataset.displayedDataset === 'acs/acs1') {
+        if (selectedGeography === 'fayetteCountyTracts') {
+          console.log('locationIndex not found test 1')
+          locationIndex = row.length - 3;
+        } else if (selectedGeography === 'kentuckyCounties') {
+        console.log('locationIndex not found test 2')
+          locationIndex = row.length - 2;
+        } else {
+          console.log('locationIndex not found test 3')
+          locationIndex = row.length - 1;
+        }
+      } else if ( currentVariableProps.dataset.displayedDataset === 'abscs') {
+        console.log('locationIndex not found test 4')
+        locationIndex = row.length - 1;
+      } else if ( currentVariableProps.dataset.displayedDataset === 'acs/acs5/subject') {
+        if (selectedGeography === 'fayetteCountyTracts') {
+          console.log('locationIndex not found test 5')
+          locationIndex = row.length - 3;
+        } else if (selectedGeography === 'kentuckyCounties') {
+          console.log('locationIndex not found test 6')
+          locationIndex = row.length - 2;
+        } else {
+          console.log('locationIndex not found test 7')
+          locationIndex = row.length - 1;
+        }
+      } 
+
+
+      console.log(`
+        currentVariableProps.dataset.displayedDataset: ${currentVariableProps.dataset.displayedDataset}
+        selectedGeography: ${selectedGeography}
+        locationIndex: ${locationIndex}
+      `);
+
+      if (currentVariableProps.dataset.displayedDataset === 'acs/acs1/subject' && selectedGeography === 'fayetteCountyTracts'
+        || currentVariableProps.dataset.displayedDataset === 'acs/acs1/subject' && selectedGeography === 'kentuckyCounties') {
+        locationIndex = row.length - 3;
+      }
+
 
       let censusEstimates = row.slice(0, locationIndex); // The census estimates are all values up to the location index
 
@@ -218,9 +255,10 @@ function parseData(acsData, currentVariableProps, selectedGeography) {
       
       // adds value as a value to a 'censusEstimates' key in the parsedData[geocode] object
       parsedData[geoCode] = { censusEstimates: censusEstimates };
-      // // console.log('single parsedData', parsedData)
     }
   }
+
+console.log('single parsedData', parsedData)
   return parsedData; 
 }
 
@@ -228,6 +266,7 @@ function transformData(parsedData, transformationType) {
   const annotationValues = referenceData.annotationValues;
 
   const convertValues = (data) => {
+    console.log('data', data)
     if (!data) return data; // If data is null or undefined, return as is
     const dataArray = Array.isArray(data) ? data : [data]; // Ensure data is an array
     for (let i = 0; i < dataArray.length; i++) {
@@ -236,12 +275,14 @@ function transformData(parsedData, transformationType) {
         return value; // Return the annotation value if found
       }
       const parsedValue = parseFloat(value);
+      console.log('parsedValue', parsedValue)
       if (isNaN(parsedValue)) {
         console.error(`Failed to parse value to float: ${value}`);
         continue; // Skip this value if it can't be parsed
       }
       dataArray[i] = parsedValue; // Convert to float otherwise
     }
+    console.log('dataArray', dataArray)
     return dataArray;
   };
 
@@ -253,7 +294,7 @@ function transformData(parsedData, transformationType) {
     return estimates;
   };
 
-  const applyTransformation = (census, base, type) => {
+  const applyTransformation = (census, base, type, convertedCensus) => {
     if (isNaN(census) || (base !== undefined && (isNaN(base) || base === 0))) {
       console.error(`Invalid census (${census}) or base (${base}) value for transformation type: ${type}`);
       return NaN;
@@ -265,8 +306,15 @@ function transformData(parsedData, transformationType) {
         return parseFloat(((census / base) * 1000).toFixed(2));
       case "summedPercentage":
         return parseFloat(((census / base) * 100).toFixed(2));
-      case "subtractedPercentage":
+      case "percentageDifference":
         return parseFloat(((base - census) / base * 100).toFixed(2));
+      // case "percentageDifferenceFromTotal":
+      //   return parseFloat(100 - ((census - base) / base * 100).toFixed(2));
+      case "precalculation":
+        return parseFloat(census).toFixed(1);
+      case "averageOfPrecalculations":
+        // return the average of the precalculated values by dividing the sum of the precalculated values (census) by the number of precalculated values (length of the convertedCensus array)
+        return parseFloat(census / convertedCensus.length).toFixed(1);
       case "none":
       default:
         return census;
@@ -281,20 +329,34 @@ function transformData(parsedData, transformationType) {
       let convertedCensus = convertValues(parsedData[key]["censusEstimates"]);
       let convertedBase = convertValues(parsedData[key]["baseEstimates"]);
 
+      console.log(`
+        convertedCensus: ${typeof convertedCensus}
+        convertedBase: ${typeof convertedBase}
+      `);
+
+
       if (Array.isArray(convertedCensus) && convertedCensus.some(value => value in annotationValues)) {
+        console.log('census is an annotation value')
         transformedData[key] = convertedCensus.find(value => value in annotationValues);
       } else if (Array.isArray(convertedBase) && convertedBase.some(value => value in annotationValues)) {
+        console.log('base is an annotation value')
         transformedData[key] = convertedBase.find(value => value in annotationValues);
       } else {
+        console.log('not an array')
         // Process and transform data
         let targetCensusEstimates = processEstimates(convertedCensus);
         let targetBaseEstimates = processEstimates(convertedBase);
 
-        if (isNaN(targetCensusEstimates) || (targetBaseEstimates !== undefined && isNaN(targetBaseEstimates))) {
+        if (isNaN(targetCensusEstimates) || (targetBaseEstimates !== undefined && isNaN(targetBaseEstimates))) { // If the targetCensusEstimates or targetBaseEstimates are NaN, log an error and set the transformedData[key] to NaN
           console.error(`Invalid estimates for key: ${key}. Census: ${targetCensusEstimates}, Base: ${targetBaseEstimates}`);
           transformedData[key] = NaN;
         } else {
-          transformedData[key] = applyTransformation(targetCensusEstimates, targetBaseEstimates, transformationType);
+          transformedData[key] = applyTransformation(targetCensusEstimates, targetBaseEstimates, transformationType, convertedCensus);
+            for (const key in transformedData) {
+    if (typeof transformedData[key] === 'string') {
+      transformedData[key] = parseFloat(transformedData[key]);
+    }
+  }
         }
       }
     } catch (error) {
@@ -303,6 +365,14 @@ function transformData(parsedData, transformationType) {
     }
   }
 
+// // ensures all values in the transformedData object are numbers
+//   for (const key in transformedData) {
+//     if (typeof transformedData[key] === 'string') {
+//       transformedData[key] = parseFloat(transformedData[key]);
+//     }
+//   }
+
+  console.log('transformedData', transformedData)
   return transformedData;
 }
 
