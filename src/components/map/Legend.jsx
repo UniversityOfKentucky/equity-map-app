@@ -18,6 +18,7 @@ const Legend = ({ selectedVariable, selectedGeography, breaks, colors}) => {
 
       const formattingSuffix = {
         "percentage": '%',
+        "percentageDifference": '%',
         "ratePerThousand": ' per 1,000 residents',
         "currency": '',
         "none": ''
@@ -44,7 +45,7 @@ const Legend = ({ selectedVariable, selectedGeography, breaks, colors}) => {
             const label = format && format !== 'none'
               ? endingBreak
                 ? `${startingBreak} -- ${endingBreak + formattingSuffix[format]}` 
-                : `${startingBreak + formattingSuffix[format]} +`
+                : format === "ratePerThousand" ? `${startingBreak}+ ${formattingSuffix[format]}` : `${startingBreak + formattingSuffix[format]} +`
               : endingBreak
                 ? `${startingBreak} -- ${endingBreak}` 
                 : `${startingBreak} +`
