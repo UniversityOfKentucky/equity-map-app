@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import PropTypes from "prop-types";
 import { useQuery } from "react-query";
 import { referenceData, appConfig } from "../../config/config";
@@ -23,7 +23,7 @@ referenceData.variables = generateVariablesReference(referenceData.categories);
 const fetchVariableData = async (selectedGeography, selectedVariable) => {
   const selectedVariablesProps = referenceData.variables[selectedVariable];
 
-  const dataQueryURL = constructFetchURL(selectedGeography, selectedVariable, 'data0');
+  const dataQueryURL = constructFetchURL(selectedGeography, selectedVariable, 'data');
   const queries = [dataQueryURL];
 
   if (selectedVariablesProps.baseFilter) {
@@ -106,6 +106,7 @@ const DataLayerContainer = ({ selectedGeography, selectedVariable }) => {
       <GeoJSONFeatureLayer
         data={geoJSONData}
         selectedVariable={selectedVariable}
+        selectedGeography={selectedGeography}
       />
       <Legend
         selectedVariable={selectedVariable}
