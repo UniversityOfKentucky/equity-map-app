@@ -9,7 +9,7 @@ const annotationValues = referenceData.annotationValues;
 
 referenceData.variables = generateVariablesReference(referenceData.categories);
 
-const GeoJSONFeatureLayer = ({ data, selectedVariable }) => {
+const GeoJSONFeatureLayer = ({ data, selectedVariable, selectedGeography }) => {
   const selectedDataset = referenceData.variables[selectedVariable].dataset.displayedDataset;
 
   const style = (feature) => ({
@@ -24,6 +24,7 @@ const GeoJSONFeatureLayer = ({ data, selectedVariable }) => {
 
   const formattingSuffix = {
     "percentage": '%',
+    "percentageDifference": '%',
     "ratePerThousand": ' per 1,000 residents',
     "currency": '',
     "none": ''
@@ -37,11 +38,12 @@ const GeoJSONFeatureLayer = ({ data, selectedVariable }) => {
       const sourceLink = referenceData.censusDataAPIs[selectedDataset].source;
       const annotation = annotationValues[value]?.annotation;
       const meaning = annotationValues[value]?.meaning;
+      const name = selectedGeography === 'fayetteZipcodes' ? `Zipcode ${feature.properties.ZCTA5CE20}` : feature.properties.NAMELSAD;
     
       if (annotation) {
         return `
           <div>
-            <h2 class="text-xl">${feature.properties.NAMELSAD}</h2>
+            <h2 class="text-xl">${name}</h2>
             <h2>${selectedVariable}: <b>${annotation}</b></h2>
             <p class="text-sm text-gray-400 truncate hover:untruncate underline">${meaning}</p>
             <p>Source: US Census ${datasetName} Dataset | ${appConfig.initialTimePeriod}</p>
@@ -72,7 +74,7 @@ const GeoJSONFeatureLayer = ({ data, selectedVariable }) => {
     
       return `
         <div>
-          <h2 class="text-2xl text-neutral-500">${feature.properties.NAMELSAD}</h2>
+          <h2 class="text-2xl text-neutral-500">${name}</h2>
           <p class="text-lg text-left text-pretty text-neutral-500">${selectedVariable}: ${valueContent}</p>
           <p>Source: US Census Bureau's <a class="text-neutral-400 underline" href="${sourceLink}">${datasetName} Dataset</a> | ${appConfig.initialTimePeriod}</p>
         </div>
