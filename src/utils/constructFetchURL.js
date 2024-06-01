@@ -15,7 +15,6 @@ const constructFetchURL = (selectedGeography, selectedVariable, filterType = nul
   if (dataset.startsWith("acs")) {
     // console.log('ACS Dataset');
     year = "2022";
-    dataset = `acs/${dataset}`;
   } else if (dataset.startsWith("abscs")) {
     year = "2021";
     geoCode += filterType === 'base' ? selectedVariablesProps.baseFilter : selectedVariablesProps.filter;
