@@ -6,7 +6,7 @@ const GlobalStateContext = createContext();
 
 export const GlobalStateProvider = ({ children }) => {
     
-    const [globalData, setGlobalData] = useState({ geoJsonData: {}, apiData: {}, transformedData: {} });
+    const [globalData, setGlobalData] = useState({ geoJsonData: {}, apiData: {}, processedData: {} });
 
     return (
         <GlobalStateContext.Provider value={{
