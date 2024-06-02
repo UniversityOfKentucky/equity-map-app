@@ -34,7 +34,7 @@ const Legend = ({ selectedVariable, selectedGeography, breaks, colors, minValue,
           let startingBreak, endingBreak;
 
           if (i === 0) {
-            startingBreak = minValue;
+            startingBreak = minValue === startingBreak ? startingBreak : minValue;
           } else {
             startingBreak = breaks[i - 1];
           }
@@ -42,7 +42,7 @@ const Legend = ({ selectedVariable, selectedGeography, breaks, colors, minValue,
           if (i < breaks.length) {
             endingBreak = breaks[i];
           } else {
-            endingBreak = maxValue;
+            endingBreak = maxValue === endingBreak ? endingBreak : maxValue;
           }
 
           if (format) {
