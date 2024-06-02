@@ -39,7 +39,7 @@ function processData(acsData, selectedVariables, selectedGeography) {
 function classifyValues(data, variableProps) {
   const values = Object.values(data).filter(value => 
     // check if value is not in annotationValues, is a number, and is not and is not less than 0 
-    !(value in referenceData.annotationValues) && !isNaN(value) && value >= 0
+    !(value in referenceData.annotationValues) || !isNaN(value) || value >= 0
   ); // the 'data' object remains unchanged
 
 
@@ -66,6 +66,12 @@ function classifyValues(data, variableProps) {
     default:
       console.error('Unknown classification method');
   }
+
+  console.log('breaks', breaks)
+
+  // removes zeros from the breaks array
+  breaks = breaks.filter((breakValue) => breakValue > 0);
+  
 
   let classifiedData = {};
 
