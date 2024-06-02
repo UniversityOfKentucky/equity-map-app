@@ -88,8 +88,14 @@ const DataLayerContainer = ({ selectedGeography, selectedVariable }) => {
 
         feature.properties = { ...feature.properties, ...data };
       });
-      setMinValue(Math.min(...Object.values(processedData).map((data) => data.value).filter(value => value > 0)));
-      setMaxValue(Math.max(...Object.values(processedData).map((data) => data.value)));
+      // old code
+      // // Sets minValue, filters out 0 values, nullls, NANs, typeof !== "number" and undefined values
+      // setMinValue(Math.min(...Object.values(processedData).filter((data) => data.value).map((data) => data.value))); // Sets minValue to the minimum value of the data filtered out. The filter will remove 0 values, nulls, NANs, typeof !== "number" and undefined values
+      // // Sets maxValue, filters out 0 values, nullls, NANs, typeof !== "number" and undefined values
+      setMaxValue(Math.max(...Object.values(processedData).filter((data) => data.value).map((data) => data.value))); // Sets maxValue to the maximum value of the data filtered out. The filter will remove 0 values, nulls, NANs, typeof !== "number" and undefined values
+      // new code
+      // sets minValue to the minimum value of the data filtered out. The filter will remove values equal to or less than zero, nulls, NANs, typeof !== "number" and undefined values.
+      setMinValue(Math.min(...Object.values(processedData).filter((data) => data.value > 0).map((data) => data.value)));
     }
   }, [geoJSONData, variableData, selectedGeography, selectedVariable]);
 
