@@ -92,8 +92,8 @@ const GeoJSONFeatureLayer = ({ data, selectedVariable, selectedGeography }) => {
         <div>
           <h2 class="text-2xl text-neutral-500">${name}</h2>
           <p class="text-lg text-left text-pretty text-neutral-500">${selectedVariable}: ${valueContent}</p>
-          <p class="text-sm text-neutral-400">Note: Data is an estimate and may not reflect the exact count or rate.</p>
-          <p>Source: US Census Bureau's <a class="text-neutral-400 underline" href="${sourceLink}">${datasetName} Dataset</a> | ${appConfig.initialTimePeriod}</p>
+          <p class="text-xxs text-neutral-400">Note: <b>Data is an estimate</b> and may not reflect the exact count or rate. ${datasetName == 'Annual Business Survey' ? `<p class="text-xxs text-neutral-400">Note: Data from the Annual Business Survey is based only on those businesses <b>that responded</b> to the survey and may not be representative of all businesses in the area.</p>` : ''}</p> 
+          <p class="text-xxs text-neutral-400">Source: US Census Bureau's <a class="text-blue-500 hover:text-blue-700 visited:text-blue-600" href="${sourceLink}">${datasetName} Dataset</a> | ${appConfig.initialTimePeriod}</p>
         </div>
       `;
     };
