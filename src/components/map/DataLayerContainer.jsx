@@ -57,6 +57,8 @@ const aggregateData = (data1, data2) => {
 const DataLayerContainer = ({ selectedGeography, selectedVariable }) => {
   const [breaks, setBreaks] = useState([]);
   const [colors, setColors] = useState([]);
+  const [minValue, setMinValue] = useState(0);
+  const [maxValue, setMaxValue] = useState(0);
 
   const { data: geoJSONData, error: geoJSONError } = useQuery(
     ["geoJSON", selectedGeography],
@@ -82,16 +84,14 @@ const DataLayerContainer = ({ selectedGeography, selectedVariable }) => {
           feature.properties[
             appConfig.geographies[selectedGeography].geoCodeField
           ];
-          // the following line is a ternary operator that checks if the processedData object has a key that matches the geoCode. If it does, it assigns the formattedData and color properties to the feature.properties object. If it doesn't, it assigns the formattedData property the string "No data" and the color property the string "lightgrey".
-        const data =
-          processedData[geoCode] && processedData[geoCode].formattedData !== 0
-            ? processedData[geoCode]
-            : { formattedData: "No data", color: "lightgrey" };
+        const data = processedData[geoCode] || null;
+
         feature.properties = { ...feature.properties, ...data };
       });
-      // setFormat(referenceData.variables[selectedVariable].format);
+      setMinValue(Math.min(...Object.values(processedData).map((data) => data.value).filter(value => value > 0)));
+      setMaxValue(Math.max(...Object.values(processedData).map((data) => data.value)));
     }
-  }, [geoJSONData, variableData, selectedGeography, selectedVariable]); // runs only when these dependencies change. If you want it to run on initial render and when these 
+  }, [geoJSONData, variableData, selectedGeography, selectedVariable]);
 
   if (geoJSONError || variableError) {
     return <div>Error loading data</div>;
@@ -114,7 +114,8 @@ const DataLayerContainer = ({ selectedGeography, selectedVariable }) => {
         position="leaflet-top leaflet-right"
         breaks={breaks}
         colors={colors}
-        // format={format}
+        minValue={minValue}
+        maxValue={maxValue} 
       />
     </>
   );
