@@ -32,14 +32,14 @@ function processData(acsData, selectedVariables, selectedGeography) {
       // format: currentVariableProps.format
     };
   }
-
+  console.log('processedData', processedData)
   return { processedData, breaks, colors };
 }
 
 function classifyValues(data, variableProps) {
   const values = Object.values(data).filter(value => 
     // check if value is not in annotationValues, is a number, and is not and is not less than 0 
-    !(value in referenceData.annotationValues) && !isNaN(value) && value > 0
+    !(value in referenceData.annotationValues) && !isNaN(value) && value >= 0
   ); // the 'data' object remains unchanged
 
 
@@ -78,6 +78,7 @@ function classifyValues(data, variableProps) {
         value,
         color: 'lightgrey'
       };
+      // console.log('value', value, 'classifiedData', classifiedData[geoCode])
       continue;
     }
 
@@ -90,6 +91,7 @@ function classifyValues(data, variableProps) {
         color: colorScale[colorIndex]
       };
     } else {
+      // console.log('value', value, 'breaks', breaks)
       const classIndex = getClassIndex(value, breaks);
       classifiedData[geoCode] = {
         value,
@@ -139,6 +141,7 @@ function getStandardDeviationBreaks(values) {
 
 function formatData(value, format) {
   if (value === null || isNaN(value) || typeof value !== 'number') {
+    // console.log('value', value)
     return 'No data';
   }
 
@@ -161,50 +164,50 @@ function formatData(value, format) {
 
 function parseData(acsData, currentVariableProps, selectedGeography) {
   let parsedData = {};
-  console.log('currentVariableProps', currentVariableProps)
+  // console.log('currentVariableProps', currentVariableProps)
 
   if (currentVariableProps.transformationType !== "none") {
     for (let i = 1; i < acsData.length; i++) {
       const row = acsData[i];
-      console.log('row', row);
+      // console.log('row', row);
       const geoCode = row[row.length - 1];  // The geographic code, which is the last value in the row
       let locationIndex;
-      console.log('currentVariableProps', currentVariableProps)
+      // console.log('currentVariableProps', currentVariableProps)
 
       if (currentVariableProps.dataset.displayedDataset === 'acs/acs5' 
         || currentVariableProps.dataset.displayedDataset === 'acs/acs1') {
         if (selectedGeography === 'fayetteCountyTracts') {
-          console.log('locationIndex not found test 1')
+          // console.log('locationIndex not found test 1')
           locationIndex = row.length - 3;
         } else if (selectedGeography === 'kentuckyCounties') {
-        console.log('locationIndex not found test 2')
+        // console.log('locationIndex not found test 2')
           locationIndex = row.length - 2;
         } else {
-          console.log('locationIndex not found test 3')
+          // console.log('locationIndex not found test 3')
           locationIndex = row.length - 1;
         }
       } else if ( currentVariableProps.dataset.displayedDataset === 'abscs') {
-        console.log('locationIndex not found test 4')
+        // console.log('locationIndex not found test 4')
         locationIndex = row.length - 1;
       } else if ( currentVariableProps.dataset.displayedDataset === 'acs/acs5/subject') {
         if (selectedGeography === 'fayetteCountyTracts') {
-          console.log('locationIndex not found test 5')
+          // console.log('locationIndex not found test 5')
           locationIndex = row.length - 3;
         } else if (selectedGeography === 'kentuckyCounties') {
-          console.log('locationIndex not found test 6')
+          // console.log('locationIndex not found test 6')
           locationIndex = row.length - 2;
         } else {
-          console.log('locationIndex not found test 7')
+          // console.log('locationIndex not found test 7')
           locationIndex = row.length - 1;
         }
       } 
 
 
-      console.log(`
-        currentVariableProps.dataset.displayedDataset: ${currentVariableProps.dataset.displayedDataset}
-        selectedGeography: ${selectedGeography}
-        locationIndex: ${locationIndex}
-      `);
+      // console.log(`
+      //   currentVariableProps.dataset.displayedDataset: ${currentVariableProps.dataset.displayedDataset}
+      //   selectedGeography: ${selectedGeography}
+      //   locationIndex: ${locationIndex}
+      // `);
 
       if (currentVariableProps.dataset.displayedDataset === 'acs/acs1/subject' && selectedGeography === 'fayetteCountyTracts'
         || currentVariableProps.dataset.displayedDataset === 'acs/acs1/subject' && selectedGeography === 'kentuckyCounties') {
@@ -258,7 +261,7 @@ function parseData(acsData, currentVariableProps, selectedGeography) {
     }
   }
 
-console.log('single parsedData', parsedData)
+// console.log('single parsedData', parsedData)
   return parsedData; 
 }
 
@@ -266,7 +269,7 @@ function transformData(parsedData, transformationType) {
   const annotationValues = referenceData.annotationValues;
 
   const convertValues = (data) => {
-    console.log('data', data)
+    // console.log('data', data)
     if (!data) return data; // If data is null or undefined, return as is
     const dataArray = Array.isArray(data) ? data : [data]; // Ensure data is an array
     for (let i = 0; i < dataArray.length; i++) {
@@ -275,14 +278,14 @@ function transformData(parsedData, transformationType) {
         return value; // Return the annotation value if found
       }
       const parsedValue = parseFloat(value);
-      console.log('parsedValue', parsedValue)
+      // console.log('parsedValue', parsedValue)
       if (isNaN(parsedValue)) {
         console.error(`Failed to parse value to float: ${value}`);
         continue; // Skip this value if it can't be parsed
       }
       dataArray[i] = parsedValue; // Convert to float otherwise
     }
-    console.log('dataArray', dataArray)
+    // console.log('dataArray', dataArray)
     return dataArray;
   };
 
@@ -329,20 +332,20 @@ function transformData(parsedData, transformationType) {
       let convertedCensus = convertValues(parsedData[key]["censusEstimates"]);
       let convertedBase = convertValues(parsedData[key]["baseEstimates"]);
 
-      console.log(`
-        convertedCensus: ${typeof convertedCensus}
-        convertedBase: ${typeof convertedBase}
-      `);
+      // console.log(`
+      //   convertedCensus: ${typeof convertedCensus}
+      //   convertedBase: ${typeof convertedBase}
+      // `);
 
 
       if (Array.isArray(convertedCensus) && convertedCensus.some(value => value in annotationValues)) {
-        console.log('census is an annotation value')
+        // console.log('census is an annotation value')
         transformedData[key] = convertedCensus.find(value => value in annotationValues);
       } else if (Array.isArray(convertedBase) && convertedBase.some(value => value in annotationValues)) {
-        console.log('base is an annotation value')
+        // console.log('base is an annotation value')
         transformedData[key] = convertedBase.find(value => value in annotationValues);
       } else {
-        console.log('not an array')
+        // console.log('not an array')
         // Process and transform data
         let targetCensusEstimates = processEstimates(convertedCensus);
         let targetBaseEstimates = processEstimates(convertedBase);
