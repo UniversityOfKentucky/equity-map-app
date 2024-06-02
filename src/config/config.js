@@ -43,7 +43,7 @@ const appConfig = {
       apiEndpoints: {
         MSAFIPScode: "30460",
         apiQuery:
-          "metropolitan%20statistical%20area/micropolitan%20statistical%20area:30460,17300,23180,23190,23980,25775,31580,32460,37140,49080,21060,14540,18340,34460,36980,43700,15820,17140,19220,34660,26580,31140,33180,382107",
+          "metropolitan%20statistical%20area/micropolitan%20statistical%20area:30460,17300,23180,23190,23980,25775,31580,32460,37140,40080,21060,14540,18340,34460,36980,43700,15820,17140,19220,34660,26580,31140,33180,382107",
       },
       geoJSONfileName: "msa.geojson",
       mapSettings: {
@@ -195,7 +195,7 @@ const referenceData = {
               baseCode: ["B21001_001E"],
               baseLabel: "Total Civilian Population 18 and Over",
               format: "percentage",
-              classificationMethod: "equalInterval",
+              classificationMethod: "quantiles",
             },
             "Total Female Veterans in the Civilian Population": {
               dataset: { availableIn: ["acs5"], displayedDataset: "acs/acs5" },
@@ -204,7 +204,7 @@ const referenceData = {
               baseCode: ["B21001_022E"],
               baseLabel: "Total Female Civilian Population 18 and Over",
               format: "percentage",
-              classificationMethod: "equalInterval",
+              classificationMethod: "quantiles",
             },
             "Total Male Veterans in the Civilian Population": {
               dataset: { availableIn: ["acs5"], displayedDataset: "acs/acs5" },
@@ -213,7 +213,7 @@ const referenceData = {
               baseCode: ["B21001_004E"],
               baseLabel: "Total Male Civilian Population 18 and Over",
               format: "percentage",
-              classificationMethod: "equalInterval",
+              classificationMethod: "quantiles",
             },
             "Percent of Veterans 18 to 64 Who Are Employed": {
               dataset: { availableIn: ["acs5"], displayedDataset: "acs/acs5" },
@@ -443,7 +443,7 @@ const referenceData = {
               format: "number",
               classificationMethod: "naturalBreaks",
             },
-            Payroll: {
+            "Payroll": {
               dataset: { availableIn: ["cbp"], displayedDataset: "cbp" },
               variableCode: ["PAY"],
               transformationType: "none",
@@ -468,7 +468,7 @@ const referenceData = {
             },
           },
           "Survey of Income and Program Participation (SIPP)": {
-            Income: {
+            "Income": {
               dataset: { availableIn: ["sipp"], displayedDataset: "sipp" },
               variableCode: ["INCOME"],
               transformationType: "none",
@@ -482,7 +482,7 @@ const referenceData = {
               format: "number",
               classificationMethod: "naturalBreaks",
             },
-            Employment: {
+            "Employment": {
               dataset: { availableIn: ["sipp"], displayedDataset: "sipp" },
               variableCode: ["EMPLOYMENT"],
               transformationType: "none",
@@ -516,7 +516,7 @@ const referenceData = {
         ],
       },
     },
-    Demographics: {
+    "Demographics": {
       data: {
         subcategories: {
           "Age and Gender": {
@@ -530,7 +530,7 @@ const referenceData = {
               baseCode: ["B01001_001E"],
               baseLabel: "Total Population",
               format: "percentage",
-              classificationMethod: "equalInterval",
+              classificationMethod: "quantiles",
             },
             "Male Population": {
               dataset: {
@@ -542,7 +542,7 @@ const referenceData = {
               baseCode: ["B01001_001E"],
               baseLabel: "Total Population",
               format: "percentage",
-              classificationMethod: "equalInterval",
+              classificationMethod: "quantiles",
             },
             "Total Population": {
               dataset: {
@@ -551,7 +551,7 @@ const referenceData = {
               },
               variableCode: ["B01001_001E"],
               format: "none",
-              classificationMethod: "naturalBreaks",
+              classificationMethod: "equalInterval",
             },
           },
           "Race and Ethnicity": {
@@ -603,7 +603,7 @@ const referenceData = {
               baseCode: ["B11001_001E"],
               baseLabel: "Total Households",
               format: "percentage",
-              classificationMethod: "equalInterval",
+              classificationMethod: "quantiles",
             },
             "Non-family Households": {
               dataset: {
@@ -615,7 +615,7 @@ const referenceData = {
               baseCode: ["B11001_001E"],
               baseLabel: "Total Households",
               format: "percentage",
-              classificationMethod: "equalInterval",
+              classificationMethod: "quantiles",
             },
           },
           "Language Spoken At Home": {
@@ -629,7 +629,7 @@ const referenceData = {
               baseCode: ["B01001_001E"],
               baseLabel: "Total Population",
               format: "percentage",
-              classificationMethod: "equalInterval",
+              classificationMethod: "quantiles",
             },
             "Other Languages": {
               dataset: {
@@ -641,7 +641,7 @@ const referenceData = {
               baseCode: ["B01001_001E"],
               baseLabel: "Total Population",
               format: "percentage",
-              classificationMethod: "equalInterval",
+              classificationMethod: "quantiles",
             },
             Spanish: {
               dataset: {
@@ -653,7 +653,7 @@ const referenceData = {
               baseCode: ["B01001_001E"],
               baseLabel: "Total Population",
               format: "percentage",
-              classificationMethod: "equalInterval",
+              classificationMethod: "quantiles",
             },
           },
           "Veterans Status": {
@@ -667,7 +667,7 @@ const referenceData = {
               baseCode: ["B21001_001E"],
               baseLabel: "Total Civilian population 18 years and over",
               format: "ratePerThousand",
-              classificationMethod: "equalInterval",
+              classificationMethod: "quantiles", 
             },
           },
         },
@@ -696,7 +696,7 @@ const referenceData = {
     "Income & Employment": {
       data: {
         subcategories: {
-          Income: {
+            "Income": {
             "Median Household Income (in 2018 inflation-adjusted dollars)": {
               dataset: {
                 availableIn: ["acs5", "acs1"],
@@ -716,7 +716,7 @@ const referenceData = {
               classificationMethod: "naturalBreaks",
             },
           },
-          Poverty: {
+            "Poverty": {
             "Households Receiving Food Stamps/SNAP": {
               dataset: {
                 availableIn: ["acs5", "acs1"],
@@ -742,7 +742,7 @@ const referenceData = {
               classificationMethod: "quantiles",
             },
           },
-          Employment: {
+            "Employment": {
             "Labor Force Participation": {
               dataset: {
                 availableIn: ["acs5", "acs1"],
@@ -765,7 +765,7 @@ const referenceData = {
               baseCode: ["B23025_002E"],
               baseLabel: "Labor Force",
               format: "percentage",
-              classificationMethod: "equalInterval",
+              classificationMethod: "quantiles",
             },
           },
           "Industry and Occupation": {
@@ -847,7 +847,7 @@ const referenceData = {
         tags: ["income distribution", "employment rates", "poverty levels"],
       },
     },
-    Education: {
+    "Education": {
       data: {
         subcategories: {
           "Educational Attainment": {
@@ -982,7 +982,7 @@ const referenceData = {
               baseCode: ["B25003_001E"],
               baseLabel: "Total Housing Units",
               format: "percentage",
-              classificationMethod: "equalInterval",
+              classificationMethod: "quantiles",
             },
             "Renter-Occupied Units": {
               dataset: {
@@ -994,7 +994,7 @@ const referenceData = {
               baseCode: ["B25003_001E"],
               baseLabel: "Total Housing Units",
               format: "percentage",
-              classificationMethod: "equalInterval",
+              classificationMethod: "quantiles",
             },
           },
           "Housing Affordability and Costs": {
@@ -1028,7 +1028,7 @@ const referenceData = {
               baseCode: ["B08006_001E"],
               baseLabel: "Total Workers Commuting",
               format: "percentage",
-              classificationMethod: "equalInterval",
+              classificationMethod: "quantiles",
             },
             "Public Transportation (excluding taxicab)": {
               dataset: {
@@ -1040,7 +1040,7 @@ const referenceData = {
               baseCode: ["B08006_001E"],
               baseLabel: "Total Workers Commuting",
               format: "percentage",
-              classificationMethod: "equalInterval",
+              classificationMethod: "quantiles",
             },
           },
         },
@@ -1098,7 +1098,7 @@ const referenceData = {
               baseCode: ["B27001_001E"], // Total Population in table 'universe' --> https://api.census.gov/data/2018/acs/acs1/groups/B27001.html
               baseLabel: "Total Population",
               format: "percentage",
-              classificationMethod: "equalInterval",
+              classificationMethod: "quantiles",
             },
             // "Without Health Insurance": {
             //   dataset: {
@@ -1246,7 +1246,7 @@ const referenceData = {
               ],
               baseLabel: "Total Population",
               format: "percentage",
-              classificationMethod: "equalInterval",
+              classificationMethod: "quantiles",
             },
             "Health Insurance Coverage Among Women (% insured)": {
               dataset: {
@@ -1258,7 +1258,7 @@ const referenceData = {
               ],
               transformationType: "precalculation",
               format: "percentage",
-              classificationMethod: "equalInterval",
+              classificationMethod: "quantiles",
             },
             // "Health Insurance Coverage Among Veterans": {
             // },
@@ -1274,7 +1274,7 @@ const referenceData = {
               baseCode: ["B01001_001E"],
               baseLabel: "Total Civilian Non-institutionalized Population",
               format: "percentage",
-              classificationMethod: "equalInterval",
+              classificationMethod: "quantiles",
             },
           },
         },
@@ -1298,7 +1298,7 @@ const referenceData = {
         ],
       },
     },
-    Entrepreneurship: {
+    "Entrepreneurship": {
       data: {
         subcategories: {
           "Business Ownership": {
@@ -1315,7 +1315,7 @@ const referenceData = {
               baseCode: ["B24080_001E"], // SEX BY CLASS OF WORKER FOR THE CIVILIAN EMPLOYED POPULATION 16 YEARS AND OVER
               baseLabel: "Total Employed Population",
               format: "percentage",
-              classificationMethod: "equalInterval",
+              classificationMethod: "quantiles",
             },
             "Percent of Workers Self-Employed in Own Not-Incorporated Business":
               {
@@ -1351,7 +1351,7 @@ const referenceData = {
               ],
               baseLabel: "Total Employed Population",
               format: "percentage",
-              classificationMethod: "equalInterval",
+              classificationMethod: "quantiles",
             },
             "Percent of Self-Employed Women Who Have Incorporated Their Business":
               {
@@ -1371,18 +1371,18 @@ const referenceData = {
                 format: "percentage",
                 classificationMethod: "equalInterval",
               },
-            "Total Businesses Surveyed": {
-              dataset: {
-                availableIn: ["abscs"],
-                displayedDataset: "abscs",
-              },
-              variableCode: ["FIRMPDEMP"],
-              format: "none",
-              description:
-                "This includes all businesses that responded to the survey. If any one person owned 10% or more of the business, the respondent provided details about the sex, ethnicity, race, and veteran status for up to four of the largest owners.",
-              classificationMethod: "naturalBreaks",
-            },
-            // "Female-Owned Businesses (State Level)": {
+            // "Total Businesses Surveyed": {
+            //   dataset: {
+            //     availableIn: ["abscs"],
+            //     displayedDataset: "abscs",
+            //   },
+            //   variableCode: ["FIRMPDEMP"],
+            //   format: "none",
+            //   description:
+            //     "This includes all businesses that responded to the survey. If any one person owned 10% or more of the business, the respondent provided details about the sex, ethnicity, race, and veteran status for up to four of the largest owners.",
+            //   classificationMethod: "naturalBreaks",
+            // },
+            // "Female-Owned Businesses": {
             //   dataset: {
             //     availableIn: ["abscs"],
             //     displayedDataset: "abscs",
@@ -1392,7 +1392,7 @@ const referenceData = {
             //   format: "none",
             //   classificationMethod: "naturalBreaks",
             // },
-            // "Female-Owned Businesses (MSA Level)": {
+            // "Female-Owned Businesses": {
             //   dataset: {
             //     availableIn: ["abscs"],
             //     displayedDataset: "abscs",
@@ -1402,7 +1402,7 @@ const referenceData = {
             //   format: "none",
             //   classificationMethod: "naturalBreaks",
             // },
-            // "Veteran-Owned Businesses (MSA Level)": {
+            // "Veteran-Owned Businesses": {
             //   dataset: {
             //     availableIn: ["abscs"],
             //     displayedDataset: "abscs",
@@ -1412,7 +1412,7 @@ const referenceData = {
             //   format: "none",
             //   classificationMethod: "naturalBreaks",
             // },
-            // "Minority-Owned Businesses (MSA Level)": {
+            // "Minority-Owned Businesses": {
             //   dataset: {
             //     availableIn: ["abscs"],
             //     displayedDataset: "abscs",
@@ -1434,7 +1434,7 @@ const referenceData = {
               baseCode: ["B23025_002E"],
               baseLabel: "Labor Force",
               format: "percentage",
-              classificationMethod: "equalInterval",
+              classificationMethod: "quantiles",
             },
           },
         },
@@ -1485,13 +1485,32 @@ const referenceData = {
         "Counties",
         "Metropolitan Statistical Areas",
         "Congressional Districts",
+        "ZIP Code Tabulation Areas",
         "Places",
         "Census Tracts",
         "Block Groups"
         ],
         "source": "https://www.census.gov/programs-surveys/acs"
     },
-    "acs1": {
+    "acs/acs5/subject": {
+      "description": "Detailed demographic, social, economic, and housing statistics (5-year estimates)",
+      "datasetName": "American Community Survey 5-Year Data",
+      "yearsAvailable": [[2005, 2023]],
+      "apiReference": "https://api.census.gov/data/{year}/acs/acs5/subject?get=VARIABLE&for=GEOGRAPHY",
+      "geographiesAvailable": [
+      "Nation",
+      "States",
+      "Counties",
+      "Metropolitan Statistical Areas",
+      "Congressional Districts",
+      "ZIP Code Tabulation Areas",
+      "Places",
+      "Census Tracts",
+      "Block Groups"
+      ],
+      "source": "https://www.census.gov/programs-surveys/acs"
+  },
+    "acs/acs1": {
         "description": "Detailed demographic, social, economic, and housing statistics (1-year estimates)",
       "datasetName": "American Community Survey 1-Year Data",
       "yearsAvailable": [[2010, 2023]],
@@ -1501,6 +1520,7 @@ const referenceData = {
         "States",
         "Counties",
         "Metropolitan Statistical Areas",
+        "ZIP Code Tabulation Areas",
         "Congressional Districts",
         "Places",
           "Census Tracts"
