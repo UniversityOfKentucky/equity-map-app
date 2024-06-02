@@ -6,14 +6,14 @@ import { formatData } from '../../utils/dataProcessingUtils';
 import { appConfig, referenceData } from '../../config/config';
 import generateVariablesReference from '../../utils/generateVariables';
 
-const Legend = ({ selectedVariable, selectedGeography, breaks, colors}) => {
+const Legend = ({ selectedVariable, selectedGeography, breaks, colors, minValue, maxValue }) => {
   const map = useMap();
   generateVariablesReference(referenceData.categories);
   const format = referenceData.variables[selectedVariable].format;
-  
+
   useEffect(() => {
     const legend = L.control({ position: 'topright', class: 'w=1/2' });
-    // // console.log('selectedVariable.format);', selectedVariable);
+
     legend.onAdd = () => {
 
       const formattingSuffix = {
@@ -29,36 +29,40 @@ const Legend = ({ selectedVariable, selectedGeography, breaks, colors}) => {
         <h2 class="text-2xl text-neutral-500">${appConfig.geographies[selectedGeography].label}</h2>
         <h3 class="text-lg text-left text-pretty text-neutral-500">${selectedVariable}</h3>`;
 
-        if (breaks) {
-          // console.log('breaks:', breaks)
-          for (let i = 0; i < breaks.length; i++) {
-            let startingBreak, endingBreak;
-  
-            if (format) {
-              startingBreak = formatData(breaks[i], format);
-              endingBreak = breaks[i + 1] ? formatData(breaks[i + 1], format): null;
-            } else {
-              startingBreak = breaks[i];
-              endingBreak = breaks[i + 1];
-            } 
-  
-            const label = format && format !== 'none'
-              ? endingBreak
-                ? `${startingBreak} -- ${endingBreak + formattingSuffix[format]}` 
-                : format === "ratePerThousand" ? `${startingBreak}+ ${formattingSuffix[format]}` : `${startingBreak + formattingSuffix[format]} +`
-              : endingBreak
-                ? `${startingBreak} -- ${endingBreak}` 
-                : `${startingBreak} +`
-  
-            div.innerHTML += `
-              <div class="flex items-center gap-2 bg-black-100">
-                <span class="group flex size-5 items-center justify-center rounded-full border" style="background-color:${colors[i]}">
-                  <span class="invisible size-2 rounded-full" style="background-color:${colors[i]}"></span>
-                </span>
-                <label>${label}</label>
-              </div>`;
+      if (breaks) {
+        for (let i = 0; i <= breaks.length; i++) {
+          let startingBreak, endingBreak;
+
+          if (i === 0) {
+            startingBreak = minValue;
+          } else {
+            startingBreak = breaks[i - 1];
           }
+
+          if (i < breaks.length) {
+            endingBreak = breaks[i];
+          } else {
+            endingBreak = maxValue;
+          }
+
+          if (format) {
+            startingBreak = formatData(startingBreak, format);
+            endingBreak = formatData(endingBreak, format);
+          }
+
+          const label = format && format !== 'none'
+            ? `${startingBreak} -- ${endingBreak + formattingSuffix[format]}`
+            : `${startingBreak} -- ${endingBreak}`;
+
+          div.innerHTML += `
+            <div class="flex items-center gap-2 bg-black-100">
+              <span class="group flex size-5 items-center justify-center rounded-full border" style="background-color:${colors[i]}">
+                <span class="invisible size-2 rounded-full" style="background-color:${colors[i]}"></span>
+              </span>
+              <label>${label}</label>
+            </div>`;
         }
+      }
 
       return div;
     };
@@ -68,7 +72,7 @@ const Legend = ({ selectedVariable, selectedGeography, breaks, colors}) => {
     return () => {
       map.removeControl(legend);
     };
-  }, [map, selectedVariable, selectedGeography, breaks, colors]);
+  }, [map, selectedVariable, selectedGeography, breaks, colors, minValue, maxValue]);
 
   return null;
 };
@@ -77,7 +81,9 @@ Legend.propTypes = {
   selectedVariable: PropTypes.string.isRequired,
   selectedGeography: PropTypes.string.isRequired,
   breaks: PropTypes.array.isRequired,
-  colors: PropTypes.array.isRequired
+  colors: PropTypes.array.isRequired,
+  minValue: PropTypes.number.isRequired,
+  maxValue: PropTypes.number.isRequired
 };
 
 export default Legend;
