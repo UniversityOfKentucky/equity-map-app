@@ -229,7 +229,7 @@ const referenceData = {
               variableCode: ["B21004_002E"],
               transformationType: "none",
               format: "currency",
-              classificationMethod: "naturalBreaks",
+              classificationMethod: "quantiles",
             },
           },
           Minorities: {
@@ -393,7 +393,7 @@ const referenceData = {
               format: "percentage",
               filter: "&NAICS2017=00&SEX=002&YIBSZFI=321",
               baseFilter: ["&NAICS2017=00&SEX=002&YIBSZFI=323"],
-              classificationMethod: "equalInterval",
+              classificationMethod: "quantiles",
             },
             "Employment Size": {
               dataset: { availableIn: ["abscs"], displayedDataset: "abscs" },
@@ -402,7 +402,7 @@ const referenceData = {
               format: "number",
               filter: "&SEX=002",
               baseFilter: ["&SEX=001"],
-              classificationMethod: "naturalBreaks",
+              classificationMethod: "quantiles",
             },
           },
           "Economic Data (BDS)": {
@@ -704,7 +704,7 @@ const referenceData = {
               },
               variableCode: ["B19013_001E"],
               format: "currency",
-              classificationMethod: "naturalBreaks",
+              classificationMethod: "quantiles", // a better classification method might be needed such as quantiles
             },
             "Per Capita Income": {
               dataset: {
@@ -713,7 +713,7 @@ const referenceData = {
               },
               variableCode: ["B19301_001E"],
               format: "currency",
-              classificationMethod: "naturalBreaks",
+              classificationMethod: "quantiles",
             },
           },
             "Poverty": {
@@ -1005,7 +1005,7 @@ const referenceData = {
               },
               variableCode: ["B25077_001E"],
               format: "currency",
-              classificationMethod: "naturalBreaks",
+              classificationMethod: "quantiles",
             },
             "Median Gross Rent": {
               dataset: {
@@ -1014,7 +1014,7 @@ const referenceData = {
               },
               variableCode: ["B25064_001E"],
               format: "currency",
-              classificationMethod: "naturalBreaks",
+              classificationMethod: "quantiles",
             },
           },
           "Commuting Patterns": {
