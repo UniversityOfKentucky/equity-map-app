@@ -24,6 +24,7 @@ const MapView = ({ selectedGeography, selectedVariable }) => {
     <div className="col-span-3 relative h-screen">
       <MapContainer
         key={selectedGeography}
+        className="map-container"
         maxBoundsViscosity={1.0}
         {...mapSettings}
         style={{ height: "100%", width: "100%" }}
