@@ -1,3 +1,4 @@
+import { data } from "autoprefixer";
 import chroma from "chroma-js";
 
 const appConfig = {
@@ -130,11 +131,255 @@ const referenceData = {
     Regions: "&for=region:*",
   },
   categories: {
-    "Community Economic Development": {
+    "Minorities": {
       data: {
         subcategories: {
-          Women: {
-            "Women 25 and Over with a Bachelors Degree or Higher": {
+          "Demographics": {
+            "Minorities as a Percent of the Total Population": {
+              dataset: { availableIn: ["acs5"], displayedDataset: "acs/acs5" },
+              variableCode: ["B02001_002E"], // White Alone
+              transformationType: "percentageDifference",
+              baseCode: ["B02001_001E"], // Total Population
+              baseLabel: "Total Population",
+              format: "percentage",
+              classificationMethod: "quantiles",
+            },
+          },
+          "Public Health": {
+            "Health Insurance Coverage Among Minorities (% insured)": {
+              dataset: {
+                availableIn: ["acs5", "acs1"],
+                displayedDataset: "acs/acs5/subject",
+              },
+              // Total: B27001_001E - Total White: B27001H_001E = Total Minority Population
+              // Percent of Minorities with health insurance = (Total Population with health insurance - 'White Alone, Not Hispanic or Latino' population with health insurance) / Total Population) * 100
+              variableCode: [
+                // "S2701_C03_016E", // Estimate!!Percent Insured!!Civilian noninstitutionalized population!!RACE AND HISPANIC OR LATINO ORIGIN!!White alone
+                "S2701_C03_017E", // Estimate!!Percent Insured!!Civilian noninstitutionalized population!!RACE AND HISPANIC OR LATINO ORIGIN!!Black or African American alone
+                "S2701_C03_018E", // 	Estimate!!Percent Insured!!Civilian noninstitutionalized population!!RACE AND HISPANIC OR LATINO ORIGIN!!American Indian and Alaska Native alone
+                "S2701_C03_019E", // Estimate!!Percent Insured!!Civilian noninstitutionalized population!!RACE AND HISPANIC OR LATINO ORIGIN!!Asian alone
+                "S2701_C03_020E", // Estimate!!Percent Insured!!Civilian noninstitutionalized population!!RACE AND HISPANIC OR LATINO ORIGIN!!Native Hawaiian and Other Pacific Islander alone
+                "S2701_C03_021E", // Estimate!!Percent Insured!!Civilian noninstitutionalized population!!RACE AND HISPANIC OR LATINO ORIGIN!!Some Other Race Alone
+                "S2701_C03_022E", // Estimate!!Percent Insured!!Civilian noninstitutionalized population!!RACE AND HISPANIC OR LATINO ORIGIN!!Two or More Races
+                "S2701_C03_023E", // Estimate!!Percent Insured!!Civilian noninstitutionalized population!!RACE AND HISPANIC OR LATINO ORIGIN!!Hispanic or Latino Origin
+                // "S2701_C03_024E", // Estimate!!Percent Insured!!Civilian noninstitutionalized population!! RACE AND HISPANIC OR LATINO ORIGIN!!White alone, Not Hispanic or Latino
+
+                // //White Alone
+                // // "B27001A_003E", // Estimate!!Total:!!Under 6 years:!!With health insurance coverage
+                // // "B27001A_006E", // Estimate!!Total:!!6 to 18 years:!!With health insurance coverage
+                // // "B27001A_009E", // Estimate!!Total:!!19 to 25 years:!!With health insurance coverage
+                // // "B27001A_012E", // Estimate!!Total:!!26 to 34 years:!!With health insurance coverage
+                // // "B27001A_015E", // Estimate!!Total:!!35 to 44 years:!!With health insurance coverage
+                // // "B27001A_018E", // Estimate!!Total:!!45 to 54 years:!!With health insurance coverage
+                // // "B27001A_021E", // Estimate!!Total:!!55 to 64 years:!!With health insurance coverage
+                // // "B27001A_024E", // Estimate!!Total:!!65 to 74 years:!!With health insurance coverage
+                // // "B27001A_027E", // Estimate!!Total:!!75 years and over:!!With health insurance coverage
+
+                // //Black or African American Alone
+                // "B27001B_003E", // Estimate!!Total:!!Under 6 years:!!With health insurance coverage
+                // "B27001B_006E", // Estimate!!Total:!!6 to 18 years:!!With health insurance coverage
+                // "B27001B_009E", // Estimate!!Total:!!19 to 25 years:!!With health insurance coverage
+                // "B27001B_012E", // Estimate!!Total:!!26 to 34 years:!!With health insurance coverage
+                // "B27001B_015E", // Estimate!!Total:!!35 to 44 years:!!With health insurance coverage
+                // "B27001B_018E", // Estimate!!Total:!!45 to 54 years:!!With health insurance coverage
+                // "B27001B_021E", // Estimate!!Total:!!55 to 64 years:!!With health insurance coverage
+                // "B27001B_024E", // Estimate!!Total:!!65 to 74 years:!!With health insurance coverage
+                // "B27001B_027E", // Estimate!!Total:!!75 years and over:!!With health insurance coverage
+
+                // //American Indian and Alaska Native Alone
+                // "B27001C_003E", // Estimate!!Total:!!Under 6 years:!!With health insurance coverage
+                // "B27001C_006E", // Estimate!!Total:!!6 to 18 years:!!With health insurance coverage
+                // "B27001C_009E", // Estimate!!Total:!!19 to 25 years:!!With health insurance coverage
+                // "B27001C_012E", // Estimate!!Total:!!26 to 34 years:!!With health insurance coverage
+                // "B27001C_015E", // Estimate!!Total:!!35 to 44 years:!!With health insurance coverage
+                // "B27001C_018E", // Estimate!!Total:!!45 to 54 years:!!With health insurance coverage
+                // "B27001C_021E", // Estimate!!Total:!!55 to 64 years:!!With health insurance coverage
+                // "B27001C_024E", // Estimate!!Total:!!65 to 74 years:!!With health insurance coverage
+                // "B27001C_027E", // Estimate!!Total:!!75 years and over:!!With health insurance coverage
+
+                // //Asian Alone
+                // "B27001D_003E", // Estimate!!Total:!!Under 6 years:!!With health insurance coverage
+                // "B27001D_006E", // Estimate!!Total:!!6 to 18 years:!!With health insurance coverage
+                // "B27001D_009E", // Estimate!!Total:!!19 to 25 years:!!With health insurance coverage
+                // "B27001D_012E", // Estimate!!Total:!!26 to 34 years:!!With health insurance coverage
+                // "B27001D_015E", // Estimate!!Total:!!35 to 44 years:!!With health insurance coverage
+                // "B27001D_018E", // Estimate!!Total:!!45 to 54 years:!!With health insurance coverage
+                // "B27001D_021E", // Estimate!!Total:!!55 to 64 years:!!With health insurance coverage
+                // "B27001D_024E", // Estimate!!Total:!!65 to 74 years:!!With health insurance coverage
+                // "B27001D_027E", // Estimate!!Total:!!75 years and over:!!With health insurance coverage
+
+                // //Native Hawaiian and Other Pacific Islander Alone
+                // "B27001E_003E", // Estimate!!Total:!!Under 6 years:!!With health insurance coverage
+                // "B27001E_006E", // Estimate!!Total:!!6 to 18 years:!!With health insurance coverage
+                // "B27001E_009E", // Estimate!!Total:!!19 to 25 years:!!With health insurance coverage
+                // "B27001E_012E", // Estimate!!Total:!!26 to 34 years:!!With health insurance coverage
+                // "B27001E_015E", // Estimate!!Total:!!35 to 44 years:!!With health insurance coverage
+                // "B27001E_018E", // Estimate!!Total:!!45 to 54 years:!!With health insurance coverage
+                // "B27001E_021E", // Estimate!!Total:!!55 to 64 years:!!With health insurance coverage
+                // "B27001E_024E", // Estimate!!Total:!!65 to 74 years:!!With health insurance coverage
+                // "B27001E_027E", // Estimate!!Total:!!75 years and over:!!With health insurance coverage
+
+                // // Some Other Race Alone
+                // "B27001F_003E", // Estimate!!Total:!!Under 6 years:!!With health insurance coverage
+                // "B27001F_006E", // Estimate!!Total:!!6 to 18 years:!!With health insurance coverage
+                // "B27001F_009E", // Estimate!!Total:!!19 to 25 years:!!With health insurance coverage
+                // "B27001F_012E", // Estimate!!Total:!!26 to 34 years:!!With health insurance coverage
+                // "B27001F_015E", // Estimate!!Total:!!35 to 44 years:!!With health insurance coverage
+                // "B27001F_018E", // Estimate!!Total:!!45 to 54 years:!!With health insurance coverage
+                // "B27001F_021E", // Estimate!!Total:!!55 to 64 years:!!With health insurance coverage
+                // "B27001F_024E", // Estimate!!Total:!!65 to 74 years:!!With health insurance coverage
+                // "B27001F_027E", // Estimate!!Total:!!75 years and over:!!With health insurance coverage
+
+                // // Two or More Races
+                // "B27001G_003E", // Estimate!!Total:!!Under 6 years:!!With health insurance coverage
+                // "B27001G_006E", // Estimate!!Total:!!6 to 18 years:!!With health insurance coverage
+                // "B27001G_009E", // Estimate!!Total:!!19 to 25 years:!!With health insurance coverage
+                // "B27001G_012E", // Estimate!!Total:!!26 to 34 years:!!With health insurance coverage
+                // "B27001G_015E", // Estimate!!Total:!!35 to 44 years:!!With health insurance coverage
+                // "B27001G_018E", // Estimate!!Total:!!45 to 54 years:!!With health insurance coverage
+                // "B27001G_021E", // Estimate!!Total:!!55 to 64 years:!!With health insurance coverage
+                // "B27001G_024E", // Estimate!!Total:!!65 to 74 years:!!With health insurance coverage
+                // "B27001G_027E", // Estimate!!Total:!!75 years and over:!!With health insurance coverage
+
+                // // White Alone, Not Hispanic or Latino
+                // // "B27001H_003E", // Estimate!!Total:!!Under 6 years:!!With health insurance coverage
+                // // "B27001H_006E", // Estimate!!Total:!!6 to 18 years:!!With health insurance coverage
+                // // "B27001H_009E", // Estimate!!Total:!!19 to 25 years:!!With health insurance coverage
+                // // "B27001H_012E", // Estimate!!Total:!!26 to 34 years:!!With health insurance coverage
+                // // "B27001H_015E", // Estimate!!Total:!!35 to 44 years:!!With health insurance coverage
+                // // "B27001H_018E", // Estimate!!Total:!!45 to 54 years:!!With health insurance coverage
+                // // "B27001H_021E", // Estimate!!Total:!!55 to 64 years:!!With health insurance coverage
+                // // "B27001H_024E", // Estimate!!Total:!!65 to 74 years:!!With health insurance coverage
+                // // "B27001H_027E", // Estimate!!Total:!!75 years and over:!!With health insurance coverage
+
+                // // Hispanic or Latino
+                // "B27001I_003E", // Estimate!!Total:!!Under 6 years:!!With health insurance coverage
+                // "B27001I_006E", // Estimate!!Total:!!6 to 18 years:!!With health insurance coverage
+                // "B27001I_009E", // Estimate!!Total:!!19 to 25 years:!!With health insurance coverage
+                // "B27001I_012E", // Estimate!!Total:!!26 to 34 years:!!With health insurance coverage
+                // "B27001I_015E", // Estimate!!Total:!!35 to 44 years:!!With health insurance coverage
+                // "B27001I_018E", // Estimate!!Total:!!45 to 54 years:!!With health insurance coverage
+                // "B27001I_021E", // Estimate!!Total:!!55 to 64 years:!!With health insurance coverage
+                // "B27001I_024E", // Estimate!!Total:!!65 to 74 years:!!With health insurance coverage
+                // "B27001I_027E", // Estimate!!Total:!!75 years and over:!!With health insurance coverage
+              ],
+              // Transformation will need to involve a new transformation to determine the average of the percentages among the different minority groups
+              transformationType: "averageOfPrecalculations",
+              baseCode: [
+                // Total Population in table 'universe' https://api.census.gov/data/2022/acs/acs1/groups/B27001.html
+                // "B27001_001E", // Total Population
+                // "B27001A_001E", // Total White Alone
+                // "B27001B_001E", // Total Black or African American Alone
+                // "B27001C_001E", // Total American Indian and Alaska Native Alone
+                // "B27001D_001E", // Total Asian Alone
+                // "B27001E_001E", // Total Native Hawaiian and Other Pacific Islander Alone
+                // "B27001F_001E", // Total Some Other Race Alone
+                // "B27001G_001E", // Total Two or More Races
+                // // "B27001H_001E", // Total White Alone, Not Hispanic or Latino
+                // "B27001I_001E", // Total Hispanic or Latino
+              ],
+              baseLabel: "Total Population",
+              format: "percentage",
+              classificationMethod: "quantiles",
+            },
+          },
+      },
+    },
+      narrativeElements: {
+        subtitle: "Insights into the Socio-Economic Dynamics of Minority Communities",
+        overview: "Minorities are a vital part of the American population, contributing to the nation's cultural, social, and economic diversity. Understanding the unique challenges and opportunities faced by minority communities is essential for promoting equality, diversity, and inclusion.",
+        questions: [
+          "What are the main socio-economic challenges faced by minority communities?",
+          "How do demographic factors influence the economic well-being of minority populations?",
+          "What strategies can be implemented to address disparities and promote economic growth in minority communities?",
+        ],
+        keyInsights: "Highlight significant trends, disparities, and growth patterns within minority communities.",
+        impact: "Discuss the real-world implications of these insights on policy-making, resource allocation, and community development, particularly for minorities and underrepresented groups.",
+        tags: ["minorities", "socio-economic dynamics", "diversity", "inclusion", "equality"],
+    },
+  },
+    "Veterans": {
+      data: {
+        subcategories: {
+          "Demographics": {
+            "Percent of Veterans in the Civilian Population": {
+              dataset: { availableIn: ["acs5"], displayedDataset: "acs/acs5" },
+              variableCode: ["B21001_002E"],
+              transformationType: "percentage",
+              baseCode: ["B21001_001E"],
+              baseLabel: "Total Civilian Population 18 and Over",
+              format: "percentage",
+              classificationMethod: "quantiles",
+            },
+            "Percent of Female Civilian Population Who are Veterans": {
+              dataset: { availableIn: ["acs5"], displayedDataset: "acs/acs5" },
+              variableCode: ["B21001_023E"],
+              transformationType: "percentage",
+              baseCode: ["B21001_022E"],
+              baseLabel: "Total Female Civilian Population 18 and Over",
+              format: "percentage",
+              classificationMethod: "quantiles",
+            },
+            "Percent of Male Civilian Population Who are Veterans": {
+              dataset: { availableIn: ["acs5"], displayedDataset: "acs/acs5" },
+              variableCode: ["B21001_005E"],
+              transformationType: "percentage",
+              baseCode: ["B21001_004E"],
+              baseLabel: "Total Male Civilian Population 18 and Over",
+              format: "percentage",
+              classificationMethod: "quantiles",
+            },
+          },
+          "Employment": {
+            "Percent of Veterans 18 to 64 Who Are Employed": {
+              dataset: { availableIn: ["acs5"], displayedDataset: "acs/acs5" },
+              variableCode: ["B21005_005E", "B21005_016E", "B21005_027E"],
+              transformationType: "summedPercentage",
+              baseCode: ["B21005_003E", "B21005_014E", "B21005_025E"],
+              baseLabel: "Veteran Population 18 to 64 Years",
+              format: "percentage",
+              classificationMethod: "quantiles",
+            },
+          },
+          "Income": {
+            "Median Income for Veterans": {
+              dataset: { availableIn: ["acs5"], displayedDataset: "acs/acs5" },
+              variableCode: ["B21004_002E"],
+              transformationType: "none",
+              format: "currency",
+              classificationMethod: "quantiles",
+            },
+          },
+        },
+      },
+      narrativeElements: {
+        subtitle:
+          "Insights into the Economic and Social Well-being of Veterans.",
+        overview:
+          "Veterans are a unique and important segment of the population, having served their country with honor and distinction. Understanding the economic and social well-being of veterans is essential for providing them with the support and resources they need to thrive in civilian life.",
+        questions: [
+          "What are the main challenges faced by veterans in transitioning to civilian life?",
+          "How do demographic factors influence the economic and social well-being of veterans?",
+          "What strategies can be implemented to support veterans and improve their quality of life?",
+        ],
+        keyInsights:
+          "Highlight significant trends, disparities, and opportunities within the veteran population.",
+        impact:
+          "Discuss the real-world implications of these insights on policy-making, resource allocation, and community support for veterans.",
+        tags: [
+          "veterans",
+          "economic well-being",
+          "social well-being",
+          "transition to civilian life",
+          "support services",
+        ],
+    }
+},
+    "Women": {
+      data: {
+        subcategories: {
+          "Education": {
+            "Percent of Women 25 and Over with a Bachelors Degree or Higher": {
               dataset: { availableIn: ["acs5"], displayedDataset: "acs/acs5" },
               variableCode: [
                 "B15002_032E",
@@ -148,7 +393,9 @@ const referenceData = {
               format: "percentage",
               classificationMethod: "quantiles",
             },
-            "Women 16 and Over Employed In the Labor Force": {
+          },
+          "Employment": {
+            "Percent of Women 16 and Over Employed In the Labor Force": {
               dataset: { availableIn: ["acs5"], displayedDataset: "acs/acs5" },
               variableCode: [
                 "B23001_093E",
@@ -187,63 +434,7 @@ const referenceData = {
               classificationMethod: "quantiles",
             },
           },
-          Veterans: {
-            "Total Veterans in the Civilian Population": {
-              dataset: { availableIn: ["acs5"], displayedDataset: "acs/acs5" },
-              variableCode: ["B21001_002E"],
-              transformationType: "percentage",
-              baseCode: ["B21001_001E"],
-              baseLabel: "Total Civilian Population 18 and Over",
-              format: "percentage",
-              classificationMethod: "quantiles",
-            },
-            "Total Female Veterans in the Civilian Population": {
-              dataset: { availableIn: ["acs5"], displayedDataset: "acs/acs5" },
-              variableCode: ["B21001_023E"],
-              transformationType: "percentage",
-              baseCode: ["B21001_022E"],
-              baseLabel: "Total Female Civilian Population 18 and Over",
-              format: "percentage",
-              classificationMethod: "quantiles",
-            },
-            "Total Male Veterans in the Civilian Population": {
-              dataset: { availableIn: ["acs5"], displayedDataset: "acs/acs5" },
-              variableCode: ["B21001_005E"],
-              transformationType: "percentage",
-              baseCode: ["B21001_004E"],
-              baseLabel: "Total Male Civilian Population 18 and Over",
-              format: "percentage",
-              classificationMethod: "quantiles",
-            },
-            "Percent of Veterans 18 to 64 Who Are Employed": {
-              dataset: { availableIn: ["acs5"], displayedDataset: "acs/acs5" },
-              variableCode: ["B21005_005E", "B21005_016E", "B21005_027E"],
-              transformationType: "summedPercentage",
-              baseCode: ["B21005_003E", "B21005_014E", "B21005_025E"],
-              baseLabel: "Veteran Population 18 to 64 Years",
-              format: "percentage",
-              classificationMethod: "quantiles",
-            },
-            "Median Income for Veterans": {
-              dataset: { availableIn: ["acs5"], displayedDataset: "acs/acs5" },
-              variableCode: ["B21004_002E"],
-              transformationType: "none",
-              format: "currency",
-              classificationMethod: "quantiles",
-            },
-          },
-          Minorities: {
-            "Minorities as a Percent of the Total Population": {
-              dataset: { availableIn: ["acs5"], displayedDataset: "acs/acs5" },
-              variableCode: ["B02001_002E"], // White Alone
-              transformationType: "percentageDifference",
-              baseCode: ["B02001_001E"], // Total Population
-              baseLabel: "Total Population",
-              format: "percentage",
-              classificationMethod: "quantiles",
-            },
-          },
-          "Woman-Owned Businesses": {
+          "Entrepreneurship": {
             "Percent of Total Businesses Owned by Women": {
               dataset: { availableIn: ["abscs"], displayedDataset: "abscs" },
               variableCode: ["FIRMPDEMP"],
@@ -252,6 +443,52 @@ const referenceData = {
               filter: "&NAICS2017=00&SEX=002",
               baseFilter: ["&NAICS2017=00&SEX=001"],
               classificationMethod: "equalInterval",
+            },
+            "Percent of Self-Employed Women Who Have Incorporated Their Business": {
+              dataset: {
+                availableIn: ["acs5", "acs1"],
+                displayedDataset: "acs/acs5",
+              },
+              variableCode: [
+                "B24080_015E", // 	Estimate!!Total!!Female!!Private for-profit wage and salary workers!!Self-employed in own incorporated business workers
+              ],
+              transformationType: "percentage",
+              baseCode: [
+                "B24080_020E", // Estimate!!Total!!Female!!Self-employed in own not incorporated business workers
+                "B24080_015E", // 	Estimate!!Total!!Female!!Private for-profit wage and salary workers!!Self-employed in own incorporated business workers
+              ],
+              baseLabel: "Total Employed Population",
+              format: "percentage",
+              classificationMethod: "quantiles",
+            },
+            "Percent of All Self-Employed Workers Who Are Women": {
+              dataset: {
+                availableIn: ["acs5", "acs1"],
+                displayedDataset: "acs/acs5",
+              },
+              variableCode: [
+                "B24080_020E", // Estimate!!Total!!Female!!Self-employed in own not incorporated business workers
+                "B24080_015E", // 	Estimate!!Total!!Female!!Private for-profit wage and salary workers!!Self-employed in own incorporated business workers
+              ],
+              transformationType: "percentage",
+              baseCode: [
+                "B24080_005E", // Estimate!!Total!!Male!!Private for-profit wage and salary workers!!Self-employed in own incorporated business workers
+                "B24080_015E", // 	Estimate!!Total!!Female!!Private for-profit wage and salary workers!!Self-employed in own incorporated business workers
+                "B24080_010E", // Estimate!!Total!!Male!!Self-employed in own not incorporated business workers
+                "B24080_020E", // Estimate!!Total!!Female!!Self-employed in own not incorporated business workers
+              ],
+              baseLabel: "Total Employed Population",
+              format: "percentage",
+              classificationMethod: "quantiles",
+            },
+            "Employment Size FIX ME": {
+              dataset: { availableIn: ["abscs"], displayedDataset: "abscs" },
+              variableCode: ["EMP"],
+              transformationType: "none",
+              format: "number",
+              filter: "&SEX=002",
+              baseFilter: ["&SEX=001"],
+              classificationMethod: "quantiles",
             },
             "Women-Owned Businesses with sales/receipts of less than $5,000": {
               dataset: { availableIn: ["abscs"], displayedDataset: "abscs" },
@@ -395,128 +632,74 @@ const referenceData = {
               baseFilter: ["&NAICS2017=00&SEX=002&YIBSZFI=323"],
               classificationMethod: "quantiles",
             },
-            "Employment Size": {
-              dataset: { availableIn: ["abscs"], displayedDataset: "abscs" },
-              variableCode: ["EMP"],
-              transformationType: "none",
-              format: "number",
-              filter: "&SEX=002",
-              baseFilter: ["&SEX=001"],
-              classificationMethod: "quantiles",
+        },
+        "Public Health": {
+          "Health Insurance Coverage Among Women (% insured)": {
+            dataset: {
+              availableIn: ["acs5", "acs1"],
+              displayedDataset: "acs/acs5/subject", // '/subject' is necessary for the 'S' variables (subject tables)
             },
-          },
-          "Economic Data (BDS)": {
-            "Job Creation and Destruction": {
-              dataset: { availableIn: ["bds"], displayedDataset: "bds" },
-              variableCode: ["JOB_CREATION", "JOB_DESTRUCTION"],
-              transformationType: "none",
-              format: "number",
-              classificationMethod: "naturalBreaks",
-            },
-            "Firm Births and Deaths": {
-              dataset: { availableIn: ["bds"], displayedDataset: "bds" },
-              variableCode: ["FIRM_BIRTHS", "FIRM_DEATHS"],
-              transformationType: "none",
-              format: "number",
-              classificationMethod: "naturalBreaks",
-            },
-            "Establishment Characteristics": {
-              dataset: { availableIn: ["bds"], displayedDataset: "bds" },
-              variableCode: ["ESTABLISHMENT_SIZE"],
-              transformationType: "none",
-              format: "number",
-              classificationMethod: "naturalBreaks",
-            },
-          },
-          "County Business Patterns": {
-            "Number of Establishments": {
-              dataset: { availableIn: ["cbp"], displayedDataset: "cbp" },
-              variableCode: ["ESTAB"],
-              transformationType: "none",
-              format: "number",
-              classificationMethod: "naturalBreaks",
-            },
-            "Employment Size": {
-              dataset: { availableIn: ["cbp"], displayedDataset: "cbp" },
-              variableCode: ["EMP_SIZE"],
-              transformationType: "none",
-              format: "number",
-              classificationMethod: "naturalBreaks",
-            },
-            "Payroll": {
-              dataset: { availableIn: ["cbp"], displayedDataset: "cbp" },
-              variableCode: ["PAY"],
-              transformationType: "none",
-              format: "currency",
-              classificationMethod: "naturalBreaks",
-            },
-          },
-          "Post-Secondary Employment Outcomes (PSEO)": {
-            "Earnings by Degree Level": {
-              dataset: { availableIn: ["pseo"], displayedDataset: "pseo" },
-              variableCode: ["EARNINGS"],
-              transformationType: "none",
-              format: "currency",
-              classificationMethod: "naturalBreaks",
-            },
-            "Employment Outcomes by Institution and Major": {
-              dataset: { availableIn: ["pseo"], displayedDataset: "pseo" },
-              variableCode: ["EMPLOYMENT"],
-              transformationType: "none",
-              format: "number",
-              classificationMethod: "naturalBreaks",
-            },
-          },
-          "Survey of Income and Program Participation (SIPP)": {
-            "Income": {
-              dataset: { availableIn: ["sipp"], displayedDataset: "sipp" },
-              variableCode: ["INCOME"],
-              transformationType: "none",
-              format: "currency",
-              classificationMethod: "naturalBreaks",
-            },
-            "Program Participation": {
-              dataset: { availableIn: ["sipp"], displayedDataset: "sipp" },
-              variableCode: ["PROGRAM_PARTICIPATION"],
-              transformationType: "none",
-              format: "number",
-              classificationMethod: "naturalBreaks",
-            },
-            "Employment": {
-              dataset: { availableIn: ["sipp"], displayedDataset: "sipp" },
-              variableCode: ["EMPLOYMENT"],
-              transformationType: "none",
-              format: "number",
-              classificationMethod: "naturalBreaks",
-            },
+            variableCode: [
+              "S2701_C03_015E", //Estimate!!Percent Insured!!Civilian noninstitutionalized population!!SEX!!Female
+            ],
+            transformationType: "precalculation",
+            format: "percentage",
+            classificationMethod: "quantiles",
           },
         },
       },
+    },
       narrativeElements: {
         subtitle:
-          "Key Insights into the Economic Growth and Sustainability of Communities.",
-        overview:
-          "Community Economic Development focuses on understanding and improving the economic health and sustainability of communities. This includes analyzing business ownership, employment, and economic indicators to identify areas of growth and opportunities for development.",
+          "Insights into the Economic and Social Empowerment of",
+        overview: "Women play a critical role in society, contributing to the economy, culture, and social fabric of communities. Understanding the economic and social empowerment of women is essential to promoting a more equitable and inclusive society.",
         questions: [
-          "What are the main drivers of economic growth in different communities?",
-          "How do demographic factors influence economic development and business ownership?",
-          "What strategies can be implemented to foster sustainable economic development in underserved communities?",
+          "What are the main challenges and opportunities?",
+          "How do demographic factors influence the economic and social empowerment",
+          "What strategies can be implemented?"
         ],
-        keyInsights:
-          "Highlight significant trends, growth patterns, and economic disparities within various communities.",
-        impact:
-          "Discuss the real-world implications of these insights on policy-making, resource allocation, and community planning, particularly for minorities, women, and veterans.",
+        keyInsights: "Highlight significant trends, disparities, and opportunities within the",
+        impact: "Discuss the real-world implications of these insights on policy-making, resource allocation, and community support.",
         tags: [
-          "economic growth",
-          "community development",
-          "business ownership",
-          "employment",
-          "economic indicators",
-          "sustainability",
+          "Trends",
+          "Disparities",
+          "Opportunities",
+          "Empowerment",
+          "Equality",
+          "Inclusion"
         ],
-      },
+      }
     },
-    "Demographics": {
+    // "Community Economic Development": {
+    //   data: {
+
+
+    //       },
+    //   narrativeElements: {
+    //     subtitle:
+    //       "Key Insights into the Economic Growth and Sustainability of Communities.",
+    //     overview:
+    //       "Community Economic Development focuses on understanding and improving the economic health and sustainability of communities. This includes analyzing business ownership, employment, and economic indicators to identify areas of growth and opportunities for development.",
+    //     questions: [
+    //       "What are the main drivers of economic growth in different communities?",
+    //       "How do demographic factors influence economic development and business ownership?",
+    //       "What strategies can be implemented to foster sustainable economic development in underserved communities?",
+    //     ],
+    //     keyInsights:
+    //       "Highlight significant trends, growth patterns, and economic disparities within various communities.",
+    //     impact:
+    //       "Discuss the real-world implications of these insights on policy-making, resource allocation, and community planning, particularly for minorities, women, and veterans.",
+    //     tags: [
+    //       "economic growth",
+    //       "community development",
+    //       "business ownership",
+    //       "employment",
+    //       "economic indicators",
+    //       "sustainability",
+    //     ],
+    //   },
+    // },
+    "Demographics (Total Population)": {
       data: {
         subcategories: {
           "Age and Gender": {
@@ -656,20 +839,20 @@ const referenceData = {
               classificationMethod: "quantiles",
             },
           },
-          "Veterans Status": {
-            "Total Veterans": {
-              dataset: {
-                availableIn: ["acs5", "acs1"],
-                displayedDataset: "acs/acs5",
-              },
-              variableCode: ["B21001_002E"],
-              transformationType: "ratePerThousand",
-              baseCode: ["B21001_001E"],
-              baseLabel: "Total Civilian population 18 years and over",
-              format: "ratePerThousand",
-              classificationMethod: "quantiles", 
-            },
-          },
+          // "Veterans Status": {
+          //   "Total Veterans": {
+          //     dataset: {
+          //       availableIn: ["acs5", "acs1"],
+          //       displayedDataset: "acs/acs5",
+          //     },
+          //     variableCode: ["B21001_002E"],
+          //     transformationType: "ratePerThousand",
+          //     baseCode: ["B21001_001E"],
+          //     baseLabel: "Total Civilian population 18 years and over",
+          //     format: "ratePerThousand",
+          //     classificationMethod: "quantiles", 
+          //   },
+          // },
         },
       },
       narrativeElements: {
@@ -693,7 +876,7 @@ const referenceData = {
         ],
       },
     },
-    "Income & Employment": {
+    "Income & Employment (Total Population)": {
       data: {
         subcategories: {
             "Income": {
@@ -749,10 +932,10 @@ const referenceData = {
                 displayedDataset: "acs/acs5",
               },
               variableCode: ["B23001_001E"],
-              transformationType: "ratePerThousand",
+              transformationType: "percentage",
               baseCode: ["B01001_001E"],
               baseLabel: "Total Population",
-              format: "ratePerThousand",
+              format: "percentage",
               classificationMethod: "equalInterval",
             },
             "Unemployment Rate": {
@@ -847,7 +1030,7 @@ const referenceData = {
         tags: ["income distribution", "employment rates", "poverty levels"],
       },
     },
-    "Education": {
+    "Education (Total Population)": {
       data: {
         subcategories: {
           "Educational Attainment": {
@@ -968,7 +1151,7 @@ const referenceData = {
         ],
       },
     },
-    "Housing & Infrastructure": {
+    "Housing & Infrastructure (Total Population)": {
       data: {
         subcategories: {
           "Ownership and Rent": {
@@ -1064,7 +1247,7 @@ const referenceData = {
         ],
       },
     },
-    "Public Health": {
+    "Public Health (Total Population)": {
       data: {
         subcategories: {
           "Insurance Coverage": {
@@ -1298,7 +1481,7 @@ const referenceData = {
         ],
       },
     },
-    "Entrepreneurship": {
+    "Entrepreneurship (Total Population)": {
       data: {
         subcategories: {
           "Business Ownership": {
@@ -1331,7 +1514,7 @@ const referenceData = {
                 baseCode: ["B24080_001E"], // SEX BY CLASS OF WORKER FOR THE CIVILIAN EMPLOYED POPULATION 16 YEARS AND OVER
                 baseLabel: "Total Employed Population",
                 format: "percentage",
-                classificationMethod: "equalInterval",
+                classificationMethod: "quantiles",
               },
             "Percent of All Self-Employed Workers Who Are Women": {
               dataset: {
@@ -1353,8 +1536,7 @@ const referenceData = {
               format: "percentage",
               classificationMethod: "quantiles",
             },
-            "Percent of Self-Employed Women Who Have Incorporated Their Business":
-              {
+            "Percent of Self-Employed Women Who Have Incorporated Their Business": {
                 dataset: {
                   availableIn: ["acs5", "acs1"],
                   displayedDataset: "acs/acs5",
@@ -1369,7 +1551,7 @@ const referenceData = {
                 ],
                 baseLabel: "Total Employed Population",
                 format: "percentage",
-                classificationMethod: "equalInterval",
+                classificationMethod: "quantiles",
               },
             // "Total Businesses Surveyed": {
             //   dataset: {
@@ -1437,6 +1619,91 @@ const referenceData = {
               classificationMethod: "quantiles",
             },
           },
+          "Economic Data (BDS)": {
+            "Job Creation and Destruction": {
+              dataset: { availableIn: ["bds"], displayedDataset: "bds" },
+              variableCode: ["JOB_CREATION", "JOB_DESTRUCTION"],
+              transformationType: "none",
+              format: "number",
+              classificationMethod: "naturalBreaks",
+            },
+            "Firm Births and Deaths": {
+              dataset: { availableIn: ["bds"], displayedDataset: "bds" },
+              variableCode: ["FIRM_BIRTHS", "FIRM_DEATHS"],
+              transformationType: "none",
+              format: "number",
+              classificationMethod: "naturalBreaks",
+            },
+            "Establishment Characteristics": {
+              dataset: { availableIn: ["bds"], displayedDataset: "bds" },
+              variableCode: ["ESTABLISHMENT_SIZE"],
+              transformationType: "none",
+              format: "number",
+              classificationMethod: "naturalBreaks",
+            },
+          },
+          "County Business Patterns": {
+            "Number of Establishments": {
+              dataset: { availableIn: ["cbp"], displayedDataset: "cbp" },
+              variableCode: ["ESTAB"],
+              transformationType: "none",
+              format: "number",
+              classificationMethod: "naturalBreaks",
+            },
+            "Employment Size": {
+              dataset: { availableIn: ["cbp"], displayedDataset: "cbp" },
+              variableCode: ["EMP_SIZE"],
+              transformationType: "none",
+              format: "number",
+              classificationMethod: "naturalBreaks",
+            },
+            "Payroll": {
+              dataset: { availableIn: ["cbp"], displayedDataset: "cbp" },
+              variableCode: ["PAY"],
+              transformationType: "none",
+              format: "currency",
+              classificationMethod: "naturalBreaks",
+            },
+          },
+          "Post-Secondary Employment Outcomes (PSEO)": {
+            "Earnings by Degree Level": {
+              dataset: { availableIn: ["pseo"], displayedDataset: "pseo" },
+              variableCode: ["EARNINGS"],
+              transformationType: "none",
+              format: "currency",
+              classificationMethod: "naturalBreaks",
+            },
+            "Employment Outcomes by Institution and Major": {
+              dataset: { availableIn: ["pseo"], displayedDataset: "pseo" },
+              variableCode: ["EMPLOYMENT"],
+              transformationType: "none",
+              format: "number",
+              classificationMethod: "naturalBreaks",
+            },
+          },
+          "Survey of Income and Program Participation (SIPP)": {
+            "Income": {
+              dataset: { availableIn: ["sipp"], displayedDataset: "sipp" },
+              variableCode: ["INCOME"],
+              transformationType: "none",
+              format: "currency",
+              classificationMethod: "naturalBreaks",
+            },
+            "Program Participation": {
+              dataset: { availableIn: ["sipp"], displayedDataset: "sipp" },
+              variableCode: ["PROGRAM_PARTICIPATION"],
+              transformationType: "none",
+              format: "number",
+              classificationMethod: "naturalBreaks",
+            },
+            "Employment": {
+              dataset: { availableIn: ["sipp"], displayedDataset: "sipp" },
+              variableCode: ["EMPLOYMENT"],
+              transformationType: "none",
+              format: "number",
+              classificationMethod: "naturalBreaks",
+            },
+          },
         },
       },
       narrativeElements: {
@@ -1464,7 +1731,7 @@ const referenceData = {
         "yearsAvailable": [[2012, 2023]],
         "apiReference": "https://api.census.gov/data/{year}/abscs?get=VARIABLE&for=GEOGRAPHY",
         "geographiesAvailable": ["States", "Metropolitan Statistical Areas"],
-        "source": "https://www.census.gov/programs-surveys/abscs.html"
+        "source": "https://www.census.gov/programs-surveys/abs.html"
     },
       "abscbo": {
         "description": "rovides data for owners of respondent employer firms by sector, sex, ethnicity, race, and veteran status for the U.S., states, and metro areas, including detailed owner characteristics. Data for counties and economic places are also available for 2018.",
