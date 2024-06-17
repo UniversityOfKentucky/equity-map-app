@@ -24,7 +24,7 @@ const Legend = ({ selectedVariable, selectedGeography, breaks, colors, minValue,
         "none": ''
       };
 
-      const div = L.DomUtil.create('div', 'bg-white p-4 rounded-lg shadow m-2 mb-4 text-gray-500');
+      const div = L.DomUtil.create('div', 'bg-white p-4 rounded-lg shadow m-2 mb-4 text-gray-500 legend-tour-step');
       div.innerHTML = `
         <h2 class="text-2xl text-neutral-500">${appConfig.geographies[selectedGeography].label}</h2>
         <h3 class="text-lg text-left text-pretty text-neutral-500">${selectedVariable}</h3>`;
