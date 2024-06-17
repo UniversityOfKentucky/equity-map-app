@@ -10,8 +10,9 @@ import {
 import { ChevronUpIcon } from "@heroicons/react/24/outline";
 import { appConfig, referenceData } from "../../config/config";
 import propTypes from "prop-types";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import generateVariablesReference from "../../utils/generateVariables";
+// import Joyride from 'react-joyride';
 
 const VariableSelector = ({
   selectedVariable,
@@ -35,8 +36,9 @@ const VariableSelector = ({
   };
 
   return (
-    <div className="category-selector m-2 border border-gray-200 rounded-lg">
+    <div className="variable-selector m-2 border border-gray-200 rounded-lg">
       {/* Loop over the categories in the referenceData object creating an element for each which will hold selection elements for the categories' subcategories and variables */}
+      <h1 className="font-bold text-xl text-pretty m-2">Target Populations and General Equity Indicators</h1>
       {Object.keys(referenceData.categories).map((categoryKey) =>
         categoryKey !== "_reference" ? (
           <Disclosure
