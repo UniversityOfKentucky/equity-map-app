@@ -77,24 +77,19 @@ const DataLayerContainer = ({ selectedGeography, selectedVariable }) => {
       const { processedData, breaks, colors } = processData(variableData, selectedVariable, selectedGeography);
       setBreaks(breaks);
       setColors(colors);
-      // console.log('processedData', processedData);
       const updatedGeoJSONData = { ...geoJSONData };
+      
       updatedGeoJSONData.features.forEach((feature) => {
         const geoCode =
           feature.properties[
             appConfig.geographies[selectedGeography].geoCodeField
           ];
-        const data = processedData[geoCode] || null;
+        const data = processedData[geoCode] || { value: null };
 
         feature.properties = { ...feature.properties, ...data };
       });
-      // old code
-      // // Sets minValue, filters out 0 values, nullls, NANs, typeof !== "number" and undefined values
-      // setMinValue(Math.min(...Object.values(processedData).filter((data) => data.value).map((data) => data.value))); // Sets minValue to the minimum value of the data filtered out. The filter will remove 0 values, nulls, NANs, typeof !== "number" and undefined values
-      // // Sets maxValue, filters out 0 values, nullls, NANs, typeof !== "number" and undefined values
-      setMaxValue(Math.max(...Object.values(processedData).filter((data) => data.value).map((data) => data.value))); // Sets maxValue to the maximum value of the data filtered out. The filter will remove 0 values, nulls, NANs, typeof !== "number" and undefined values
-      // new code
-      // sets minValue to the minimum value of the data filtered out. The filter will remove values equal to or less than zero, nulls, NANs, typeof !== "number" and undefined values.
+
+      setMaxValue(Math.max(...Object.values(processedData).filter((data) => data.value).map((data) => data.value)));
       setMinValue(Math.min(...Object.values(processedData).filter((data) => data.value > 0).map((data) => data.value)));
     }
   }, [geoJSONData, variableData, selectedGeography, selectedVariable]);
