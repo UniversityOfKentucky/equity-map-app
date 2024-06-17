@@ -38,30 +38,33 @@ function processData(acsData, selectedVariables, selectedGeography) {
 
 function classifyValues(data, variableProps) {
   const values = Object.values(data).filter(value => 
-    // check if value is not in annotationValues, is a number, and is not and is not less than 0 
-    !(value in referenceData.annotationValues) || !isNaN(value) || value >= 0
+    // filter out annotation values and values that are not numbers, and any number that is less than or equal to 0
+    !(value in referenceData.annotationValues) && !isNaN(value) && value > 0
   ); // the 'data' object remains unchanged
 
 
   const classificationMethod = variableProps.classificationMethod || 'equalInterval';
   let breaks = [];
+  let numberOfClasses;
   const colorScale = appConfig.colorScale;
 
   switch (classificationMethod) {
     case 'equalInterval':
-      breaks = getEqualIntervalBreaks(values, 5);
+      numberOfClasses = Math.min(5, values.length);
+      breaks = getEqualIntervalBreaks(values, numberOfClasses);
       break;
     case 'quantiles':
-      breaks = getQuantileBreaks(values, 5);
+      numberOfClasses = Math.min(5, values.length);
+      breaks = getQuantileBreaks(values, numberOfClasses);
       break;
     case 'naturalBreaks':
-      breaks = ss.jenks(values, 4); 
+      numberOfClasses = Math.min(4, values.length);
+      breaks = ss.jenks(values, numberOfClasses); 
       break;
     case 'standardDeviation':
       breaks = getStandardDeviationBreaks(values);
       break;
     case 'continuous':
-      // No breaks needed, continuous scale
       break;
     default:
       console.error('Unknown classification method');
@@ -273,7 +276,7 @@ function parseData(acsData, currentVariableProps, selectedGeography) {
 
 function transformData(parsedData, transformationType) {
   const annotationValues = referenceData.annotationValues;
-
+  console.log('parsedData', parsedData)
   const convertValues = (data) => {
     // console.log('data', data)
     if (!data) return data; // If data is null or undefined, return as is
