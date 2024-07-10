@@ -112,7 +112,6 @@ const DataLayerContainer = ({ selectedGeography, selectedVariable }) => {
       <Legend
         selectedVariable={selectedVariable}
         selectedGeography={selectedGeography}
-        position="leaflet-top leaflet-right"
         breaks={breaks}
         colors={colors}
         minValue={minValue}
