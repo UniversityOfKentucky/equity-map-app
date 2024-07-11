@@ -5,6 +5,7 @@ import {
   Field,
   Label,
   Checkbox,
+  Description,
 } from "@headlessui/react";
 import { ChevronUpIcon } from "@heroicons/react/24/outline";
 import { CheckIcon } from '@heroicons/react/16/solid';
@@ -132,6 +133,16 @@ const VariableSelector = ({
                                   </Checkbox>
                                   <Label className="text-left">
                                     {variableKey}
+                                    <Description>
+                                      {selectedVariables.includes(variableKey) || comparisonVariable === variableKey ? (
+                                        <span className="text-xs text-gray-400">
+                                          Dataset:{" "}
+                                          {referenceData.censusDataAPIs[
+                                            referenceData.variables[variableKey].dataset.displayedDataset
+                                          ].datasetName}
+                                        </span>
+                                      ) : null}
+                                    </Description>
                                   </Label>
                                 </Field>
                               </div>
