@@ -481,7 +481,7 @@ const referenceData = {
               format: "percentage",
               classificationMethod: "quantiles",
             },
-            "Employment Size FIX ME": {
+            "Employment Size": { // FIX ME
               dataset: { availableIn: ["abscs"], displayedDataset: "abscs" },
               variableCode: ["EMP"],
               transformationType: "none",
