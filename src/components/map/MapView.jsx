@@ -96,11 +96,12 @@ const MapView = ({ selectedGeography, selectedVariable, comparisonVariable, setI
         <MapContainer
           ref={mapRef2}
           key={`${selectedGeography}-${comparisonVariable}`} // centered but doesn't sync at all
+          // key={selectedGeography} // syncs but uncentered, doesn't work on new geos unless comparison var is deselected and reselected
           className="map-container"
           maxBoundsViscosity={1.0}
           {...mapSettings}
           style={{ height: "100%", width: "100%" }}
-          zoomControl={false}
+          zoomControl={true}
         >
             {/* Basemap tile layer */}
             <TileLayer
