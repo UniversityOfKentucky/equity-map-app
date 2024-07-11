@@ -4,19 +4,21 @@ import {
   DisclosurePanel,
   Field,
   Label,
-  Radio,
-  RadioGroup,
+  Checkbox,
+  Description,
 } from "@headlessui/react";
 import { ChevronUpIcon } from "@heroicons/react/24/outline";
+import { CheckIcon } from '@heroicons/react/16/solid';
 import { appConfig, referenceData } from "../../config/config";
 import propTypes from "prop-types";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import generateVariablesReference from "../../utils/generateVariables";
-// import Joyride from 'react-joyride';
 
 const VariableSelector = ({
   selectedVariable,
   setSelectedVariable,
+  comparisonVariable,
+  setComparisonVariable,
   selectedGeography,
 }) => {
   useMemo(() => {
@@ -35,18 +37,56 @@ const VariableSelector = ({
     return availableGeographies.includes(selectedGeosType);
   };
 
+  // Initialize selectedVariables state with the selectedVariable prop
+  const [selectedVariables, setSelectedVariables] = useState([selectedVariable]);
+  const [showLimitMessage, setShowLimitMessage] = useState(false); // * State to manage limit message
+  const [limitMessageVariable, setLimitMessageVariable] = useState(null); // * State to manage variable key of limit message
+
+  useEffect(() => {
+    if (selectedVariables.length === 2) {
+      setComparisonVariable(selectedVariables[1]);
+    } else {
+      setComparisonVariable(null);
+    }
+    setSelectedVariable(selectedVariables[0] || null);
+  }, [selectedVariables, setSelectedVariable, setComparisonVariable]);
+
+  // Handler to manage variable selection with a limit of two
+  const handleVariableChange = (variable) => {
+    if (selectedVariables.includes(variable)) {
+      // If the variable is already selected, remove it
+      const newVariables = selectedVariables.filter((v) => v !== variable);
+      setSelectedVariables(newVariables);
+      // console.log("Selected Variables:", newVariables);
+      setShowLimitMessage(false); // * Hide limit message
+    } else if (selectedVariables.length < 2) {
+      // If less than two variables are selected, add the new one
+      const newVariables = [...selectedVariables, variable];
+      setSelectedVariables(newVariables);
+      // console.log("Selected Variables:", newVariables);
+      setShowLimitMessage(false); // * Hide limit message
+    } else {
+      // console.log("Cannot select more than two variables.");
+      setLimitMessageVariable(variable); // * Set variable key of limit message
+      setShowLimitMessage(true); // * Show limit message
+    }
+  };
+
   return (
     <div className="variable-selector m-2 border border-gray-200 rounded-lg">
-      {/* Loop over the categories in the referenceData object creating an element for each which will hold selection elements for the categories' subcategories and variables */}
-      <h1 className="font-bold text-xl text-pretty m-2">Target Populations and General Equity Indicators</h1>
+      <h1 className="font-bold text-xl text-pretty m-2">
+        Target Populations and General Equity Indicators
+      </h1>
       {Object.keys(referenceData.categories).map((categoryKey) =>
         categoryKey !== "_reference" ? (
           <Disclosure
             as="div"
             className="m-2 border h-full border-gray-200 rounded-lg"
             key={categoryKey}
+            // * Add defaultOpen prop for "Demographics (Total Population)" category
+            defaultOpen={categoryKey === "Demographics (Total Population)"}
           >
-            {({ False }) => (
+            {({ open }) => (
               <>
                 <DisclosureButton className="flex justify-between w-full px-4 py-2 text-sm font-medium text-left text-blue-700 bg-blue-100 rounded-lg hover:bg-blue-200 focus:outline-none focus-visible:ring focus-visible:ring-blue-500 focus-visible:ring-opacity-75">
                   {categoryKey}
@@ -58,7 +98,6 @@ const VariableSelector = ({
                 </DisclosureButton>
                 <DisclosurePanel className="m-2 px-4 pt-4 pb-2 text-sm text-gray-500 transition duration-500 ease-out">
                   <div className="p-4 border border-gray-200 rounded-lg">
-                    {/* Loop over the subcategories in the category object*/}
                     {Object.keys(
                       referenceData.categories[categoryKey].data.subcategories
                     ).map((subcategoryKey) =>
@@ -72,52 +111,43 @@ const VariableSelector = ({
                           <h2 className="font-bold text-lg">
                             {subcategoryKey}
                           </h2>
-                          <RadioGroup
-                            value={selectedVariable}
-                            onChange={setSelectedVariable}
-                            className="bg-blue-100 p-4 rounded-lg shadow m-2 mb-4"
-                          >
-                            {/* Loop over the variables in the subcategory object creating an element for each which will hold the selection element for the variable */}
-                            {Object.keys(
-                              referenceData.categories[categoryKey].data
-                                .subcategories[subcategoryKey]
-                            ).map(
-                              (variableKey) =>
-                                isGeographyAvailable(variableKey) ? (
-                                  <Field
-                                    key={variableKey}
-                                    className="flex items-stretch gap-2 self-start"
+                          {Object.keys(
+                            referenceData.categories[categoryKey].data
+                              .subcategories[subcategoryKey]
+                          ).map((variableKey, index) => (
+                            isGeographyAvailable(variableKey) && (
+                              <div key={variableKey}>
+                                {showLimitMessage && limitMessageVariable === variableKey && (
+                                  <div className="text-red-500 text-sm mb-2">
+                                    You can only select up to two variables at a time.
+                                  </div>
+                                )}
+                                <Field className="flex items-stretch gap-2 self-start">
+                                  <Checkbox
+                                    value={variableKey}
+                                    checked={selectedVariables.includes(variableKey)}
+                                    onChange={() => handleVariableChange(variableKey)}
+                                    className="group size-6 rounded-md bg-white/10 p-1 ring-1 ring-white/15 ring-inset data-[checked]:bg-white m-1"
                                   >
-                                    <Radio
-                                      value={variableKey}
-                                      className="group flex size-5 items-center justify-center rounded-full border bg-white data-[checked]:bg-blue-400"
-                                    >
-                                      <span className="invisible size-2 rounded-full bg-white group-data-[checked]:visible flex-wrap" />
-                                    </Radio>
-                                    <Label className="text-left">
-                                      {variableKey}
-                                    </Label>
-                                    {/* <Description className="opacity-50">{variableKey.description}</Description>
-                              // To be added to the config file for each variable to provide a description of the variable to the user
-                              */}
-                                  </Field>
-                                ) : null
-                              // (
-                              // <Field key={variableKey} className="flex items-stretch gap-2 self-start">
-                              //   <Radio
-                              //     value={variableKey}
-                              //     className="group flex size-5 items-center justify-center rounded-full border bg-white data-[checked]:bg-blue-400"
-                              //     disabled
-                              //   >
-                              //     <span className="invisible size-2 rounded-full bg-white group-data-[checked]:visible flex-wrap" />
-                              //   </Radio>
-                              //   <Label className="text-left opacity-50" title="This variable is not available for the selected geography">
-                              //     {variableKey}
-                              //   </Label>
-                              // </Field>
-                              // )
-                            )}
-                          </RadioGroup>
+                                    <CheckIcon className="hidden size-4 fill-black group-data-[checked]:block" />
+                                  </Checkbox>
+                                  <Label className="text-left">
+                                    {variableKey}
+                                    <Description>
+                                      {selectedVariables.includes(variableKey) || comparisonVariable === variableKey ? (
+                                        <span className="text-xs text-gray-400">
+                                          Dataset:{" "}
+                                          {referenceData.censusDataAPIs[
+                                            referenceData.variables[variableKey].dataset.displayedDataset
+                                          ].datasetName}
+                                        </span>
+                                      ) : null}
+                                    </Description>
+                                  </Label>
+                                </Field>
+                              </div>
+                            )
+                          ))}
                         </div>
                       ) : null
                     )}
@@ -128,6 +158,10 @@ const VariableSelector = ({
           </Disclosure>
         ) : null
       )}
+      {/* * Add a user-friendly message */}
+      <div className="text-sm text-gray-700 mt-4">
+        Please note: You can select up to two variables at a time for comparison.
+      </div>
     </div>
   );
 };
@@ -135,6 +169,8 @@ const VariableSelector = ({
 VariableSelector.propTypes = {
   selectedVariable: propTypes.string.isRequired,
   setSelectedVariable: propTypes.func.isRequired,
+  comparisonVariable: propTypes.string,
+  setComparisonVariable: propTypes.func.isRequired,
   selectedGeography: propTypes.string.isRequired,
 };
 

@@ -12,7 +12,7 @@ const Legend = ({ selectedVariable, selectedGeography, breaks, colors, minValue,
   const format = referenceData.variables[selectedVariable].format;
 
   useEffect(() => {
-    const legend = L.control({ position: 'topright', class: 'w=1/2' });
+    const legend = L.control({ position: 'bottomright', class: 'w-1/3' });
 
     legend.onAdd = () => {
 
@@ -24,10 +24,8 @@ const Legend = ({ selectedVariable, selectedGeography, breaks, colors, minValue,
         "none": ''
       };
 
-      const div = L.DomUtil.create('div', 'bg-white p-4 rounded-lg shadow m-2 mb-4 text-gray-500 legend-tour-step');
-      div.innerHTML = `
-        <h2 class="text-2xl text-neutral-500">${appConfig.geographies[selectedGeography].label}</h2>
-        <h3 class="text-lg text-left text-pretty text-neutral-500">${selectedVariable}</h3>`;
+      const div = L.DomUtil.create('div', 'bg-white p-4 rounded-lg shadow m-2 mb-4 text-gray-500 legend-tour-step map-legend');
+      div.innerHTML = `<h3 class="text-lg text-left text-pretty text-right text-neutral-500 max-w-96 mb-2">${selectedVariable}</h3>`;
 
       if (breaks) {
         for (let i = 0; i <= breaks.length; i++) {
@@ -56,7 +54,7 @@ const Legend = ({ selectedVariable, selectedGeography, breaks, colors, minValue,
 
           div.innerHTML += `
             <div class="flex items-center gap-2 bg-black-100">
-              <span class="group flex size-5 items-center justify-center rounded-full border" style="background-color:${colors[i]}">
+              <span class="group flex size-5 items-center justify-center rounded-full border mb-1" style="background-color:${colors[i]}">
                 <span class="invisible size-2 rounded-full" style="background-color:${colors[i]}"></span>
               </span>
               <label>${label}</label>

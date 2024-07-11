@@ -11,15 +11,6 @@
   padding: 0;
 }
 
-/* .joyride-container {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 0;
-  z-index: 1000;
-}*/
-
 .reactour__helper {
   color: #1a202c !important;
 }
@@ -30,6 +21,12 @@
 
 .map-view {
   grid-column: 2 / 5;
+}
+
+.map-container {
+  /* Light grey border that matches the headless UI theme */
+  border: 1px solid #e2e8f0;
+  box-sizing: border-box; /* Ensure border is included in the element's dimensions */
 }
 
 .features-panel, .ReactModalPortal {
@@ -70,4 +67,11 @@
 
 .read-the-docs {
   color: #888;
+}
+
+.geography-title {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 1000;
 }

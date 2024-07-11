@@ -18,6 +18,14 @@ const fetchGeoJSON = async (selectedGeography) => {
   return response.json();
 };
 
+const fetchKentuckyGeoJSON = async () => {
+  const response = await fetch('https://opendata.arcgis.com/api/v3/datasets/0ef820032e0b4b3c8d17585366a45319_1/downloads/data?format=geojson&spatialRefId=4326&where=1=1');
+  if (!response.ok) {
+    throw new Error("Network response was not ok");
+  }
+  return response.json();
+};
+
 referenceData.variables = generateVariablesReference(referenceData.categories);
 
 const fetchVariableData = async (selectedGeography, selectedVariable) => {
@@ -66,6 +74,12 @@ const DataLayerContainer = ({ selectedGeography, selectedVariable }) => {
     { enabled: !!selectedGeography }
   );
 
+  const { data: kentuckyGeoJSONData, error: kentuckyGeoJSONError } = useQuery(
+    ["kentuckyGeoJSON"],
+    fetchKentuckyGeoJSON,
+    { enabled: true }
+  );
+
   const { data: variableData, error: variableError } = useQuery(
     ["variableData", selectedGeography, selectedVariable],
     () => fetchVariableData(selectedGeography, selectedVariable),
@@ -78,7 +92,7 @@ const DataLayerContainer = ({ selectedGeography, selectedVariable }) => {
       setBreaks(breaks);
       setColors(colors);
       const updatedGeoJSONData = { ...geoJSONData };
-      
+
       updatedGeoJSONData.features.forEach((feature) => {
         const geoCode =
           feature.properties[
@@ -106,17 +120,17 @@ const DataLayerContainer = ({ selectedGeography, selectedVariable }) => {
     <>
       <GeoJSONFeatureLayer
         data={geoJSONData}
+        kentuckyGeoJSONData={kentuckyGeoJSONData}
         selectedVariable={selectedVariable}
         selectedGeography={selectedGeography}
       />
       <Legend
         selectedVariable={selectedVariable}
         selectedGeography={selectedGeography}
-        position="leaflet-top leaflet-right"
         breaks={breaks}
         colors={colors}
         minValue={minValue}
-        maxValue={maxValue} 
+        maxValue={maxValue}
       />
     </>
   );

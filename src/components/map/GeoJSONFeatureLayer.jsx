@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import { GeoJSON } from "react-leaflet";
-import React from "react";
+import React, { useState } from "react";
 import { appConfig, referenceData } from "../../config/config";
 import generateVariablesReference from "../../utils/generateVariables";
 import { formatData } from '../../utils/dataProcessingUtils';
@@ -9,7 +9,18 @@ const annotationValues = referenceData.annotationValues;
 
 referenceData.variables = generateVariablesReference(referenceData.categories);
 
-const GeoJSONFeatureLayer = ({ data, selectedVariable, selectedGeography }) => {
+const GeoJSONFeatureLayer = ({ data, kentuckyGeoJSONData, selectedVariable, selectedGeography }) => {
+
+  console.log('kentuckyGeoJSONData:', kentuckyGeoJSONData);
+
+  const kentuckyStyle = {
+    fillColor: "transparent",
+    weight: 1.5 ,
+    opacity: 1,
+    color: "#d1d5db",
+    fillOpacity: 0,
+  };
+
   const selectedDataset = referenceData.variables[selectedVariable].dataset.displayedDataset;
 
   const style = (feature) => ({
@@ -52,7 +63,7 @@ const GeoJSONFeatureLayer = ({ data, selectedVariable, selectedGeography }) => {
       }
     
       let valueContent = `<b><span class="text-black">Not Available</span></b>`;
-      console.log('Value:', value);
+      // console.log('Value:', value);
       if (value !== 0 && value !== 'No data' && value !== null && !isNaN(value) && typeof value === 'number') {
         valueContent = `<b><span class="text-black">${formatData(value, format)}${formattingSuffix[format]}</span></b>`;
       } else if (value === 0) {
@@ -86,30 +97,53 @@ const GeoJSONFeatureLayer = ({ data, selectedVariable, selectedGeography }) => {
           </div>
         `;
         }
-    
-    
       return `
         <div>
           <h2 class="text-2xl text-neutral-500">${name}</h2>
           <p class="text-lg text-left text-pretty text-neutral-500">${selectedVariable}: ${valueContent}</p>
-          <p class="text-xxs text-neutral-400">Note: <b>Data is an estimate</b> and may not reflect the exact count or rate. ${datasetName == 'Annual Business Survey' ? `<p class="text-xxs text-neutral-400">Note: Data from the Annual Business Survey is based only on those businesses <b>that responded</b> to the survey and may not be representative of all businesses in the area.</p>` : ''}</p> 
-          <p class="text-xxs text-neutral-400">Source: US Census Bureau's <a class="text-blue-500 hover:text-blue-700 visited:text-blue-600" href="${sourceLink}">${datasetName} Dataset</a> | ${appConfig.initialTimePeriod}</p>
+          <p class="text-xxs text-neutral-400">Note: <b>Data is an estimate</b> and may not reflect the exact count or rate. ${datasetName == 'Annual Business Survey' ? `<p class="text-xxs text-neutral-400">Note: Data from the Annual Business Survey is based only on those businesses <b>that responded</b> to the survey and may not be representative of all businesses in the area.</p>` : ''}</p>
+          <p class="text-xxs text-neutral-400">Source: US Census Bureau's <a class="text-blue-500 hover:text-blue-700 visited:text-blue-600" href="${sourceLink}" target="blank">${datasetName} Dataset</a> | ${appConfig.initialTimePeriod}</p>
         </div>
       `;
     };
-    
     const popupContent = generatePopupContent(feature, value, selectedVariable, format, formattingSuffix);
     layer.bindPopup(popupContent);
-    
+
+    layer.on({
+      mouseover: (e) => {
+        layer.setStyle({
+          weight: 3,
+          opacity: 1,
+          color: "white",
+          fillOpacity: 1,
+        });
+      }
+      ,
+      mouseout: (e) => {
+        layer.setStyle({
+          weight: 2,
+          opacity: 1,
+          color: "white",
+          fillOpacity: 0.7,
+        });
+      }
+    });
+
   };
 
   return (
+    <div>
     <GeoJSON
       key={`${data.features[0].properties[selectedVariable]}-${selectedVariable}`}
       data={data}
       style={style}
       onEachFeature={onEachFeature}
     />
+    {selectedGeography == "kentuckyMSAs" && <GeoJSON
+      key={`${selectedGeography}`}
+      data={kentuckyGeoJSONData}
+      style={kentuckyStyle} />}
+    </div>
   );
 };
 

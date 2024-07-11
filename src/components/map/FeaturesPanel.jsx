@@ -14,14 +14,14 @@ const FeaturesPanel = () => {
     };
 
     return (
-        <div className="features-panel absolute bottom-0 left-1/2 transform -translate-x-1/2 w-3/4 bg-white rounded-lg shadow-lg p-4">
+        <div className="features-panel absolute bottom-2 left-1/2 transform -translate-x-1/2 w-3/5 bg-white rounded-lg shadow-lg p-1">
             <TabGroup>
                 <TabList className="flex space-x-1">
                     {referenceData.featuredStudies.map((feature, index) => (
                         <Tab 
                         key={index} 
                         className={({ selected }) => 
-                            `w-full py-2 text-sm font-medium leading-5 text-center rounded-lg 
+                            `w-full py-2 textxs font-medium leading-5 text-center rounded-lg 
                             ${selected ? 'bg-blue-500 text-white' : 'bg-blue-100 text-blue-700 hover:bg-blue-200'} `
                         }
                         onClick={() => openModal(feature)}>
