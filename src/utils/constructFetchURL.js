@@ -5,7 +5,7 @@ const constructFetchURL = (selectedGeography, selectedVariable, filterType = nul
   referenceData.variables = generateVariablesReference(referenceData.categories);
   const selectedVariablesProps = referenceData.variables[selectedVariable];
 
-  // console.log('ConstructFetchURL Called');
+  // // console.log('ConstructFetchURL Called');
   const baseUrl = "https://api.census.gov/data";
   let year;
   let dataset = selectedVariablesProps.dataset.displayedDataset;
@@ -13,20 +13,20 @@ const constructFetchURL = (selectedGeography, selectedVariable, filterType = nul
   let geoCode = appConfig.geographies[selectedGeography].apiEndpoints.apiQuery;
 
   if (dataset.startsWith("acs")) {
-    // console.log('ACS Dataset');
+    // // console.log('ACS Dataset');
     year = "2022";
   } else if (dataset.startsWith("abscs")) {
     year = "2021";
     geoCode += filterType === 'base' ? selectedVariablesProps.baseFilter : selectedVariablesProps.filter;
   }
- // console.log('Geo Code', geoCode);
- // console.log('baseCode', selectedVariablesProps.baseCode)
+ // // console.log('Geo Code', geoCode);
+ // // console.log('baseCode', selectedVariablesProps.baseCode)
   const baseCode = selectedVariablesProps.baseCode ? selectedVariablesProps.baseCode.join(',') : null;
-  // console.log('Base Code', baseCode);
+  // // console.log('Base Code', baseCode);
   const queryCodes = baseCode ? `${variableCode},${baseCode}` : variableCode;
-  // console.log('Query Codes', queryCodes);
+  // // console.log('Query Codes', queryCodes);
   let url = `${baseUrl}/${year}/${dataset}?get=${queryCodes}&for=${geoCode}`;
-  // console.log('URL', url);
+  // // console.log('URL', url);
   return url;
 };
 

@@ -52,7 +52,7 @@ const GeoJSONFeatureLayer = ({ data, selectedVariable, selectedGeography }) => {
       }
     
       let valueContent = `<b><span class="text-black">Not Available</span></b>`;
-      console.log('Value:', value);
+      // console.log('Value:', value);
       if (value !== 0 && value !== 'No data' && value !== null && !isNaN(value) && typeof value === 'number') {
         valueContent = `<b><span class="text-black">${formatData(value, format)}${formattingSuffix[format]}</span></b>`;
       } else if (value === 0) {
