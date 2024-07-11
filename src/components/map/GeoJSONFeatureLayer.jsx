@@ -1,16 +1,26 @@
 import PropTypes from "prop-types";
 import { GeoJSON } from "react-leaflet";
-import React from "react";
+import React, { useState } from "react";
 import { appConfig, referenceData } from "../../config/config";
 import generateVariablesReference from "../../utils/generateVariables";
 import { formatData } from '../../utils/dataProcessingUtils';
-
 
 const annotationValues = referenceData.annotationValues;
 
 referenceData.variables = generateVariablesReference(referenceData.categories);
 
-const GeoJSONFeatureLayer = ({ data, selectedVariable, selectedGeography }) => {
+const GeoJSONFeatureLayer = ({ data, kentuckyGeoJSONData, selectedVariable, selectedGeography }) => {
+
+  console.log('kentuckyGeoJSONData:', kentuckyGeoJSONData);
+
+  const kentuckyStyle = {
+    fillColor: "transparent",
+    weight: 2,
+    opacity: 1,
+    color: "white",
+    fillOpacity: 0,
+  };
+
   const selectedDataset = referenceData.variables[selectedVariable].dataset.displayedDataset;
 
   const style = (feature) => ({
@@ -122,12 +132,18 @@ const GeoJSONFeatureLayer = ({ data, selectedVariable, selectedGeography }) => {
   };
 
   return (
+    <div>
     <GeoJSON
       key={`${data.features[0].properties[selectedVariable]}-${selectedVariable}`}
       data={data}
       style={style}
       onEachFeature={onEachFeature}
     />
+    {selectedGeography == "kentuckyMSAs" && <GeoJSON
+      key={`${selectedGeography}`}
+      data={kentuckyGeoJSONData}
+      style={kentuckyStyle} />}
+    </div>
   );
 };
 
