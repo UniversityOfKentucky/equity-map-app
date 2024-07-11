@@ -58,7 +58,8 @@ const MapView = ({ selectedGeography, selectedVariable, comparisonVariable, setI
       <div className={comparisonVariable ? "col-span-1 h-screen" : "col-span-2 h-screen"}>
       <MapContainer
           ref={mapRef1}
-          key={selectedGeography}
+          // key={selectedGeography} // syncs but uncentered, doesn't work on new geos unless comparison var is deselected and reselected
+          key={`${selectedGeography}-${comparisonVariable}`} // centered but doesn't sync at all
           className="map-container"
           maxBoundsViscosity={1.0}
           {...mapSettings}
@@ -69,6 +70,9 @@ const MapView = ({ selectedGeography, selectedVariable, comparisonVariable, setI
           <TileLayer
             url="https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png"
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/attributions">CARTO</a>'
+            // url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+            // attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            opacity={0.7}
             maxZoom="19"
           />
           <GeographyTitle selectedGeography={selectedGeography} />
@@ -91,7 +95,7 @@ const MapView = ({ selectedGeography, selectedVariable, comparisonVariable, setI
       <div className="col-span-1 h-screen">
         <MapContainer
           ref={mapRef2}
-          key={selectedGeography}
+          key={`${selectedGeography}-${comparisonVariable}`} // centered but doesn't sync at all
           className="map-container"
           maxBoundsViscosity={1.0}
           {...mapSettings}
@@ -100,16 +104,19 @@ const MapView = ({ selectedGeography, selectedVariable, comparisonVariable, setI
         >
             {/* Basemap tile layer */}
             <TileLayer
-              url="https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png"
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/attributions">CARTO</a>'
-              maxZoom="19"
-            />
+            // url="https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png"
+            // attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/attributions">CARTO</a>'
+            url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            opacity={0.7}  
+            maxZoom="19"
+          />
             {/* Label tile layer */}
-            <TileLayer
+            {/* <TileLayer
               url="https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png"
               maxZoom="19"
               zIndex="1000"
-            />
+            /> */}
           <DataLayerContainer
             selectedGeography={selectedGeography}
             selectedVariable={comparisonVariable}
