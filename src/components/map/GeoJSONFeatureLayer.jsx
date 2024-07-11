@@ -15,9 +15,9 @@ const GeoJSONFeatureLayer = ({ data, kentuckyGeoJSONData, selectedVariable, sele
 
   const kentuckyStyle = {
     fillColor: "transparent",
-    weight: 2,
+    weight: 1.5 ,
     opacity: 1,
-    color: "white",
+    color: "#d1d5db",
     fillOpacity: 0,
   };
 
