@@ -12,6 +12,37 @@ const MapView = ({ selectedGeography, selectedVariable, comparisonVariable, setI
   const mapSettings = appConfig.geographies[selectedGeography].mapSettings;
   const center = mapSettings.center;
 
+  // Custom hook to synchronize maps
+  const useSyncMaps = (map1, map2) => {
+    useEffect(() => {
+      if (!map1 || !map2) return;
+
+      const syncMaps = (source, target) => {
+        source.on('moveend', () => {
+          if (!source._syncing) {
+            target._syncing = true;
+            target.setView(source.getCenter(), source.getZoom(), { animate: false });
+            target._syncing = false;
+          }
+        });
+        source.on('zoomend', () => {
+          if (!source._syncing) {
+            target._syncing = true;
+            target.setView(source.getCenter(), source.getZoom(), { animate: false });
+            target._syncing = false;
+          }
+        });
+      };
+
+      syncMaps(map1, map2);
+      syncMaps(map2, map1);
+    }, [map1, map2]);
+  };
+
+  // Refs for the map instances
+  const mapRef1 = useRef(null);
+  const mapRef2 = useRef(null);
+
   useEffect(() => {
     const maxBounds = [
       [center[0] * 1.1, center[1] * 1.1],
@@ -20,11 +51,13 @@ const MapView = ({ selectedGeography, selectedVariable, comparisonVariable, setI
     mapSettings.maxBounds = maxBounds;
   }, [center, mapSettings]);
 
+  useSyncMaps(mapRef1.current, mapRef2.current);
 
   return (
     <div className="grid grid-cols-2 col-span-6 relative h-screen">
       <div className={comparisonVariable ? "col-span-1 h-screen" : "col-span-2 h-screen"}>
-        <MapContainer
+      <MapContainer
+          ref={mapRef1}
           key={selectedGeography}
           className="map-container"
           maxBoundsViscosity={1.0}
@@ -55,16 +88,16 @@ const MapView = ({ selectedGeography, selectedVariable, comparisonVariable, setI
           {!comparisonVariable && <FeaturesPanel />}
         </MapContainer>
       </div>
-      {comparisonVariable && (
-        <div className="col-span-1 h-screen">
-          <MapContainer
-            key={selectedGeography}
-            className="map-container"
-            maxBoundsViscosity={1.0}
-            {...mapSettings}
-            style={{ height: "100%", width: "100%" }}
-            zoomControl={false}
-          >
+      <div className="col-span-1 h-screen">
+        <MapContainer
+          ref={mapRef2}
+          key={selectedGeography}
+          className="map-container"
+          maxBoundsViscosity={1.0}
+          {...mapSettings}
+          style={{ height: "100%", width: "100%" }}
+          zoomControl={false}
+        >
             {/* Basemap tile layer */}
             <TileLayer
               url="https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png"
@@ -77,13 +110,12 @@ const MapView = ({ selectedGeography, selectedVariable, comparisonVariable, setI
               maxZoom="19"
               zIndex="1000"
             />
-            <DataLayerContainer
-              selectedGeography={selectedGeography}
-              selectedVariable={comparisonVariable}
-            />
-          </MapContainer>
-        </div>
-      )}
+          <DataLayerContainer
+            selectedGeography={selectedGeography}
+            selectedVariable={comparisonVariable}
+          />
+        </MapContainer>
+      </div>
     </div>
   );
 };
